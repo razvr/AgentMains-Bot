@@ -26,5 +26,10 @@ module.exports = {
   deleteAfterReply: {
     enabled: false,
     time: 10000, // In milliseconds
-  }
+  },
+
+  regions: [
+    'NA',
+    'EU'
+  ]
 };
