@@ -4,3 +4,5 @@ coverage
 \.idea/workspace\.xml
 
 config\.private\.js
+
+npm-debug\.log
