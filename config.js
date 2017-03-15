@@ -17,6 +17,8 @@ module.exports = {
   // Then create a new application and grab your token.
   token: privateConfig.token,
 
+  spyUserId: privateConfig.spyUserId,
+
   // If this option is enabled, the bot will delete the message that triggered it, and its own
   // response, after the specified amount of time has passed.
   // Enable this if you don't want your channel to be flooded with bot messages.

@@ -17,6 +17,7 @@
   ],
   "scripts": {
     "bot": "node ./lib/index.js",
+    "bot-debug": "node %NODE_DEBUG_OPTION% ./lib/index.js",
     "prepublish": "gulp prepublish",
     "test": "gulp"
   },
