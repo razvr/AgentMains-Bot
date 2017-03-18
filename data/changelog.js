@@ -1,6 +1,12 @@
 module.exports = [
   [
     {
+      type: 'Bugfix: commands are now case-insensitive',
+      msg: '!Region and !region are now the same command'
+    }
+  ],
+  [
+    {
       type: 'New command: !changelog',
       msg: 'See new features and changes since my last update'
     },
