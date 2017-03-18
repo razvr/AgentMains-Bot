@@ -1,6 +1,12 @@
 module.exports = [
   [
     {
+      type: 'Feature: reply types',
+      msg: 'I can now reply to you, say something, or send a private message',
+    }
+  ],
+  [
+    {
       type: 'Bugfix: commands are now case-insensitive',
       msg: '!Region and !region are now the same command'
     }
