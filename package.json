@@ -45,6 +45,7 @@
     "clapp": "^1.2.1",
     "discord.js": "^11.0.0",
     "git-rev": "^0.2.1",
-    "minimist-string": "^1.0.2"
+    "minimist-string": "^1.0.2",
+    "moment": "^2.18.1"
   }
 }

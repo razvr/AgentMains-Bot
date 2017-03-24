@@ -21,6 +21,10 @@ module.exports = [
       msg: 'Boop!'
     },
     {
+      type: 'New command: !highoon',
+      msg: 'Is it high noon?'
+    },
+    {
       type: 'New command: !info',
       msg: 'Get information about me.'
     },
