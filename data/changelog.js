@@ -9,8 +9,8 @@ module.exports = [
       },
       {
         type: 'New command',
-        title: '!highnoon',
-        msg: 'Is it high noon?',
+        title: '!time',
+        msg: 'What time is it?',
       }
     ]
   },
