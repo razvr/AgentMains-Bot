@@ -1,5 +1,15 @@
 module.exports = [
   {
+    version: 'v2.1.1',
+    changes: [
+      {
+        type: 'Improvement',
+        title: 'Improved changelog',
+        msg: 'Changelog should now be easier to read and understand.',
+      }
+    ]
+  },
+  {
     version: 'v2.1.0',
     changes: [
       {
