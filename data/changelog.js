@@ -6,6 +6,11 @@ module.exports = [
         type: 'Improvement',
         title: 'Improved changelog',
         msg: 'Changelog should now be easier to read and understand.',
+      },
+      {
+        type: 'New command',
+        title: '!time',
+        msg: 'What time is it?',
       }
     ]
   },
@@ -63,5 +68,5 @@ module.exports = [
         msg: 'I play some games now. Recommend me some titles!',
       },
     ],
-  },
+  }
 ];
