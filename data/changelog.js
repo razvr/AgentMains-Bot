@@ -11,6 +11,11 @@ module.exports = [
         type: 'New command',
         title: '!time',
         msg: 'What time is it?',
+      },
+      {
+        type: 'Bugfix',
+        title: 'Fix !help command',
+        msg: 'I now know what the help command is'
       }
     ]
   },
