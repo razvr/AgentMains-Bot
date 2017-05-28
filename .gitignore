@@ -1,8 +1,5 @@
 node_modules
-coverage
 
-\.idea/workspace\.xml
+.idea/workspace.xml
 
-config\.private\.js
-
-npm-debug\.log
+config/private.js
