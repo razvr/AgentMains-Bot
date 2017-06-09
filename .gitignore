@@ -3,3 +3,5 @@ node_modules
 .idea/workspace.xml
 
 config/private.js
+
+*.log
