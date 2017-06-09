@@ -16,36 +16,15 @@
     ""
   ],
   "scripts": {
-    "bot": "node ./lib/index.js",
-    "bot-debug": "node %NODE_DEBUG_OPTION% ./lib/index.js",
-    "prepublish": "gulp prepublish",
-    "test": "gulp"
+    "bot": "node --harmony_trailing_commas ./index.js",
+    "bot-debug": "node %NODE_DEBUG_OPTION% --harmony_trailing_commas ./index.js"
   },
-  "devDependencies": {
-    "eslint": "^3.1.1",
-    "eslint-config-xo-space": "^0.15.0",
-    "gulp": "^3.9.0",
-    "gulp-eslint": "^3.0.1",
-    "gulp-exclude-gitignore": "^1.0.0",
-    "gulp-line-ending-corrector": "^1.0.1",
-    "gulp-istanbul": "^1.0.0",
-    "gulp-mocha": "^3.0.1",
-    "gulp-plumber": "^1.0.0",
-    "gulp-nsp": "^2.1.0"
-  },
-  "eslintConfig": {
-    "extends": "xo-space",
-    "env": {
-      "mocha": true
-    }
-  },
+  "devDependencies": {},
   "repository": "https://github.com/SpyMaster356/nix-discord-bot",
   "license": "MIT",
   "dependencies": {
-    "clapp": "^1.2.1",
     "discord.js": "^11.0.0",
     "git-rev": "^0.2.1",
-    "minimist-string": "^1.0.2",
-    "moment": "^2.18.1"
+    "rx": "^4.1.0"
   }
 }
