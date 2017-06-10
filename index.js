@@ -24,12 +24,12 @@ nix.listen()
 
 function onNixError(error) {
   console.error(error);
-  nix.messageOwner('Unhandled error: ' + error)
+  nix.messageOwner('Shutting down due to unhandled error: ' + error)
     .subscribe(
       () => {},
       () => {},
       () => process.exit(1)
-    )
+    );
 }
 
 function onNixComplete() {
