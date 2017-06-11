@@ -1,7 +1,7 @@
 module.exports = [
   {
     name: 'PlayStation',
-    role: 'PlayStation',
+    tag: 'PS',
     alias: [
       'PS4',
       'PS3',
@@ -11,7 +11,7 @@ module.exports = [
   },
   {
     name: 'Xbox',
-    role: 'XBox',
+    tag: 'XB',
     alias: [
       'xb',
       'xbox',
