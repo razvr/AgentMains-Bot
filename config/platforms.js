@@ -1,5 +1,13 @@
 module.exports = [
   {
+    name: 'PC',
+    tag: 'PC',
+    alias: [
+      'PC',
+      'Windows',
+    ],
+  },
+  {
     name: 'PlayStation',
     tag: 'PS',
     alias: [
