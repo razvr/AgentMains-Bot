@@ -10,7 +10,7 @@
     "node": true
   },
   "rules": {
-    "comma-dangle": ["error", "always"],
+    "comma-dangle": ["error", "always-multiline"],
     "semi": ["error", "always"],
     "arrow-parens": ["error", "always"]
   }
