@@ -11,7 +11,7 @@ let nix = new Nix(discordClient, cfg);
 
 // Load every command in the commands folder
 fs.readdirSync('./lib/commands')
-  .forEach(file => {
+  .forEach((file) => {
     nix.addCommand(require('./lib/commands/' + file));
   });
 
