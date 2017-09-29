@@ -1,5 +1,5 @@
 {
-  "name": "nix-discord-bot",
+  "name": "nix-core",
   "version": "0.0.0",
   "description": "",
   "homepage": "",
@@ -11,20 +11,16 @@
   "files": [
     "lib"
   ],
-  "main": "lib/index.js",
+  "main": "nix.js",
   "keywords": [
     ""
   ],
-  "scripts": {
-    "bot": "node --harmony_trailing_commas ./index.js",
-    "bot-debug": "node %NODE_DEBUG_OPTION% --harmony_trailing_commas ./index.js"
+  "devDependencies": {
+    "discord.js": "^11.1.0"
   },
-  "devDependencies": {},
-  "repository": "https://github.com/SpyMaster356/nix-discord-bot",
+  "repository": "https://github.com/SpyMaster356/nix-core",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^11.1.0",
-    "git-rev": "^0.2.1",
     "rx": "^4.1.0"
   }
 }
