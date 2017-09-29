@@ -2,6 +2,7 @@
 
 const Rx = require('rx');
 const CommandManager = require('./lib/command-manager');
+const DataManager = require('./lib/data-manager');
 
 class Nix {
   /**
