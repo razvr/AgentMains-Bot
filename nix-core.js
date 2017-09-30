@@ -184,7 +184,7 @@ class NixCore {
   }
 
   _findOwner() {
-    return Rx.Observable.fromPromise(this._discord.fetchUser(this._ownerUserId))
+    return Rx.Observable.fromPromise(this._discord.users.fetch(this._ownerUserId))
       .do((user) => console.log('owner "' + user.username + '" found.'))
       .do((user) => this._owner = user);
   }
