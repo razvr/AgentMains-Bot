@@ -1,6 +1,6 @@
 {
   "name": "nix-core",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "",
   "homepage": "",
   "author": {
@@ -11,7 +11,7 @@
   "files": [
     "lib"
   ],
-  "main": "nix.js",
+  "main": "nix-core.js",
   "keywords": [
     ""
   ],

@@ -8,7 +8,7 @@ const DataManager = require('./lib/data-manager');
 
 const HelpCommand = require('./lib/help-command');
 
-class Nix {
+class NixCore {
   /**
    * Create a new instance of Nix
    *
