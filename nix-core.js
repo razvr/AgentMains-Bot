@@ -3,9 +3,9 @@
 const Rx = require('rx');
 const Discord = require('discord.js');
 
+const defaultResponseStrings = require('./lib/default-reponse-strings');
 const CommandManager = require('./lib/command-manager');
 const DataManager = require('./lib/data-manager');
-
 const HelpCommand = require('./lib/help-command');
 
 class NixCore {
@@ -17,6 +17,7 @@ class NixCore {
    * @param config.loginToken {String} A Discord login token to authenticate with Discord.
    * @param config.ownerUserId {String} The user ID of the owner of the bot.
    * @param config.commands {Array<CommandConfig>}
+   * @param config.responseStrings {Object}
    */
   constructor(config) {
     config = Object.assign({
@@ -25,7 +26,10 @@ class NixCore {
       dataSource: {
         type: 'none',
       },
+      responseStrings: {},
     }, config);
+
+    config.responseStrings = Object.assign(defaultResponseStrings, config.responseStrings);
 
     this._discord = new Discord.Client(config.discord);
 
@@ -43,6 +47,8 @@ class NixCore {
     this._commandManager = new CommandManager(config.commands);
     this._dataManager = new DataManager(config.dataSource);
 
+    this._responseStrings = config.responseStrings;
+
     this.addCommand(HelpCommand);
   }
 
@@ -52,6 +58,10 @@ class NixCore {
 
   get dataManager() {
     return this._dataManager;
+  }
+
+  get responseStrings() {
+    return this._responseStrings;
   }
 
   /**
@@ -73,15 +83,12 @@ class NixCore {
 
     return Rx.Observable.fromPromise(this.discord.login(this._loginToken))
       .flatMap(() => this._findOwner())
-      .flatMap(() => {
-          return Rx.Observable.merge([
-            this._message$,
-            this._disconnect$,
-            this._command$,
-            this.messageOwner("I'm now online."),
-          ]);
-        }
-      )
+      .flatMap(() => Rx.Observable.merge([
+        this._message$,
+        this._disconnect$,
+        this._command$,
+        this.messageOwner("I'm now online."),
+      ]))
       .takeWhile(() => this.listening)
       .doOnError(() => this.shutdown())
       .ignoreElements();
