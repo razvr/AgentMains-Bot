@@ -1,21 +1,34 @@
 'use strict';
 
 const Rx = require('rx');
+const Discord = require('discord.js');
+
 const CommandManager = require('./lib/command-manager');
 const DataManager = require('./lib/data-manager');
+
+const HelpCommand = require('./lib/help-command');
 
 class Nix {
   /**
    * Create a new instance of Nix
    *
    * @param config {Object} The settings for Nix to use
-   * @param config.discordClient {Discord.Client} The instance of a Discord.js Client for Nix to use.
+   * @param config.discord {Object} The instance of a Discord.js Client for Nix to use.
    * @param config.loginToken {String} A Discord login token to authenticate with Discord.
    * @param config.ownerUserId {String} The user ID of the owner of the bot.
    * @param config.commands {Array<CommandConfig>}
    */
   constructor(config) {
-    this._discord = config.discordClient;
+    config = Object.assign({
+      discord: {},
+      commands: [],
+      dataSource: {
+        type: 'none',
+      },
+    }, config);
+
+    this._discord = new Discord.Client(config.discord);
+
     this._loginToken = config.loginToken;
     this._ownerUserId = config.ownerUserId;
 
@@ -29,6 +42,8 @@ class Nix {
 
     this._commandManager = new CommandManager(config.commands);
     this._dataManager = new DataManager(config.dataSource);
+
+    this.addCommand(HelpCommand);
   }
 
   get commandManager() {

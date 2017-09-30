@@ -15,12 +15,11 @@
   "keywords": [
     ""
   ],
-  "devDependencies": {
-    "discord.js": "^11.1.0"
+  "peerDependencies": {
+    "discord.js": "^11.1.0",
+    "rx": "^4.1.0"
   },
   "repository": "https://github.com/SpyMaster356/nix-core",
   "license": "MIT",
-  "dependencies": {
-    "rx": "^4.1.0"
-  }
+  "dependencies": {}
 }
