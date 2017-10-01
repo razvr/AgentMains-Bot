@@ -1,12 +1,15 @@
 'use strict';
 
+const fs = require('fs');
 const Rx = require('rx');
 const Discord = require('discord.js');
 
 const defaultResponseStrings = require('./lib/default-reponse-strings');
 const CommandManager = require('./lib/command-manager');
 const DataManager = require('./lib/data-manager');
-const HelpCommand = require('./lib/commands/help');
+
+const defaultCommandFiles = fs.readdirSync(__dirname + '/lib/commands')
+  .map((file) => require(__dirname + '/lib/commands/' + file));
 
 class NixCore {
   /**
@@ -49,7 +52,10 @@ class NixCore {
 
     this._responseStrings = config.responseStrings;
 
-    this.addCommand(HelpCommand);
+    // Load default commands
+    defaultCommandFiles.forEach((command) => {
+      this.addCommand(command);
+    });
   }
 
   get commandManager() {
