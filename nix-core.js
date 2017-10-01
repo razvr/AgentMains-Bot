@@ -106,11 +106,13 @@ class NixCore {
    * Sends a message to the owner of the bot
    *
    * @param message
+   * @param options
+   *
    * @return {Rx.Observable} an observable stream to subscribe to
    */
-  messageOwner(message) {
+  messageOwner(message, options={}) {
     if (this.owner !== null) {
-      return Rx.Observable.fromPromise(this.owner.send(message));
+      return Rx.Observable.fromPromise(this.owner.send(message, options));
     } else {
       return Rx.Observable.throw('Owner was not found.');
     }
