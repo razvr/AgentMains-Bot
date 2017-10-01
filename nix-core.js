@@ -6,7 +6,7 @@ const Discord = require('discord.js');
 const defaultResponseStrings = require('./lib/default-reponse-strings');
 const CommandManager = require('./lib/command-manager');
 const DataManager = require('./lib/data-manager');
-const HelpCommand = require('./lib/help-command');
+const HelpCommand = require('./lib/commands/help');
 
 class NixCore {
   /**
