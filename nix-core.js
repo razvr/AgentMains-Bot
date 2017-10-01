@@ -1,12 +1,15 @@
 'use strict';
 
+const fs = require('fs');
 const Rx = require('rx');
 const Discord = require('discord.js');
 
 const defaultResponseStrings = require('./lib/default-reponse-strings');
 const CommandManager = require('./lib/command-manager');
 const DataManager = require('./lib/data-manager');
-const HelpCommand = require('./lib/help-command');
+
+const defaultCommandFiles = fs.readdirSync(__dirname + '/lib/commands')
+  .map((file) => require(__dirname + '/lib/commands/' + file));
 
 class NixCore {
   /**
@@ -49,7 +52,10 @@ class NixCore {
 
     this._responseStrings = config.responseStrings;
 
-    this.addCommand(HelpCommand);
+    // Load default commands
+    defaultCommandFiles.forEach((command) => {
+      this.addCommand(command);
+    });
   }
 
   get commandManager() {
@@ -106,11 +112,13 @@ class NixCore {
    * Sends a message to the owner of the bot
    *
    * @param message
+   * @param options
+   *
    * @return {Rx.Observable} an observable stream to subscribe to
    */
-  messageOwner(message) {
+  messageOwner(message, options={}) {
     if (this.owner !== null) {
-      return Rx.Observable.fromPromise(this.owner.send(message));
+      return Rx.Observable.fromPromise(this.owner.send(message, options));
     } else {
       return Rx.Observable.throw('Owner was not found.');
     }
