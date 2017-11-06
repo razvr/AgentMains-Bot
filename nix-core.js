@@ -173,6 +173,69 @@ class NixCore {
           return this._createCommandStream(message$);
         });
   }
+
+  createErrorEmbed(context, error) {
+    let embed = {
+      title: this.name,
+      description: this.description,
+
+      fields: [
+        {
+          name: 'Error:',
+          value: error.message,
+        },
+        {
+          name: 'User:',
+          value: context.user.tag,
+        },
+        {
+          name: 'Message:',
+          value: context.message.content,
+        },
+        {
+          name: 'Channel Type:',
+          value: context.channel.type,
+        },
+      ],
+    };
+
+    if (context.channel.type === 'text') {
+      embed.fields.push({
+        name: 'Guild:',
+        value: context.channel.guild.name,
+      });
+      embed.fields.push({
+        name: 'Channel:',
+        value: context.channel.name,
+      });
+    }
+    else if (context.channel.type === 'group') {
+      embed.fields.push({
+        name: 'Recipients:',
+        value: users.map((user) => user.tag).join(', '),
+      });
+    }
+
+    let stack = error.stack.split('\n');
+    let stackString = '';
+    let nextLine = stack.shift();
+
+    while (nextLine && (stackString + '\n' + nextLine).length <= 1008) {
+      stackString += '\n' + nextLine;
+      nextLine = stack.shift();
+    }
+
+    if (stack.length >= 1) {
+      stackString += '\n  ...';
+    }
+
+    embed.fields.push({
+      name: 'Stack:',
+      value: stackString,
+    });
+
+    return embed;
+  }
 }
 
 module.exports = NixCore;
