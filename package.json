@@ -21,5 +21,8 @@
   },
   "repository": "https://github.com/SpyMaster356/nix-core",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "rx": "^4.1.0"
+  }
 }
