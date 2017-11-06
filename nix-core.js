@@ -35,15 +35,11 @@ class NixCore {
     config.responseStrings = Object.assign(defaultResponseStrings, config.responseStrings);
 
     this._discord = new Discord.Client(config.discord);
-
     this._loginToken = config.loginToken;
     this._ownerUserId = config.ownerUserId;
-
     this._owner = null;
 
-    this._message$ = this._createMessageStream();
-    this._disconnect$ = this._createDisconnectStream();
-    this._command$ = this._createCommandStream(this._message$);
+    this._createStreams();
 
     this.listening = false;
 
@@ -142,59 +138,40 @@ class NixCore {
     return this._owner;
   }
 
-  /**
-   * Creates the message processing stream from the Discord 'message' event
-   *
-   * @private
-   *
-   * @return {Rx.Observable} Observable stream of messages from Discord
-   */
-  _createMessageStream() {
-    return Rx.Observable.fromEvent(this._discord, 'message');
-  }
-
-  /**
-   * Creates the message processing stream from the Discord 'disconnect' event. Handles disconnect from Discord and
-   * forwards a notification to the owner.
-   *
-   * @private
-   *
-   * @return {Rx.Observable} Observable stream of disconnects from Discord
-   */
-  _createDisconnectStream() {
-    return Rx.Observable.fromEvent(this._discord, 'disconnect')
-      .do((message) => console.error('Disconnected from Discord with code "' + message.code + '" for reason: ' + message))
-      .flatMap((message) => this.messageOwner('I was disconnected. :( \nError code was ' + message.code));
-  }
-
-  /**
-   * Creates a command processing stream from the given message stream. Filters out non-command messages, and executes
-   * the commands.
-   *
-   * @param message$ {Rx.Observable} Stream of Discord messages that may contain commands
-   *
-   * @private
-   *
-   * @return {Rx.Observable} Observable stream of processed commands
-   */
-  _createCommandStream(message$) {
-    return message$
-      .filter((message) => this.commandManager.msgIsCommand(message))
-      .map((message) => this.commandManager.parse(message, this))
-      .flatMap((parsedCommand) => parsedCommand.run())
-      .catch((error) => {
-        console.error(error);
-        this.messageOwner('Unhandled error: ' + error);
-
-        // Restart the stream so that Nix continues to handle commands
-        return this._createCommandStream(message$);
-      });
-  }
-
   _findOwner() {
     return Rx.Observable.fromPromise(this._discord.fetchUser(this._ownerUserId))
       .do((user) => console.log('owner "' + user.username + '" found.'))
       .do((user) => this._owner = user);
+  }
+
+  /**
+   *
+   * @private
+   *
+   */
+  _createStreams() {
+    this._streams = {};
+
+    this._streams.disconnect$ =
+      Rx.Observable
+        .fromEvent(this._discord, 'disconnect')
+        .do((message) => console.error('Disconnected from Discord with code "' + message.code + '" for reason: ' + message))
+        .flatMap((message) => this.messageOwner('I was disconnected. :( \nError code was ' + message.code));
+
+    this._streams.message$ = Rx.Observable.fromEvent(this._discord, 'message');
+
+    this._streams.command$ =
+      this._streams.message$
+        .filter((message) => this.commandManager.msgIsCommand(message))
+        .map((message) => this.commandManager.parse(message, this))
+        .flatMap((parsedCommand) => parsedCommand.run())
+        .catch((error) => {
+          console.error(error);
+          this.messageOwner('Unhandled error: ' + error);
+
+          // Restart the stream so that Nix continues to handle commands
+          return this._createCommandStream(message$);
+        });
   }
 }
 
