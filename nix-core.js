@@ -8,8 +8,8 @@ const defaultResponseStrings = require('./lib/default-reponse-strings');
 const CommandManager = require('./lib/managers/command-manager');
 const DataManager = require('./lib/managers/data-manager');
 
-const defaultCommandFiles = fs.readdirSync(__dirname + '/lib/commands')
-  .map((file) => require(__dirname + '/lib/commands/' + file));
+const defaultCommandFiles = fs.readdirSync(__dirname + '/lib/built-in/commands')
+  .map((file) => require(__dirname + '/lib/built-in/commands/' + file));
 
 class NixCore {
   /**
