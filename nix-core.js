@@ -140,38 +140,46 @@ class NixCore {
 
   _findOwner() {
     return Rx.Observable.fromPromise(this._discord.fetchUser(this._ownerUserId))
-      .do((user) => console.log('owner "' + user.username + '" found.'))
       .do((user) => this._owner = user);
   }
 
   /**
+   * Creates the message processing stream from the Discord 'message' event
    *
    * @private
    *
+   * @return {Rx.Observable} Observable stream of messages from Discord
    */
   _createStreams() {
     this._streams = {};
 
+    this._streams.guildCreate$ =
+      Rx.Observable
+        .fromEvent(this._discord, 'guildCreate')
+        .do((guild) => console.log(`[INFO] Joined guild ${guild.name}`))
+        .share();
+
     this._streams.disconnect$ =
       Rx.Observable
         .fromEvent(this._discord, 'disconnect')
-        .do((message) => console.error('Disconnected from Discord with code "' + message.code + '" for reason: ' + message))
-        .flatMap((message) => this.messageOwner('I was disconnected. :( \nError code was ' + message.code));
+        .do((message) => console.error('[WARN] Disconnected from Discord with code "' + message.code + '" for reason: ' + message))
+        .flatMap((message) => this.messageOwner('I was disconnected. :( \nError code was ' + message.code))
+        .share();
 
-    this._streams.message$ = Rx.Observable.fromEvent(this._discord, 'message');
+    this._streams.message$ =
+      Rx.Observable
+        .fromEvent(this._discord, 'message')
+        .do((message) => console.info(`[INFO] Message: ${message.content}`))
+        .share();
 
     this._streams.command$ =
       this._streams.message$
         .filter((message) => this.commandManager.msgIsCommand(message))
+        .do((message) => console.info(`[INFO] Command: ${message.content}`))
         .map((message) => this.commandManager.parse(message, this))
         .flatMap((parsedCommand) => parsedCommand.run())
-        .catch((error) => {
-          console.error(error);
-          this.messageOwner('Unhandled error: ' + error);
+        .share();
 
-          // Restart the stream so that Nix continues to handle commands
-          return this._createCommandStream(message$);
-        });
   }
 
   createErrorEmbed(context, error) {
