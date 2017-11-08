@@ -83,19 +83,28 @@ class NixCore {
    * @return {Rx.Observable} an observable stream to subscribe to
    */
   listen() {
-    this.listening = true;
+    if (!this.mainStream$) {
+      this.listening = true;
 
-    return Rx.Observable.fromPromise(this.discord.login(this._loginToken))
-      .flatMap(() => this._findOwner())
-      .flatMap(() => Rx.Observable.merge([
-        this._message$,
-        this._disconnect$,
-        this._command$,
-        this.messageOwner("I'm now online."),
-      ]))
-      .takeWhile(() => this.listening)
-      .doOnError(() => this.shutdown())
-      .ignoreElements();
+      this.mainStream$ = Rx.Observable
+        .return()
+        .do(() => console.log('[INFO] Booting up'))
+        .flatMap(() => this.discord.login(this._loginToken))
+        .do(() => console.log('[INFO] Logged into discord'))
+        .flatMap(() => this._findOwner())
+        .do((user) => console.log(`[INFO] Owner ${this.owner.username} found.`))
+        .flatMap(() => {
+          let eventStream$ = Rx.Observable.merge(Object.values(this._streams));
+          this.messageOwner("I'm now online.");
+          return eventStream$;
+        })
+        .takeWhile(() => this.listening)
+        .doOnError(() => this.shutdown())
+        .ignoreElements()
+        .share();
+    }
+
+    return this.mainStream$;
   }
 
   /**
