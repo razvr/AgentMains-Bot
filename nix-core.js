@@ -196,7 +196,7 @@ class NixCore {
     console.error(error);
 
     this.messageOwner(
-      this.responseStrings.commandRun.unhandledException.forOwner,
+      this.responseStrings.commandRun.unhandledException.forOwner({}),
       {embed: this.createErrorEmbed(context, error)}
     );
 
