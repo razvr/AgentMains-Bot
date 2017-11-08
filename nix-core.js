@@ -8,6 +8,8 @@ const defaultResponseStrings = require('./lib/default-reponse-strings');
 const CommandManager = require('./lib/managers/command-manager');
 const DataManager = require('./lib/managers/data-manager');
 
+const Response = require('./lib/response');
+
 const defaultCommandFiles = fs.readdirSync(__dirname + '/lib/built-in/commands')
   .map((file) => require(__dirname + '/lib/built-in/commands/' + file));
 
@@ -179,7 +181,20 @@ class NixCore {
         .map((message) => this.commandManager.parse(message, this))
         .flatMap((parsedCommand) => parsedCommand.run())
         .share();
+  }
 
+  handleError(context, error) {
+    console.error(error);
+
+    this.messageOwner(
+      this.responseStrings.commandRun.unhandledException.forOwner,
+      {embed: this.createErrorEmbed(context, error)}
+    );
+
+    let userResponse = new Response(context.message);
+    userResponse.type = 'message';
+    userResponse.content = this.responseStrings.commandRun.unhandledException.forUser({owner: context.nix.owner});
+    return userResponse.send();
   }
 
   createErrorEmbed(context, error) {
@@ -228,7 +243,7 @@ class NixCore {
     let stackString = '';
     let nextLine = stack.shift();
 
-    while (nextLine && (stackString + '\n' + nextLine).length <= 1008) {
+    while (nextLine && (stackString + '\n' + nextLine).length <= 1008) { // max length of 1008-ish characters
       stackString += '\n' + nextLine;
       nextLine = stack.shift();
     }
