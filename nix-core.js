@@ -6,10 +6,13 @@ const Discord = require('discord.js');
 
 const CommandManager = require('./lib/managers/command-manager');
 const DataManager = require('./lib/managers/data-manager');
+const ConfigManager = require('./lib/managers/config-manager');
 
 const defaultResponseStrings = require('./lib/built-in/reponse-strings');
 const defaultCommandFiles = fs.readdirSync(__dirname + '/lib/built-in/commands')
   .map((file) => require(__dirname + '/lib/built-in/commands/' + file));
+const defaultConfigModuleFiles = fs.readdirSync(__dirname + '/lib/built-in/config')
+  .map((file) => require(__dirname + '/lib/built-in/config/' + file));
 
 class NixCore {
   /**
@@ -45,12 +48,18 @@ class NixCore {
 
     this._commandManager = new CommandManager(config.commands);
     this._dataManager = new DataManager(config.dataSource);
+    this._configManager = new ConfigManager();
 
     this._responseStrings = config.responseStrings;
 
     // Load default commands
     defaultCommandFiles.forEach((command) => {
       this.addCommand(command);
+    });
+
+    // Load default config modules
+    defaultConfigModuleFiles.forEach((module) => {
+      this.addConfigActions(module);
     });
   }
 
@@ -60,6 +69,10 @@ class NixCore {
 
   get dataManager() {
     return this._dataManager;
+  }
+
+  get configManager() {
+    return this._configManager;
   }
 
   get responseStrings() {
@@ -73,6 +86,15 @@ class NixCore {
    */
   addCommand(command) {
     this.commandManager.addCommand(command);
+  }
+
+  /**
+   * alias the addConfigActions function to the Nix object for easier use.
+   *
+   * @param module {Object} The config module to add to Nix
+   */
+  addConfigActions(module) {
+    this.configManager.addConfigActions(module);
   }
 
   /**
