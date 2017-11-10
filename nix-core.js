@@ -223,9 +223,6 @@ class NixCore {
 
   createErrorEmbed(context, error) {
     let embed = {
-      title: this.name,
-      description: this.description,
-
       fields: [
         {
           name: 'Error:',
@@ -254,12 +251,6 @@ class NixCore {
       embed.fields.push({
         name: 'Channel:',
         value: context.channel.name,
-      });
-    }
-    else if (context.channel.type === 'group') {
-      embed.fields.push({
-        name: 'Recipients:',
-        value: users.map((user) => user.tag).join(', '),
       });
     }
 
