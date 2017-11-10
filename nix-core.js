@@ -111,11 +111,8 @@ class NixCore {
         .return()
         .flatMap(() => this.discord.login(this._loginToken))
         .flatMap(() => this._findOwner())
-        .flatMap(() => {
-          let eventStream$ = Rx.Observable.merge(Object.values(this._streams));
-          this.messageOwner("I'm now online.");
-          return eventStream$;
-        })
+        .flatMap(() => this.messageOwner("I'm now online."))
+        .flatMap(() => Rx.Observable.merge(Object.values(this._streams)))
         .takeWhile(() => this.listening)
         .doOnError(() => this.shutdown())
         .ignoreElements()
