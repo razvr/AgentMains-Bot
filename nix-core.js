@@ -7,8 +7,6 @@ const Discord = require('discord.js');
 const CommandManager = require('./lib/managers/command-manager');
 const DataManager = require('./lib/managers/data-manager');
 
-const Response = require('./lib/response');
-
 const defaultResponseStrings = require('./lib/built-in/reponse-strings');
 const defaultCommandFiles = fs.readdirSync(__dirname + '/lib/built-in/commands')
   .map((file) => require(__dirname + '/lib/built-in/commands/' + file));
@@ -200,10 +198,10 @@ class NixCore {
       {embed: this.createErrorEmbed(context, error)}
     );
 
-    let userResponse = new Response(context.message);
-    userResponse.type = 'message';
-    userResponse.content = this.responseStrings.commandRun.unhandledException.forUser({owner: context.nix.owner});
-    return userResponse.send();
+    let content = this.responseStrings.commandRun.unhandledException.forUser({owner: context.nix.owner});
+    context.message.channel.send(content);
+
+    return Rx.Observable.return();
   }
 
   createErrorEmbed(context, error) {
