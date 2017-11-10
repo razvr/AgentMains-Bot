@@ -86,11 +86,8 @@ class NixCore {
 
       this.mainStream$ = Rx.Observable
         .return()
-        .do(() => console.log('[INFO] Booting up'))
         .flatMap(() => this.discord.login(this._loginToken))
-        .do(() => console.log('[INFO] Logged into discord'))
         .flatMap(() => this._findOwner())
-        .do((user) => console.log(`[INFO] Owner ${this.owner.username} found.`))
         .flatMap(() => {
           let eventStream$ = Rx.Observable.merge(Object.values(this._streams));
           this.messageOwner("I'm now online.");
@@ -165,7 +162,6 @@ class NixCore {
     this._streams.guildCreate$ =
       Rx.Observable
         .fromEvent(this._discord, 'guildCreate')
-        .do((guild) => console.log(`[INFO] Joined guild ${guild.name}`))
         .share();
 
     this._streams.disconnect$ =
@@ -178,13 +174,11 @@ class NixCore {
     this._streams.message$ =
       Rx.Observable
         .fromEvent(this._discord, 'message')
-        .do((message) => console.info(`[INFO] Message: ${message.content}`))
         .share();
 
     this._streams.command$ =
       this._streams.message$
         .filter((message) => this.commandManager.msgIsCommand(message))
-        .do((message) => console.info(`[INFO] Command: ${message.content}`))
         .map((message) => this.commandManager.parse(message, this))
         .flatMap((parsedCommand) => parsedCommand.run())
         .share();
