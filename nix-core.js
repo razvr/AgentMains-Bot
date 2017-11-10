@@ -23,6 +23,7 @@ class NixCore {
    * @param config.loginToken {String} A Discord login token to authenticate with Discord.
    * @param config.ownerUserId {String} The user ID of the owner of the bot.
    * @param config.commands {Array<CommandConfig>}
+   * @param config.dataSource {Object} Configuration settings for the data source
    * @param config.responseStrings {Object}
    */
   constructor(config) {
