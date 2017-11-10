@@ -199,8 +199,7 @@ class NixCore {
     this._streams.command$ =
       this._streams.message$
         .filter((message) => this.commandManager.msgIsCommand(message))
-        .map((message) => this.commandManager.parse(message, this))
-        .flatMap((parsedCommand) => parsedCommand.run())
+        .flatMap((message) => this.commandManager.runCommandForMsg(message, this))
         .share();
   }
 
