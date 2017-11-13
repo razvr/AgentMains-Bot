@@ -18,18 +18,15 @@
   "keywords": [
     ""
   ],
-  "peerDependencies": {
-    "discord.js": "^12.0.0",
-    "rx": "^4.1.0"
-  },
   "repository": "https://github.com/SpyMaster356/nix-core",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "discord.js": "github:hydrabolt/discord.js#master",
+    "rx": "^4.1.0"
+  },
   "devDependencies": {
     "chai": "*",
-    "discord.js": "github:hydrabolt/discord.js#master",
     "mocha": "^4.0.1",
-    "rx": "^4.1.0",
     "sinon": "^4.1.2"
   }
 }
