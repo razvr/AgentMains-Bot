@@ -33,7 +33,7 @@ describe('NixCore', function () {
 
       beforeEach(function () {
         expectedError = new Error("Error from Discord.js");
-        sinon.stub(Discord.Client.prototype, 'login').rejects(expectedError);
+        sinon.stub(nix.discord, 'login').rejects(expectedError);
       });
 
       it('throws an error', function (done) {
@@ -50,8 +50,8 @@ describe('NixCore', function () {
 
     context('when the login token is valid', function () {
       beforeEach(function () {
-        sinon.stub(Discord.Client.prototype, 'login').resolves();
-        sinon.stub(Discord.UserStore.prototype, 'fetch').withArgs(ownerUser.id).resolves(ownerUser);
+        sinon.stub(nix.discord, 'login').resolves();
+        sinon.stub(nix.discord.users, 'fetch').withArgs(ownerUser.id).resolves(ownerUser);
       });
 
       it('does not cause an error', function (done) {
