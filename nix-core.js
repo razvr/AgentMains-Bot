@@ -36,32 +36,24 @@ class NixCore {
       responseStrings: {},
     }, config);
 
-    config.responseStrings = Object.assign(defaultResponseStrings, config.responseStrings);
+    this.responseStrings = Object.assign(defaultResponseStrings, config.responseStrings);
+    this.streams = null;
+    this.listening = false;
 
     this._discord = new Discord.Client(config.discord);
     this._loginToken = config.loginToken;
     this._ownerUserId = config.ownerUserId;
     this._owner = null;
 
-    this._createStreams();
-
-    this.listening = false;
-
     this._commandManager = new CommandManager(config.commands);
     this._dataManager = new DataManager(config.dataSource);
     this._configManager = new ConfigManager();
 
-    this._responseStrings = config.responseStrings;
+    this._shutdownSubject = new Rx.Subject();
 
-    // Load default commands
-    defaultCommandFiles.forEach((command) => {
-      this.addCommand(command);
-    });
-
-    // Load default config modules
-    defaultConfigModuleFiles.forEach((module) => {
-      this.addConfigActions(module);
-    });
+    // Load default modules
+    defaultCommandFiles.forEach((command) => this.addCommand(command));
+    defaultConfigModuleFiles.forEach((module) => this.addConfigActions(module));
   }
 
   get commandManager() {
@@ -74,10 +66,6 @@ class NixCore {
 
   get configManager() {
     return this._configManager;
-  }
-
-  get responseStrings() {
-    return this._responseStrings;
   }
 
   /**
@@ -104,30 +92,49 @@ class NixCore {
    * @return {Rx.Observable} an observable stream to subscribe to
    */
   listen() {
-    if (!this.mainStream$) {
-      this.listening = true;
-
-      this.mainStream$ = Rx.Observable
-        .return()
-        .flatMap(() => this.discord.login(this._loginToken))
-        .flatMap(() => this._findOwner())
-        .flatMap(() => this.messageOwner("I'm now online."))
-        .flatMap(() => Rx.Observable.merge(Object.values(this._streams)))
-        .takeWhile(() => this.listening)
-        .doOnError(() => this.shutdown())
-        .ignoreElements()
-        .share();
+    if (this.listening) {
+      return Rx.Observable.throw(new Error("Already listening"));
     }
 
-    return this.mainStream$;
+    this.listening = true;
+    this._createStreams();
+
+    let subject = new Rx.Subject();
+    Rx.Observable.return()
+      .flatMap(() => this.discord.login(this._loginToken))
+      .flatMap(() => this._findOwner())
+      .do(() => {
+        Rx.Observable
+          .merge([
+            this.streams.command$.flatMap((message) => this.commandManager.runCommandForMsg(message, this)),
+          ])
+          .subscribe(
+            () => {},
+            () => {},
+            () => {
+              console.log('main$ complete');
+              this.listening = false;
+              subject.onCompleted();
+            }
+          );
+      })
+      .subscribe(
+        () => {
+          this.messageOwner("I'm now online.");
+          subject.onNext('Ready!');
+        },
+        (error) => subject.onError(error)
+      );
+
+    return subject;
   }
 
   /**
    * Triggers a soft shutdown of the bot.
    */
   shutdown() {
-    console.log('No longer listening');
-    this.listening = false;
+    console.log("[INFO] Asked to shut down");
+    this._shutdownSubject.onNext(true);
   }
 
   /**
@@ -139,11 +146,11 @@ class NixCore {
    * @return {Rx.Observable} an observable stream to subscribe to
    */
   messageOwner(message, options={}) {
-    if (this.owner !== null) {
-      return Rx.Observable.fromPromise(this.owner.send(message, options));
-    } else {
-      return Rx.Observable.throw('Owner was not found.');
+    if (this.owner === null) {
+      return Rx.Observable.throw(new Error('Owner was not found.'));
     }
+
+    return Rx.Observable.fromPromise(this.owner.send(message, options));
   }
 
   /**
@@ -165,9 +172,10 @@ class NixCore {
   }
 
   _findOwner() {
-    return Rx.Observable.fromPromise(this._discord.users.fetch(this._ownerUserId))
-      .do((user) => console.log('owner "' + user.username + '" found.'))
-      .do((user) => this._owner = user);
+    return Rx.Observable
+      .fromPromise(this._discord.users.fetch(this._ownerUserId))
+        .do((user) => console.log('owner "' + user.username + '" found.'))
+        .do((user) => this._owner = user);
   }
 
   /**
@@ -178,29 +186,34 @@ class NixCore {
    * @return {Rx.Observable} Observable stream of messages from Discord
    */
   _createStreams() {
-    this._streams = {};
+    this.streams = {};
 
-    this._streams.guildCreate$ =
+    this.streams.guildCreate$ =
       Rx.Observable
         .fromEvent(this._discord, 'guildCreate')
+        .takeUntil(this._shutdownSubject)
+        .doOnCompleted(() => console.log('guildCreate$ complete'))
         .share();
 
-    this._streams.disconnect$ =
+    this.streams.disconnect$ =
       Rx.Observable
         .fromEvent(this._discord, 'disconnect')
-        .do((message) => console.error('[WARN] Disconnected from Discord with code "' + message.code + '" for reason: ' + message))
-        .flatMap((message) => this.messageOwner('I was disconnected. :( \nError code was ' + message.code))
+        .takeUntil(this._shutdownSubject)
+        .doOnCompleted(() => console.log('disconnect$ complete'))
         .share();
 
-    this._streams.message$ =
+    this.streams.message$ =
       Rx.Observable
         .fromEvent(this._discord, 'message')
+        .takeUntil(this._shutdownSubject)
+        .doOnCompleted(() => console.log('message$ complete'))
         .share();
 
-    this._streams.command$ =
-      this._streams.message$
+    this.streams.command$ =
+      this.streams.message$
         .filter((message) => this.commandManager.msgIsCommand(message))
-        .flatMap((message) => this.commandManager.runCommandForMsg(message, this))
+        .takeUntil(this._shutdownSubject)
+        .doOnCompleted(() => console.log('command$ complete'))
         .share();
   }
 
