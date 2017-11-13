@@ -27,7 +27,7 @@
   "dependencies": {},
   "devDependencies": {
     "chai": "*",
-    "discord.js": "^11.2.1",
+    "discord.js": "github:hydrabolt/discord.js#master",
     "mocha": "^4.0.1",
     "rx": "^4.1.0",
     "sinon": "^4.1.2"
