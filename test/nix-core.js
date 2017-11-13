@@ -7,9 +7,18 @@ const NixCore = require('./../nix-core');
 
 describe('NixCore', function () {
   let nix;
+  let ownerUser;
 
   beforeEach(function () {
+    ownerUser = {
+      id: 'ownerUserId',
+      username: 'ownerUser',
+
+      send: sinon.stub().resolves(),
+    };
+
     nix = new NixCore({
+      ownerUserId: ownerUser.id,
     });
   });
 
@@ -35,6 +44,20 @@ describe('NixCore', function () {
             expect(error.message).to.equal(expectedError.message);
             done();
           }
+        );
+      });
+    });
+
+    context('when the login token is valid', function () {
+      beforeEach(function () {
+        sinon.stub(Discord.Client.prototype, 'login').resolves();
+        sinon.stub(Discord.UserStore.prototype, 'fetch').withArgs(ownerUser.id).resolves(ownerUser);
+      });
+
+      it('does not cause an error', function (done) {
+        nix.listen().subscribe(
+          () => { done(); },
+          (error) => { done(new Error('error was passed:', error)); },
         );
       });
     });
