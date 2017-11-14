@@ -59,8 +59,30 @@ describe('NixCore', function () {
 
       it('does not cause an error', function (done) {
         nix.listen().subscribe(
-          () => { done(); },
-          (error) => { done(new Error('error was passed:', error)); }
+          () => {
+            done();
+          },
+          (error) => done(new Error('error was passed:', error))
+        );
+      });
+
+      it('finds the owner', function (done) {
+        nix.listen().subscribe(
+          () => {
+            expect(nix.owner).to.equal(ownerUser);
+            done();
+          },
+          (error) => done(new Error('error was passed:', error))
+        );
+      });
+
+      it('messages the owner', function (done) {
+        nix.listen().subscribe(
+          () => {
+            expect(ownerUser.send).to.have.been.calledWith("I'm now online.");
+            done();
+          },
+          (error) => done(new Error('error was passed:', error))
         );
       });
     });
