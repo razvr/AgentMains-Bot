@@ -1,9 +1,12 @@
-const expect = require('chai').expect;
+const chai = require("chai");
+const sinonChai = require("sinon-chai");
+const Discord = require('discord.js');
 const sinon = require('sinon').createSandbox();
 
-const Discord = require('discord.js');
-
 const NixCore = require('./../nix-core');
+
+const expect = chai.expect;
+chai.use(sinonChai);
 
 describe('NixCore', function () {
   let nix;
@@ -14,7 +17,7 @@ describe('NixCore', function () {
       id: 'ownerUserId',
       username: 'ownerUser',
 
-      send: sinon.stub().resolves(),
+      send: sinon.stub().callsFake((msg) => console.log("Sending message:", msg)),
     };
 
     nix = new NixCore({
@@ -57,8 +60,98 @@ describe('NixCore', function () {
       it('does not cause an error', function (done) {
         nix.listen().subscribe(
           () => { done(); },
-          (error) => { done(new Error('error was passed:', error)); },
+          (error) => { done(new Error('error was passed:', error)); }
         );
+      });
+    });
+  });
+
+  describe('received events', function () {
+    beforeEach(function () {
+      sinon.stub(Discord.Client.prototype, 'login').resolves();
+      sinon.stub(Discord.UserStore.prototype, 'fetch').withArgs(ownerUser.id).resolves(ownerUser);
+    });
+
+    context('when nix core receives message', function () {
+      let message;
+
+      beforeEach(function () {
+        message = {content: 'message'};
+      });
+
+      it('checks if the message is a command', function (done) {
+        let msgIsCommand = sinon.spy(nix.commandManager, 'msgIsCommand');
+
+        nix.listen().subscribe(
+          () => {
+            nix.streams.message$.subscribe(
+              () => {
+                expect(msgIsCommand).to.have.been.calledWith(message);
+                done();
+              },
+              (err) => done(err)
+            );
+
+            nix.discord.emit('message', message);
+          },
+          (err) => done(err)
+        );
+      });
+
+      context('when the message contains a command', function () {
+        let msgIsCommand;
+        let runCommandForMsg;
+
+        beforeEach(function () {
+          msgIsCommand = sinon.stub(nix.commandManager, 'msgIsCommand').returns(true);
+          runCommandForMsg = sinon.stub(nix.commandManager, 'runCommandForMsg').resolves();
+        });
+
+        it('runs the requested command', function (done) {
+          nix.listen().subscribe(
+            () => {
+              nix.streams.message$.subscribe(
+                () => {
+                  expect(msgIsCommand).to.have.been.calledWith(message);
+                  expect(runCommandForMsg).to.have.been.calledWith(message);
+                  done();
+                },
+                (err) => done(err)
+              );
+
+              nix.discord.emit('message', message);
+            },
+            (err) => done(err)
+          );
+        });
+      });
+
+      context('when the message does not contain a command', function () {
+        let msgIsCommand;
+        let runCommandForMsg;
+
+        beforeEach(function () {
+          msgIsCommand = sinon.stub(nix.commandManager, 'msgIsCommand').returns(false);
+          runCommandForMsg = sinon.stub(nix.commandManager, 'runCommandForMsg').resolves();
+        });
+
+        it('runs the requested command', function (done) {
+          nix.listen().subscribe(
+            () => {
+              nix.streams.message$.subscribe(
+                () => {
+                  expect(msgIsCommand).to.have.been.calledWith(message);
+                  expect(runCommandForMsg).not.to.have.been.calledWith(message);
+                  done();
+                },
+                (err) => done(err)
+              );
+
+              nix.discord.emit('message', message);
+            },
+            (err) => done(err)
+          );
+        });
       });
     });
   });
