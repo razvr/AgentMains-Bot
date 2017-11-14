@@ -72,7 +72,7 @@ describe('NixCore', function () {
             expect(nix.owner).to.equal(ownerUser);
             done();
           },
-          (error) => done(new Error('error was passed:', error))
+          (err) => done(err)
         );
       });
 
@@ -82,7 +82,7 @@ describe('NixCore', function () {
             expect(ownerUser.send).to.have.been.calledWith("I'm now online.");
             done();
           },
-          (error) => done(new Error('error was passed:', error))
+          (err) => done(err)
         );
       });
     });
