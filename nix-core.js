@@ -112,7 +112,6 @@ class NixCore {
             () => {},
             () => {},
             () => {
-              console.log('main$ complete');
               this.listening = false;
               subject.onCompleted();
             }
@@ -133,7 +132,6 @@ class NixCore {
    * Triggers a soft shutdown of the bot.
    */
   shutdown() {
-    console.log("[INFO] Asked to shut down");
     this._shutdownSubject.onNext(true);
   }
 
@@ -174,8 +172,7 @@ class NixCore {
   _findOwner() {
     return Rx.Observable
       .fromPromise(this._discord.users.fetch(this._ownerUserId))
-        .do((user) => console.log('owner "' + user.username + '" found.'))
-        .do((user) => this._owner = user);
+      .do((user) => this._owner = user);
   }
 
   /**
@@ -192,28 +189,24 @@ class NixCore {
       Rx.Observable
         .fromEvent(this._discord, 'guildCreate')
         .takeUntil(this._shutdownSubject)
-        .doOnCompleted(() => console.log('guildCreate$ complete'))
         .share();
 
     this.streams.disconnect$ =
       Rx.Observable
         .fromEvent(this._discord, 'disconnect')
         .takeUntil(this._shutdownSubject)
-        .doOnCompleted(() => console.log('disconnect$ complete'))
         .share();
 
     this.streams.message$ =
       Rx.Observable
         .fromEvent(this._discord, 'message')
         .takeUntil(this._shutdownSubject)
-        .doOnCompleted(() => console.log('message$ complete'))
         .share();
 
     this.streams.command$ =
       this.streams.message$
         .filter((message) => this.commandManager.msgIsCommand(message))
         .takeUntil(this._shutdownSubject)
-        .doOnCompleted(() => console.log('command$ complete'))
         .share();
   }
 

@@ -17,7 +17,7 @@ describe('NixCore', function () {
       id: 'ownerUserId',
       username: 'ownerUser',
 
-      send: sinon.stub().callsFake((msg) => console.log("Sending message:", msg)),
+      send: sinon.stub().callsFake((msg) => new Promise((resolve) => resolve(msg))),
     };
 
     nix = new NixCore({
