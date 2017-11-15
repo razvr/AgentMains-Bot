@@ -1,6 +1,5 @@
 const chai = require("chai");
 const sinonChai = require("sinon-chai");
-const Discord = require('discord.js');
 const sinon = require('sinon').createSandbox();
 
 const NixCore = require('./../nix-core');
@@ -23,6 +22,9 @@ describe('NixCore', function () {
     nix = new NixCore({
       ownerUserId: ownerUser.id,
     });
+
+    sinon.stub(nix.discord, 'login').resolves();
+    sinon.stub(nix.discord.users, 'fetch').withArgs(ownerUser.id).resolves(ownerUser);
   });
 
   afterEach(function () {
@@ -31,84 +33,171 @@ describe('NixCore', function () {
   });
 
   describe('#listen()', function () {
-    context('when the login token is not valid', function () {
-      let expectedError;
+    it('finds the owner', function (done) {
+      nix.listen(
+        () => {
+          expect(nix.owner).to.equal(ownerUser);
+          done();
+        },
+        (err) => done(err)
+      );
+    });
 
-      beforeEach(function () {
-        expectedError = new Error("Error from Discord.js");
-        sinon.stub(nix.discord, 'login').rejects(expectedError);
-      });
+    it('messages the owner', function (done) {
+      nix.listen(
+        () => {
+          expect(ownerUser.send).to.have.been.calledWith("I'm now online.");
+          done();
+        },
+        (err) => done(err)
+      );
+    });
 
-      it('throws an error', function (done) {
-        nix.listen().subscribe(
-          () => { done(new Error('next item was passed')); },
-          (error) => {
-            expect(error).to.not.equal(undefined);
-            expect(error.message).to.equal(expectedError.message);
-            done();
-          }
+    context('when passed a ready callback', function() {
+      it('calls it when ready', function (done) {
+        nix.listen(
+          () => done()
         );
       });
     });
 
-    context('when the login token is valid', function () {
-      beforeEach(function () {
-        sinon.stub(nix.discord, 'login').resolves();
-        sinon.stub(nix.discord.users, 'fetch').withArgs(ownerUser.id).resolves(ownerUser);
-      });
+    context('when passed an error callback', function () {
+      it('calls it when there is an error', function (done) {
+        nix.discord.login.rejects();
 
-      it('does not cause an error', function (done) {
-        nix.listen().subscribe(
-          () => {
-            done();
-          },
-          (error) => done(new Error('error was passed:', error))
+        nix.listen(
+          undefined,
+          () => done()
         );
       });
+    });
 
-      it('finds the owner', function (done) {
-        nix.listen().subscribe(
-          () => {
-            expect(nix.owner).to.equal(ownerUser);
-            done();
-          },
-          (err) => done(err)
-        );
-      });
-
-      it('messages the owner', function (done) {
-        nix.listen().subscribe(
-          () => {
-            expect(ownerUser.send).to.have.been.calledWith("I'm now online.");
-            done();
-          },
-          (err) => done(err)
+    context('when passed a complete callback', function () {
+      it('calls it when complete', function (done) {
+        nix.listen(
+          () => nix.shutdown(),
+          undefined,
+          () => done()
         );
       });
     });
   });
 
-  describe('received events', function () {
-    beforeEach(function () {
-      sinon.stub(Discord.Client.prototype, 'login').resolves();
-      sinon.stub(Discord.UserStore.prototype, 'fetch').withArgs(ownerUser.id).resolves(ownerUser);
+  describe('#shutdown()', function () {
+    it('stops the listen stream', function (done) {
+      nix.listen(
+        () => nix.shutdown(),
+        (err) => done(err),
+        () => done()
+      );
     });
 
-    context('when nix core receives message', function () {
-      let message;
+    it('stops the guildCreate$ stream', function (done) {
+      nix.listen(
+        () => {
+          nix.streams.guildCreate$.subscribe(
+            () => {},
+            (err) => done(err),
+            () => done()
+          );
+
+          nix.shutdown();
+        },
+        (err) => done(err)
+      );
+    });
+
+    it('stops the disconnect$ stream', function (done) {
+      nix.listen(
+        () => {
+          nix.streams.disconnect$.subscribe(
+            () => {
+            },
+            (err) => done(err),
+            () => done()
+          );
+
+          nix.shutdown();
+        },
+        (err) => done(err)
+      );
+    });
+
+    it('stops the message$ stream', function (done) {
+      nix.listen(
+        () => {
+          nix.streams.message$.subscribe(
+            () => {
+            },
+            (err) => done(err),
+            () => done()
+          );
+
+          nix.shutdown();
+        },
+        (err) => done(err)
+      );
+    });
+
+    it('stops the command$ stream', function (done) {
+      nix.listen(
+        () => {
+          nix.streams.command$.subscribe(
+            () => {
+            },
+            (err) => done(err),
+            () => done()
+          );
+
+          nix.shutdown();
+        },
+        (err) => done(err)
+      );
+    });
+  });
+
+  describe('message event', function () {
+    let message;
+
+    beforeEach(function () {
+      message = {content: 'message'};
+    });
+
+    it('checks if the message is a command', function (done) {
+      let msgIsCommand = sinon.spy(nix.commandManager, 'msgIsCommand');
+
+      nix.listen(
+        () => {
+          nix.streams.message$.subscribe(
+            () => {
+              expect(msgIsCommand).to.have.been.calledWith(message);
+              done();
+            },
+            (err) => done(err)
+          );
+
+          nix.discord.emit('message', message);
+        },
+        (err) => done(err)
+      );
+    });
+
+    context('when the message contains a command', function () {
+      let msgIsCommand;
+      let runCommandForMsg;
 
       beforeEach(function () {
-        message = {content: 'message'};
+        msgIsCommand = sinon.stub(nix.commandManager, 'msgIsCommand').returns(true);
+        runCommandForMsg = sinon.stub(nix.commandManager, 'runCommandForMsg').resolves();
       });
 
-      it('checks if the message is a command', function (done) {
-        let msgIsCommand = sinon.spy(nix.commandManager, 'msgIsCommand');
-
-        nix.listen().subscribe(
+      it('runs the requested command', function (done) {
+        nix.listen(
           () => {
             nix.streams.message$.subscribe(
               () => {
                 expect(msgIsCommand).to.have.been.calledWith(message);
+                expect(runCommandForMsg).to.have.been.calledWith(message);
                 done();
               },
               (err) => done(err)
@@ -119,61 +208,33 @@ describe('NixCore', function () {
           (err) => done(err)
         );
       });
+    });
 
-      context('when the message contains a command', function () {
-        let msgIsCommand;
-        let runCommandForMsg;
+    context('when the message does not contain a command', function () {
+      let msgIsCommand;
+      let runCommandForMsg;
 
-        beforeEach(function () {
-          msgIsCommand = sinon.stub(nix.commandManager, 'msgIsCommand').returns(true);
-          runCommandForMsg = sinon.stub(nix.commandManager, 'runCommandForMsg').resolves();
-        });
-
-        it('runs the requested command', function (done) {
-          nix.listen().subscribe(
-            () => {
-              nix.streams.message$.subscribe(
-                () => {
-                  expect(msgIsCommand).to.have.been.calledWith(message);
-                  expect(runCommandForMsg).to.have.been.calledWith(message);
-                  done();
-                },
-                (err) => done(err)
-              );
-
-              nix.discord.emit('message', message);
-            },
-            (err) => done(err)
-          );
-        });
+      beforeEach(function () {
+        msgIsCommand = sinon.stub(nix.commandManager, 'msgIsCommand').returns(false);
+        runCommandForMsg = sinon.stub(nix.commandManager, 'runCommandForMsg').resolves();
       });
 
-      context('when the message does not contain a command', function () {
-        let msgIsCommand;
-        let runCommandForMsg;
+      it('does not try to run a command', function (done) {
+        nix.listen(
+          () => {
+            nix.streams.message$.subscribe(
+              () => {
+                expect(msgIsCommand).to.have.been.calledWith(message);
+                expect(runCommandForMsg).not.to.have.been.calledWith(message);
+                done();
+              },
+              (err) => done(err)
+            );
 
-        beforeEach(function () {
-          msgIsCommand = sinon.stub(nix.commandManager, 'msgIsCommand').returns(false);
-          runCommandForMsg = sinon.stub(nix.commandManager, 'runCommandForMsg').resolves();
-        });
-
-        it('runs the requested command', function (done) {
-          nix.listen().subscribe(
-            () => {
-              nix.streams.message$.subscribe(
-                () => {
-                  expect(msgIsCommand).to.have.been.calledWith(message);
-                  expect(runCommandForMsg).not.to.have.been.calledWith(message);
-                  done();
-                },
-                (err) => done(err)
-              );
-
-              nix.discord.emit('message', message);
-            },
-            (err) => done(err)
-          );
-        });
+            nix.discord.emit('message', message);
+          },
+          (err) => done(err)
+        );
       });
     });
   });
