@@ -12,7 +12,8 @@
     "lib"
   ],
   "scripts": {
-    "test": "mocha"
+    "test": "./node_modules/.bin/mocha",
+    "lint": "./node_modules/.bin/eslint **/*.js"
   },
   "main": "nix-core.js",
   "keywords": [
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "chai": "*",
+    "eslint": "^4.11.0",
     "mocha": "^4.0.1",
     "sinon": "^4.1.2",
     "sinon-chai": "^2.14.0"
