@@ -10,7 +10,7 @@
     "node": true
   },
   "rules": {
-    "no-console": ["warn"],
+    "no-console": ["error", {"allow": ["warn", "error"]}],
     "comma-dangle": ["error", "always-multiline"],
     "semi": ["error", "always"],
     "arrow-parens": ["error", "always"]
