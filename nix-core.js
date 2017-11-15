@@ -37,7 +37,7 @@ class NixCore {
     }, config);
 
     this.responseStrings = Object.assign(defaultResponseStrings, config.responseStrings);
-    this.streams = null;
+    this.streams = {};
     this.listening = false;
 
     this._discord = new Discord.Client(config.discord);
@@ -91,41 +91,19 @@ class NixCore {
    *
    * @return {Rx.Observable} an observable stream to subscribe to
    */
-  listen() {
-    if (this.listening) {
-      return Rx.Observable.throw(new Error("Already listening"));
+  listen(ready, error, complete) {
+    if (!this.streams.main$) {
+      this.streams.main$ = Rx.Observable
+        .return()
+        .flatMap(() => this.discord.login(this._loginToken))
+        .flatMap(() => this._findOwner())
+        .map(() => this._startEventStreams())
+        .map(() => this.messageOwner("I'm now online."))
+        .share();
     }
 
-    this.listening = true;
-    this._createStreams();
-
-    let subject = new Rx.Subject();
-    Rx.Observable.return()
-      .flatMap(() => this.discord.login(this._loginToken))
-      .flatMap(() => this._findOwner())
-      .do(() => {
-        Rx.Observable
-          .merge([
-            this.streams.command$.flatMap((message) => this.commandManager.runCommandForMsg(message, this)),
-          ])
-          .subscribe(
-            () => {},
-            () => {},
-            () => {
-              this.listening = false;
-              subject.onCompleted();
-            }
-          );
-      })
-      .subscribe(
-        () => {
-          this.messageOwner("I'm now online.");
-          subject.onNext('Ready!');
-        },
-        (error) => subject.onError(error)
-      );
-
-    return subject;
+    this.streams.main$.subscribe(ready, error, complete);
+    return this.streams.main$;
   }
 
   /**
@@ -176,13 +154,11 @@ class NixCore {
   }
 
   /**
-   * Creates the message processing stream from the Discord 'message' event
+   * Creates the event processing streams from Discord
    *
    * @private
-   *
-   * @return {Rx.Observable} Observable stream of messages from Discord
    */
-  _createStreams() {
+  _startEventStreams() {
     this.streams = {};
 
     this.streams.guildCreate$ =
@@ -208,6 +184,16 @@ class NixCore {
         .filter((message) => this.commandManager.msgIsCommand(message))
         .takeUntil(this._shutdownSubject)
         .share();
+
+    Rx.Observable
+      .merge([
+        this.streams.guildCreate$,
+        this.streams.disconnect$,
+        this.streams.message$,
+        this.streams.command$.flatMap((message) => this.commandManager.runCommandForMsg(message, this)),
+      ])
+      .doOnCompleted(() => this.streams = {})
+      .subscribe();
   }
 
   handleError(context, error) {
