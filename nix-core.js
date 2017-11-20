@@ -96,7 +96,7 @@ class NixCore {
       this.streams.main$ = Rx.Observable
         .return()
         .flatMap(() => this.discord.login(this._loginToken))
-        .flatMap(() => this._findOwner())
+        .flatMap(() => this.findOwner())
         .map(() => this._startEventStreams())
         .map(() => this.messageOwner("I'm now online."))
         .share();
@@ -147,7 +147,7 @@ class NixCore {
     return this._owner;
   }
 
-  _findOwner() {
+  findOwner() {
     return Rx.Observable
       .fromPromise(this._discord.users.fetch(this._ownerUserId))
       .do((user) => this._owner = user);

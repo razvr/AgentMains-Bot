@@ -1,30 +1,21 @@
 const chai = require("chai");
 const sinonChai = require("sinon-chai");
 const sinon = require('sinon').createSandbox();
-
-const NixCore = require('./../nix-core');
+const Factory = require("./support/factory");
 
 const expect = chai.expect;
 chai.use(sinonChai);
+
+const NixCore = require('./../nix-core');
+
 
 describe('NixCore', function () {
   let nix;
   let ownerUser;
 
   beforeEach(function () {
-    ownerUser = {
-      id: 'ownerUserId',
-      username: 'ownerUser',
-
-      send: sinon.stub().callsFake((msg) => new Promise((resolve) => resolve(msg))),
-    };
-
-    nix = new NixCore({
-      ownerUserId: ownerUser.id,
-    });
-
-    sinon.stub(nix.discord, 'login').resolves();
-    sinon.stub(nix.discord.users, 'fetch').withArgs(ownerUser.id).resolves(ownerUser);
+    ownerUser = Factory.create('User');
+    nix = Factory.create('NixCore', { owner: ownerUser });
   });
 
   afterEach(function () {
@@ -62,7 +53,7 @@ describe('NixCore', function () {
     });
 
     context('when passed an error callback', function () {
-      it('calls it when there is an error', function (done) {
+      it('calls it when there is an error during bootup', function (done) {
         nix.discord.login.rejects();
 
         nix.listen(
