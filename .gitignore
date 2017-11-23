@@ -7,4 +7,6 @@
 
 *.log
 
-lib/commands/error\.js
+lib/built-in/commands/error.js
+
+\.idea/

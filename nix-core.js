@@ -4,12 +4,15 @@ const fs = require('fs');
 const Rx = require('rx');
 const Discord = require('discord.js');
 
-const defaultResponseStrings = require('./lib/default-reponse-strings');
-const CommandManager = require('./lib/command-manager');
-const DataManager = require('./lib/data-manager');
+const CommandManager = require('./lib/managers/command-manager');
+const DataManager = require('./lib/managers/data-manager');
+const ConfigManager = require('./lib/managers/config-manager');
 
-const defaultCommandFiles = fs.readdirSync(__dirname + '/lib/commands')
-  .map((file) => require(__dirname + '/lib/commands/' + file));
+const defaultResponseStrings = require('./lib/built-in/reponse-strings');
+const defaultCommandFiles = fs.readdirSync(__dirname + '/lib/built-in/commands')
+  .map((file) => require(__dirname + '/lib/built-in/commands/' + file));
+const defaultConfigModuleFiles = fs.readdirSync(__dirname + '/lib/built-in/config')
+  .map((file) => require(__dirname + '/lib/built-in/config/' + file));
 
 class NixCore {
   /**
@@ -20,6 +23,7 @@ class NixCore {
    * @param config.loginToken {String} A Discord login token to authenticate with Discord.
    * @param config.ownerUserId {String} The user ID of the owner of the bot.
    * @param config.commands {Array<CommandConfig>}
+   * @param config.dataSource {Object} Configuration settings for the data source
    * @param config.responseStrings {Object}
    */
   constructor(config) {
@@ -32,30 +36,24 @@ class NixCore {
       responseStrings: {},
     }, config);
 
-    config.responseStrings = Object.assign(defaultResponseStrings, config.responseStrings);
+    this.responseStrings = Object.assign(defaultResponseStrings, config.responseStrings);
+    this.streams = {};
+    this.listening = false;
 
     this._discord = new Discord.Client(config.discord);
-
     this._loginToken = config.loginToken;
     this._ownerUserId = config.ownerUserId;
-
     this._owner = null;
-
-    this._message$ = this._createMessageStream();
-    this._disconnect$ = this._createDisconnectStream();
-    this._command$ = this._createCommandStream(this._message$);
-
-    this.listening = false;
 
     this._commandManager = new CommandManager(config.commands);
     this._dataManager = new DataManager(config.dataSource);
+    this._configManager = new ConfigManager();
 
-    this._responseStrings = config.responseStrings;
+    this._shutdownSubject = new Rx.Subject();
 
-    // Load default commands
-    defaultCommandFiles.forEach((command) => {
-      this.addCommand(command);
-    });
+    // Load default modules
+    defaultCommandFiles.forEach((command) => this.addCommand(command));
+    defaultConfigModuleFiles.forEach((module) => this.addConfigActions(module));
   }
 
   get commandManager() {
@@ -66,8 +64,8 @@ class NixCore {
     return this._dataManager;
   }
 
-  get responseStrings() {
-    return this._responseStrings;
+  get configManager() {
+    return this._configManager;
   }
 
   /**
@@ -80,32 +78,39 @@ class NixCore {
   }
 
   /**
+   * alias the addConfigActions function to the Nix object for easier use.
+   *
+   * @param module {Object} The config module to add to Nix
+   */
+  addConfigActions(module) {
+    this.configManager.addConfigActions(module);
+  }
+
+  /**
    * Start the discord bot
    *
    * @return {Rx.Observable} an observable stream to subscribe to
    */
-  listen() {
-    this.listening = true;
+  listen(ready, error, complete) {
+    if (!this.streams.main$) {
+      this.streams.main$ = Rx.Observable
+        .return()
+        .flatMap(() => this.discord.login(this._loginToken))
+        .flatMap(() => this.findOwner())
+        .map(() => this._startEventStreams())
+        .map(() => this.messageOwner("I'm now online."))
+        .share();
+    }
 
-    return Rx.Observable.fromPromise(this.discord.login(this._loginToken))
-      .flatMap(() => this._findOwner())
-      .flatMap(() => Rx.Observable.merge([
-        this._message$,
-        this._disconnect$,
-        this._command$,
-        this.messageOwner("I'm now online."),
-      ]))
-      .takeWhile(() => this.listening)
-      .doOnError(() => this.shutdown())
-      .ignoreElements();
+    this.streams.main$.subscribe(ready, error, complete);
+    return this.streams.main$;
   }
 
   /**
    * Triggers a soft shutdown of the bot.
    */
   shutdown() {
-    console.log('No longer listening');
-    this.listening = false;
+    this._shutdownSubject.onNext(true);
   }
 
   /**
@@ -117,11 +122,11 @@ class NixCore {
    * @return {Rx.Observable} an observable stream to subscribe to
    */
   messageOwner(message, options={}) {
-    if (this.owner !== null) {
-      return Rx.Observable.fromPromise(this.owner.send(message, options));
-    } else {
-      return Rx.Observable.throw('Owner was not found.');
+    if (this.owner === null) {
+      return Rx.Observable.throw(new Error('Owner was not found.'));
     }
+
+    return Rx.Observable.fromPromise(this.owner.send(message, options));
   }
 
   /**
@@ -142,59 +147,121 @@ class NixCore {
     return this._owner;
   }
 
-  /**
-   * Creates the message processing stream from the Discord 'message' event
-   *
-   * @private
-   *
-   * @return {Rx.Observable} Observable stream of messages from Discord
-   */
-  _createMessageStream() {
-    return Rx.Observable.fromEvent(this._discord, 'message');
-  }
-
-  /**
-   * Creates the message processing stream from the Discord 'disconnect' event. Handles disconnect from Discord and
-   * forwards a notification to the owner.
-   *
-   * @private
-   *
-   * @return {Rx.Observable} Observable stream of disconnects from Discord
-   */
-  _createDisconnectStream() {
-    return Rx.Observable.fromEvent(this._discord, 'disconnect')
-      .do((message) => console.error('Disconnected from Discord with code "' + message.code + '" for reason: ' + message))
-      .flatMap((message) => this.messageOwner('I was disconnected. :( \nError code was ' + message.code));
-  }
-
-  /**
-   * Creates a command processing stream from the given message stream. Filters out non-command messages, and executes
-   * the commands.
-   *
-   * @param message$ {Rx.Observable} Stream of Discord messages that may contain commands
-   *
-   * @private
-   *
-   * @return {Rx.Observable} Observable stream of processed commands
-   */
-  _createCommandStream(message$) {
-    return message$
-      .filter((message) => this.commandManager.msgIsCommand(message))
-      .map((message) => this.commandManager.parse(message, this))
-      .flatMap((parsedCommand) => parsedCommand.run())
-      .catch((error) => {
-        console.error(error);
-        this.messageOwner('Unhandled error: ' + error);
-
-        // Restart the stream so that Nix continues to handle commands
-        return this._createCommandStream(message$);
-      });
-  }
-
-  _findOwner() {
-    return Rx.Observable.fromPromise(this._discord.fetchUser(this._ownerUserId))
-      .do((user) => console.log('owner "' + user.username + '" found.'))
+  findOwner() {
+    return Rx.Observable
+      .fromPromise(this._discord.users.fetch(this._ownerUserId))
       .do((user) => this._owner = user);
+  }
+
+  /**
+   * Creates the event processing streams from Discord
+   *
+   * @private
+   */
+  _startEventStreams() {
+    this.streams = {};
+
+    this.streams.guildCreate$ =
+      Rx.Observable
+        .fromEvent(this._discord, 'guildCreate')
+        .takeUntil(this._shutdownSubject)
+        .share();
+
+    this.streams.disconnect$ =
+      Rx.Observable
+        .fromEvent(this._discord, 'disconnect')
+        .takeUntil(this._shutdownSubject)
+        .share();
+
+    this.streams.message$ =
+      Rx.Observable
+        .fromEvent(this._discord, 'message')
+        .takeUntil(this._shutdownSubject)
+        .share();
+
+    this.streams.command$ =
+      this.streams.message$
+        .filter((message) => this.commandManager.msgIsCommand(message))
+        .takeUntil(this._shutdownSubject)
+        .share();
+
+    Rx.Observable
+      .merge([
+        this.streams.guildCreate$,
+        this.streams.disconnect$,
+        this.streams.message$,
+        this.streams.command$.flatMap((message) => this.commandManager.runCommandForMsg(message, this)),
+      ])
+      .doOnCompleted(() => this.streams = {})
+      .subscribe();
+  }
+
+  handleError(context, error) {
+    console.error(error);
+
+    this.messageOwner(
+      this.responseStrings.commandRun.unhandledException.forOwner({}),
+      {embed: this.createErrorEmbed(context, error)}
+    );
+
+    let content = this.responseStrings.commandRun.unhandledException.forUser({owner: context.nix.owner});
+    context.message.channel.send(content);
+
+    return Rx.Observable.return();
+  }
+
+  createErrorEmbed(context, error) {
+    let embed = {
+      fields: [
+        {
+          name: 'Error:',
+          value: error.message,
+        },
+        {
+          name: 'User:',
+          value: context.user.tag,
+        },
+        {
+          name: 'Message:',
+          value: context.message.content,
+        },
+        {
+          name: 'Channel Type:',
+          value: context.channel.type,
+        },
+      ],
+    };
+
+    if (context.channel.type === 'text') {
+      embed.fields.push({
+        name: 'Guild:',
+        value: context.channel.guild.name,
+      });
+      embed.fields.push({
+        name: 'Channel:',
+        value: context.channel.name,
+      });
+    }
+
+    let stack = error.stack.split('\n');
+    let stackString = '';
+    let nextLine = stack.shift();
+
+    while (nextLine && (stackString + '\n' + nextLine).length <= 1008) { // max length of 1008-ish characters
+      stackString += '\n' + nextLine;
+      nextLine = stack.shift();
+    }
+
+    if (stack.length >= 1) {
+      stackString += '\n  ...';
+    }
+
+    embed.fields.push({
+      name: 'Stack:',
+      value: stackString,
+    });
+
+    return embed;
   }
 }
 
