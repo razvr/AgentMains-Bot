@@ -167,6 +167,20 @@ describe('CommandManager', function () {
     });
 
     describe('enabled check', function () {
+      it('runs the check', function (done) {
+        sinon.stub(cmdManager, '_filterCommandEnabled').returns(Rx.Observable.return(true));
+
+        cmdManager.runCommandForMsg(message, nix)
+          .subscribe(
+            () => {},
+            (err) => done(err),
+            () => {
+              expect(cmdManager._filterCommandEnabled).to.have.been.called;
+              done();
+            }
+          );
+      });
+
       context('when the command is enabled', function () {
         beforeEach(function () {
           sinon.stub(cmdManager, 'isCommandEnabled').returns(Rx.Observable.return(true));
@@ -205,6 +219,20 @@ describe('CommandManager', function () {
     });
 
     describe('admin only check', function () {
+      it('runs the check', function (done) {
+        sinon.stub(cmdManager, '_filterAdminOnly').returns(Rx.Observable.return(true));
+
+        cmdManager.runCommandForMsg(message, nix)
+          .subscribe(
+            () => {},
+            (err) => done(err),
+            () => {
+              expect(cmdManager._filterAdminOnly).to.have.been.called;
+              done();
+            }
+          );
+      });
+
       context('when the command is admin only', function () {
         beforeEach(function () {
           command.adminOnly = true;
@@ -267,6 +295,20 @@ describe('CommandManager', function () {
     });
 
     describe('help flag check', function () {
+      it('runs the check', function (done) {
+        sinon.stub(cmdManager, '_filterHelpFlag').returns(Rx.Observable.return(true));
+
+        cmdManager.runCommandForMsg(message, nix)
+          .subscribe(
+            () => {},
+            (err) => done(err),
+            () => {
+              expect(cmdManager._filterHelpFlag).to.have.been.called;
+              done();
+            }
+          );
+      });
+
       context('when the command does not have a help flag', function () {
         beforeEach(function () {
           message.content = `!${command.name}`;
@@ -359,6 +401,21 @@ describe('CommandManager', function () {
     });
 
     describe('scope check', function () {
+      it('runs the check', function (done) {
+        sinon.stub(cmdManager, '_filterScope').returns(Rx.Observable.return(true));
+
+        cmdManager.runCommandForMsg(message, nix)
+          .subscribe(
+            () => {
+            },
+            (err) => done(err),
+            () => {
+              expect(cmdManager._filterScope).to.have.been.called;
+              done();
+            }
+          );
+      });
+
       context('when the command has no scope', function () {
         beforeEach(function () {
           command.scope = [];
@@ -451,6 +508,20 @@ describe('CommandManager', function () {
     });
 
     describe('missing args check', function () {
+      it('runs the check', function (done) {
+        sinon.stub(cmdManager, '_filterMissingArgs').returns(Rx.Observable.return(true));
+
+        cmdManager.runCommandForMsg(message, nix)
+          .subscribe(
+            () => {
+            },
+            (err) => done(err),
+            () => {
+              expect(cmdManager._filterMissingArgs).to.have.been.called;
+              done();
+            }
+          );
+      });
 
     });
   });
