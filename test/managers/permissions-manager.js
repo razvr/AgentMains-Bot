@@ -56,45 +56,19 @@ describe('PermissionsManager', function () {
         );
     });
 
-    context('when there is existing data in the dataSource', function () {
-      it('returns default data', function (done) {
-        let existingData = {
-          data: 'existing',
-        };
-        dataManager.getGuildData.returns(Rx.Observable.just(existingData));
+    it('returns data', function (done) {
+      let existingData = {
+        data: 'existing',
+      };
+      dataManager.getGuildData.returns(Rx.Observable.just(existingData));
 
-        permissionsManager
-          .getPermissionsData(guildId)
-          .subscribe(
-            (savedData) => expect(savedData).to.eql(existingData),
-            (err) => done(err),
-            () => done()
-          );
-      });
-    });
-
-    context('when there is no data in the dataSource', function () {
-      it('returns default data', function (done) {
-        let defaultData = {
-          'admin': {
-            users: [],
-            roles: [],
-          },
-          'mod': {
-            users: [],
-            roles: [],
-          },
-        };
-        dataManager.getGuildData.returns(Rx.Observable.just());
-
-        permissionsManager
-          .getPermissionsData(guildId)
-          .subscribe(
-            (savedData) => expect(savedData).to.eql(defaultData),
-            (err) => done(err),
-            () => done()
-          );
-      });
+      permissionsManager
+        .getPermissionsData(guildId)
+        .subscribe(
+          (savedData) => expect(savedData).to.eql(existingData),
+          (err) => done(err),
+          () => done()
+        );
     });
   });
 
