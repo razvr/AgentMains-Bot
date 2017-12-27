@@ -10,7 +10,6 @@ Factory.setSandbox(sinon);
 
 const NixCore = require('./../nix-core');
 
-
 describe('NixCore', function () {
   let nix;
   let ownerUser;
