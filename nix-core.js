@@ -111,6 +111,7 @@ class NixCore {
           .return()
           .flatMap(() => this.discord.login(this._loginToken))
           .flatMap(() => this.findOwner())
+          .flatMap(() => this._readyDataSource())
           .merge(this._startEventStreams())
           .map(() => this.messageOwner("I'm now online."))
           .share();
@@ -167,6 +168,13 @@ class NixCore {
       .do((user) => this._owner = user);
   }
 
+  _readyDataSource() {
+    return Rx.Observable
+      .from(this.discord.guilds.values())
+      .flatMap((guild) => this.moduleManager.readyDefaultData(this, guild.id))
+      .last();
+  }
+
   /**
    * Creates the event processing streams from Discord
    *
@@ -186,10 +194,11 @@ class NixCore {
       this.streams[streamName] = this.streams[streamName].takeUntil(this._shutdownSubject).share();
     }
 
-    // Listen to nix
+    // Listen to events
     return Rx.Observable
       .merge([
         this.streams.command$.flatMap((message) => this.commandManager.runCommandForMsg(message, this)),
+        this.streams.guildCreate$.flatMap((guild) => this.moduleManager.readyDefaultData(this, guild.id)),
       ])
       .ignoreElements()
       .doOnCompleted(() => this.streams = {})
