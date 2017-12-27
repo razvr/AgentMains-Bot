@@ -161,8 +161,13 @@ class NixCore {
   }
 
   _readyDataSource() {
+    let guilds = this.discord.guilds;
+    if (guilds.size === 0) {
+      return Rx.Observable.return();
+    }
+
     return Rx.Observable
-      .from(this.discord.guilds.values())
+      .from(guilds.values())
       .flatMap((guild) => this.moduleManager.readyDefaultData(this, guild.id))
       .last();
   }
