@@ -10,10 +10,6 @@ const DataManager = require('./lib/managers/data-manager');
 const ConfigManager = require('./lib/managers/config-manager');
 const PermissionsManager = require('./lib/managers/permissions-manager');
 
-const defaultCommandFiles = fs.readdirSync(__dirname + '/lib/built-in/commands')
-  .map((file) => require(__dirname + '/lib/built-in/commands/' + file));
-const defaultConfigModuleFiles = fs.readdirSync(__dirname + '/lib/built-in/config')
-  .map((file) => require(__dirname + '/lib/built-in/config/' + file));
 const defaultResponseStrings = require('./lib/utility/reponse-strings');
 const defaultModuleFiles = fs.readdirSync(__dirname + '/lib/modules')
   .map((file) => require(__dirname + '/lib/modules/' + file));
@@ -55,10 +51,6 @@ class NixCore {
     this._moduleManager = new ModuleManager(this, defaultModuleFiles);
 
     this._shutdownSubject = new Rx.Subject();
-
-    // Load default modules
-    defaultCommandFiles.forEach((command) => this.addCommand(command));
-    defaultConfigModuleFiles.forEach((module) => this.addConfigActions(module));
   }
 
   get commandManager() {
