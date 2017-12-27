@@ -13,8 +13,10 @@
   ],
   "scripts": {
     "test": "./node_modules/.bin/mocha",
-    "lint": "./node_modules/.bin/eslint **/*.js"
-  },
+    "lint": "./node_modules/.bin/eslint **/*.js",
+    "bot": "node --preserve-symlinks ./bot.js",
+    "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks ./bot.js"
+},
   "main": "nix-core.js",
   "keywords": [
     ""
