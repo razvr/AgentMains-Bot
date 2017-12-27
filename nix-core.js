@@ -9,11 +9,11 @@ const DataManager = require('./lib/managers/data-manager');
 const ConfigManager = require('./lib/managers/config-manager');
 const PermissionsManager = require('./lib/managers/permissions-manager');
 
-const defaultResponseStrings = require('./lib/built-in/reponse-strings');
 const defaultCommandFiles = fs.readdirSync(__dirname + '/lib/built-in/commands')
   .map((file) => require(__dirname + '/lib/built-in/commands/' + file));
 const defaultConfigModuleFiles = fs.readdirSync(__dirname + '/lib/built-in/config')
   .map((file) => require(__dirname + '/lib/built-in/config/' + file));
+const defaultResponseStrings = require('./lib/utility/reponse-strings');
 
 class NixCore {
   /**
