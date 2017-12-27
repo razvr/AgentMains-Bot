@@ -4,6 +4,7 @@ const fs = require('fs');
 const Rx = require('rx');
 const Discord = require('discord.js');
 
+const ModuleManager = require('./lib/managers/module-manager');
 const CommandManager = require('./lib/managers/command-manager');
 const DataManager = require('./lib/managers/data-manager');
 const ConfigManager = require('./lib/managers/config-manager');
@@ -14,6 +15,8 @@ const defaultCommandFiles = fs.readdirSync(__dirname + '/lib/built-in/commands')
 const defaultConfigModuleFiles = fs.readdirSync(__dirname + '/lib/built-in/config')
   .map((file) => require(__dirname + '/lib/built-in/config/' + file));
 const defaultResponseStrings = require('./lib/utility/reponse-strings');
+const defaultModuleFiles = fs.readdirSync(__dirname + '/lib/modules')
+  .map((file) => require(__dirname + '/lib/modules/' + file));
 
 class NixCore {
   /**
@@ -49,6 +52,7 @@ class NixCore {
     this._dataManager = new DataManager(config.dataSource);
     this._configManager = new ConfigManager();
     this._permissionsManager = new PermissionsManager(this._dataManager);
+    this._moduleManager = new ModuleManager(this, defaultModuleFiles);
 
     this._shutdownSubject = new Rx.Subject();
 
@@ -71,6 +75,10 @@ class NixCore {
 
   get permissionsManager() {
     return this._permissionsManager;
+  }
+
+  get moduleManager() {
+    return this._moduleManager;
   }
 
   /**
