@@ -190,7 +190,9 @@ describe('NixCore', function () {
     let message;
 
     beforeEach(function () {
-      message = {content: 'message'};
+      message = Factory.create('Message', {
+        content: 'message'
+      });
     });
 
     it('checks if the message is a command', function (done) {
@@ -201,14 +203,15 @@ describe('NixCore', function () {
           nix.streams.message$.subscribe(
             () => {
               expect(msgIsCommand).to.have.been.calledWith(message);
-              done();
+              nix.shutdown();
             },
-            (err) => done(err)
+            () => {},
           );
 
           nix.discord.emit('message', message);
         },
-        (err) => done(err)
+        (err) => done(err),
+        () => done()
       );
     });
 

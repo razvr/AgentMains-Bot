@@ -111,9 +111,9 @@ describe('CommandManager', function () {
 
     context('when the message does not start with the prefix', function () {
       beforeEach(function () {
-        message = {
+        message = Factory.create('Message', {
           content: '?test',
-        };
+        });
       });
 
       it('returns false', function () {
@@ -123,9 +123,9 @@ describe('CommandManager', function () {
 
     context('when the message starts with the prefix', function() {
       beforeEach(function () {
-        message = {
+        message = Factory.create('Message', {
           content: '!test',
-        };
+        });
       });
 
       context('when the command is not defined', function () {
