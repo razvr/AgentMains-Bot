@@ -102,10 +102,17 @@ class NixCore {
         Rx.Observable
           .return()
           .flatMap(() => this.discord.login(this._loginToken))
+          .do(() => console.log("{INFO}", 'Logged into Discord'))
+          .do(() => console.log("{INFO}", 'In', this.discord.guilds.size, 'guilds'))
           .flatMap(() => this.findOwner())
+          .do((owner) => console.log("{INFO}", "Found owner", owner.tag))
+          .do(() => console.log("{INFO}", "Preparing DataSource"))
           .flatMap(() => this._readyDataSource())
+          .do(() => console.log("{INFO}", "DataSource is ready"))
           .merge(this._startEventStreams())
+          .do(() => console.log("{INFO}", "event streams started"))
           .map(() => this.messageOwner("I'm now online."))
+          .do(() => console.log("{INFO}", "Owner messaged, ready to go!"))
           .share();
     }
 
