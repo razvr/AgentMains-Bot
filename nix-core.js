@@ -168,7 +168,7 @@ class NixCore {
 
     return Rx.Observable
       .from(guilds.values())
-      .flatMap((guild) => this.moduleManager.readyDefaultData(this, guild.id))
+      .flatMap((guild) => this.moduleManager.prepareDefaultData(this, guild.id))
       .last();
   }
 
@@ -195,7 +195,7 @@ class NixCore {
     return Rx.Observable
       .merge([
         this.streams.command$.flatMap((message) => this.commandManager.runCommandForMsg(message, this)),
-        this.streams.guildCreate$.flatMap((guild) => this.moduleManager.readyDefaultData(this, guild.id)),
+        this.streams.guildCreate$.flatMap((guild) => this.moduleManager.prepareDefaultData(this, guild.id)),
       ])
       .ignoreElements()
       .doOnCompleted(() => this.streams = {})
