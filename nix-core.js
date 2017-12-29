@@ -218,7 +218,7 @@ class NixCore {
           .flatMap((guild) =>
             Rx.Observable
               .merge([
-                this.commandManager.onNixJoinGuild(nix, guild.id),
+                this.commandManager.onNixJoinGuild(this, guild.id),
               ])
               .last() // Wait for all onNixJoinGuild hooks to complete
               .map(() => guild)
