@@ -109,6 +109,13 @@ class NixCore {
           .do(() => console.log("{INFO}", "Preparing DataSource"))
           .flatMap(() => this._readyDataSource())
           .do(() => console.log("{INFO}", "DataSource is ready"))
+          .flatMap(() =>
+            Rx.Observable.merge([
+              this.commandManager.onNixListen(this),
+            ])
+            .last() //wait for all the onNixListens to complete
+            .do(() => console.log("{INFO}", "onNixListen hooks complete"))
+          )
           .merge(this._startEventStreams())
           .do(() => console.log("{INFO}", "event streams started"))
           .map(() => this.messageOwner("I'm now online."))
@@ -202,7 +209,20 @@ class NixCore {
     return Rx.Observable
       .merge([
         this.streams.command$.flatMap((message) => this.commandManager.runCommandForMsg(message, this)),
-        this.streams.guildCreate$.flatMap((guild) => this.moduleManager.prepareDefaultData(this, guild.id)),
+        this.streams.guildCreate$
+          .flatMap((guild) =>
+            this.moduleManager
+              .prepareDefaultData(this, guild.id)
+              .map(() => guild)
+          )
+          .flatMap((guild) =>
+            Rx.Observable
+              .merge([
+                this.commandManager.onNixJoinGuild(nix, guild.id),
+              ])
+              .last() // Wait for all onNixJoinGuild hooks to complete
+              .map(() => guild)
+          ),
       ])
       .ignoreElements()
       .doOnCompleted(() => this.streams = {})

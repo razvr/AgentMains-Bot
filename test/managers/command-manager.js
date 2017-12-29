@@ -41,7 +41,7 @@ describe('CommandManager', function () {
       });
 
       it('defaults to the ! prefix', function () {
-        expect(cmdManager.commandPrefix).to.eql('!');
+        expect(cmdManager.defaultPrefix).to.eql('!');
       });
     });
 
@@ -65,8 +65,8 @@ describe('CommandManager', function () {
         cmdManager = new CommandManager([], '?');
       });
 
-      it('sets the prefix', function () {
-        expect(cmdManager.commandPrefix).to.eql('?');
+      it('sets the default prefix', function () {
+        expect(cmdManager.defaultPrefix).to.eql('?');
       });
     });
   });
