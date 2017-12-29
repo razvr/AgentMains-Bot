@@ -1,6 +1,6 @@
 {
   "name": "nix-core",
-  "version": "3.1.0",
+  "version": "4.0.0-rc",
   "description": "",
   "homepage": "",
   "author": {
@@ -16,7 +16,7 @@
     "lint": "./node_modules/.bin/eslint **/*.js",
     "bot": "node --preserve-symlinks ./bot.js",
     "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks ./bot.js"
-},
+  },
   "main": "nix-core.js",
   "keywords": [
     ""
@@ -31,7 +31,7 @@
   "devDependencies": {
     "chai": "*",
     "discord.js": "github:hydrabolt/discord.js#master",
-    "eslint": "^4.13.1",
+    "eslint": "^4.14.0",
     "glob": "^7.1.2",
     "mocha": "^4.0.1",
     "rx": "^4.1.0",
