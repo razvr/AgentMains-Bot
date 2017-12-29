@@ -231,14 +231,14 @@ describe('NixCore', function () {
               () => {
                 expect(msgIsCommand).to.have.been.calledWith(message);
                 expect(runCommandForMsg).to.have.been.calledWith(message);
-                done();
-              },
-              (err) => done(err)
+                nix.shutdown();
+              }
             );
 
             nix.discord.emit('message', message);
           },
-          (err) => done(err)
+          (err) => done(err),
+          () => done()
         );
       });
     });
