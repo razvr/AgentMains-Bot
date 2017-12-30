@@ -44,11 +44,11 @@ class NixCore {
     this._ownerUserId = config.ownerUserId;
     this._owner = null;
 
-    this._dataManager = new DataManager(config.dataSource);
+    this._dataManager = new DataManager(this, config.dataSource);
 
     this._commandManager = new CommandManager(this, config.commands);
-    this._configManager = new ConfigManager();
-    this._permissionsManager = new PermissionsManager(this._dataManager);
+    this._configManager = new ConfigManager(this);
+    this._permissionsManager = new PermissionsManager(this);
     this._moduleManager = new ModuleManager(this, defaultModuleFiles);
 
     this._shutdownSubject = new Rx.Subject();
