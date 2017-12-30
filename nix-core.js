@@ -44,8 +44,9 @@ class NixCore {
     this._ownerUserId = config.ownerUserId;
     this._owner = null;
 
-    this._commandManager = new CommandManager(config.commands);
     this._dataManager = new DataManager(config.dataSource);
+
+    this._commandManager = new CommandManager(this, config.commands);
     this._configManager = new ConfigManager();
     this._permissionsManager = new PermissionsManager(this._dataManager);
     this._moduleManager = new ModuleManager(this, defaultModuleFiles);
@@ -111,7 +112,7 @@ class NixCore {
           .do(() => console.log("{INFO}", "DataSource is ready"))
           .flatMap(() =>
             Rx.Observable.merge([
-              this.commandManager.onNixListen(this),
+              this.commandManager.onNixListen(),
             ])
             .last() //wait for all the onNixListens to complete
             .do(() => console.log("{INFO}", "onNixListen hooks complete"))
@@ -208,7 +209,7 @@ class NixCore {
     // Listen to events
     return Rx.Observable
       .merge([
-        this.streams.command$.flatMap((message) => this.commandManager.runCommandForMsg(message, this)),
+        this.streams.command$.flatMap((message) => this.commandManager.runCommandForMsg(message)),
         this.streams.guildCreate$
           .flatMap((guild) =>
             this.moduleManager
@@ -218,7 +219,7 @@ class NixCore {
           .flatMap((guild) =>
             Rx.Observable
               .merge([
-                this.commandManager.onNixJoinGuild(this, guild.id),
+                this.commandManager.onNixJoinGuild(guild),
               ])
               .last() // Wait for all onNixJoinGuild hooks to complete
               .map(() => guild)
