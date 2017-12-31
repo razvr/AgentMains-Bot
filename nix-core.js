@@ -58,6 +58,10 @@ class NixCore {
     return this._commandManager;
   }
 
+  get data() {
+    return this.dataManager;
+  }
+
   get dataManager() {
     return this._dataManager;
   }
