@@ -141,6 +141,10 @@ class NixCore {
     return this.main$;
   }
 
+  get listening() {
+    return !!this.main$;
+  }
+
   /**
    * Triggers a soft shutdown of the bot.
    */
