@@ -81,7 +81,7 @@ class NixCore {
   /**
    * alias the addCommand function to the Nix object for easier use.
    *
-   * @param command {CommandConfig} The command to add to Nix
+   * @param command {Object} The command to add to Nix
    */
   addCommand(command) {
     this.commandManager.addCommand(command);
@@ -90,10 +90,19 @@ class NixCore {
   /**
    * alias the addConfigActions function to the Nix object for easier use.
    *
-   * @param module {Object} The config module to add to Nix
+   * @param configActions {Object} The config module to add to Nix
    */
-  addConfigActions(module) {
-    this.configManager.addConfigActions(module);
+  addConfigActions(configActions) {
+    this.configManager.addConfigActions(configActions);
+  }
+
+  /**
+   * alias the addModule function to the Nix object for easier use.
+   *
+   * @param module {Object} The module to add to Nix
+   */
+  addModule(module) {
+    this.moduleManager.addModule(module);
   }
 
   /**
