@@ -4,11 +4,11 @@ const fs = require('fs');
 const Rx = require('rx');
 const Discord = require('discord.js');
 
-const ModuleManager = require('./lib/managers/module-manager');
-const CommandManager = require('./lib/managers/command-manager');
-const DataManager = require('./lib/managers/data-manager');
-const ConfigManager = require('./lib/managers/config-manager');
-const PermissionsManager = require('./lib/managers/permissions-manager');
+const ModuleService = require('./lib/services/module-service');
+const CommandService = require('./lib/services/command-service');
+const DataService = require('./lib/services/data-service');
+const ConfigService = require('./lib/services/config-service');
+const PermissionsService = require('./lib/services/permissions-service');
 
 const defaultResponseStrings = require('./lib/utility/reponse-strings');
 const defaultModuleFiles = fs.readdirSync(__dirname + '/lib/modules')
@@ -44,38 +44,34 @@ class NixCore {
     this._ownerUserId = config.ownerUserId;
     this._owner = null;
 
-    this._dataManager = new DataManager(this, config.dataSource);
+    this._dataService = new DataService(this, config.dataSource);
 
-    this._commandManager = new CommandManager(this, config.commands);
-    this._configManager = new ConfigManager(this);
-    this._permissionsManager = new PermissionsManager(this);
-    this._moduleManager = new ModuleManager(this, defaultModuleFiles);
+    this._commandService = new CommandService(this, config.commands);
+    this._configService = new ConfigService(this);
+    this._permissionsService = new PermissionsService(this);
+    this._moduleService = new ModuleService(this, defaultModuleFiles);
 
     this._shutdownSubject = new Rx.Subject();
   }
 
-  get commandManager() {
-    return this._commandManager;
+  get commandService() {
+    return this._commandService;
   }
 
-  get data() {
-    return this.dataManager;
+  get dataService() {
+    return this._dataService;
   }
 
-  get dataManager() {
-    return this._dataManager;
+  get configService() {
+    return this._configService;
   }
 
-  get configManager() {
-    return this._configManager;
+  get permissionsService() {
+    return this._permissionsService;
   }
 
-  get permissionsManager() {
-    return this._permissionsManager;
-  }
-
-  get moduleManager() {
-    return this._moduleManager;
+  get moduleService() {
+    return this._moduleService;
   }
 
   /**
@@ -84,7 +80,7 @@ class NixCore {
    * @param command {Object} The command to add to Nix
    */
   addCommand(command) {
-    this.commandManager.addCommand(command);
+    this.commandService.addCommand(command);
   }
 
   /**
@@ -93,7 +89,7 @@ class NixCore {
    * @param configActions {Object} The config module to add to Nix
    */
   addConfigActions(configActions) {
-    this.configManager.addConfigActions(configActions);
+    this.configService.addConfigActions(configActions);
   }
 
   /**
@@ -102,7 +98,7 @@ class NixCore {
    * @param module {Object} The module to add to Nix
    */
   addModule(module) {
-    this.moduleManager.addModule(module);
+    this.moduleService.addModule(module);
   }
 
   /**
@@ -125,7 +121,7 @@ class NixCore {
           .do(() => console.log("{INFO}", "DataSource is ready"))
           .flatMap(() =>
             Rx.Observable.merge([
-              this.commandManager.onNixListen(),
+              this.commandService.onNixListen(),
             ])
             .last() //wait for all the onNixListens to complete
             .do(() => console.log("{INFO}", "onNixListen hooks complete"))
@@ -200,7 +196,7 @@ class NixCore {
 
     return Rx.Observable
       .from(guilds.values())
-      .flatMap((guild) => this.moduleManager.prepareDefaultData(this, guild.id))
+      .flatMap((guild) => this.moduleService.prepareDefaultData(this, guild.id))
       .last();
   }
 
@@ -230,17 +226,17 @@ class NixCore {
     // Listen to events
     return Rx.Observable
       .merge([
-        this.streams.command$.flatMap((message) => this.commandManager.runCommandForMsg(message)),
+        this.streams.command$.flatMap((message) => this.commandService.runCommandForMsg(message)),
         this.streams.guildCreate$
           .flatMap((guild) =>
-            this.moduleManager
+            this.moduleService
               .prepareDefaultData(this, guild.id)
               .map(() => guild)
           )
           .flatMap((guild) =>
             Rx.Observable
               .merge([
-                this.commandManager.onNixJoinGuild(guild),
+                this.commandService.onNixJoinGuild(guild),
               ])
               .last() // Wait for all onNixJoinGuild hooks to complete
               .map(() => guild)

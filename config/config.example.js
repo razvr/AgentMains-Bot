@@ -6,6 +6,6 @@ module.exports = {
 
   dataSource: {
     type: 'disk',
-    dataDir: Path.join(__dirname, '../data'),
+    dataDir: Path.join(__dirname, '../dataService'),
   },
 };
