@@ -6,7 +6,7 @@ const Discord = require('discord.js');
 
 const ModuleManager = require('./lib/managers/module-manager');
 const CommandService = require('./lib/managers/command-service');
-const DataManager = require('./lib/managers/data-manager');
+const DataService = require('./lib/managers/data-service');
 const ConfigService = require('./lib/managers/config-service');
 const PermissionsManager = require('./lib/managers/permissions-manager');
 
@@ -44,7 +44,7 @@ class NixCore {
     this._ownerUserId = config.ownerUserId;
     this._owner = null;
 
-    this._dataManager = new DataManager(this, config.dataSource);
+    this._dataService = new DataService(this, config.dataSource);
 
     this._commandService = new CommandService(this, config.commands);
     this._configService = new ConfigService(this);
@@ -59,11 +59,11 @@ class NixCore {
   }
 
   get data() {
-    return this.dataManager;
+    return this.dataService;
   }
 
-  get dataManager() {
-    return this._dataManager;
+  get dataService() {
+    return this._dataService;
   }
 
   get configService() {
