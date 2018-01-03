@@ -4,11 +4,11 @@ const fs = require('fs');
 const Rx = require('rx');
 const Discord = require('discord.js');
 
-const ModuleService = require('./lib/managers/module-service');
-const CommandService = require('./lib/managers/command-service');
-const DataService = require('./lib/managers/data-service');
-const ConfigService = require('./lib/managers/config-service');
-const PermissionsService = require('./lib/managers/permissions-service');
+const ModuleService = require('./lib/services/module-service');
+const CommandService = require('./lib/services/command-service');
+const DataService = require('./lib/services/data-service');
+const ConfigService = require('./lib/services/config-service');
+const PermissionsService = require('./lib/services/permissions-service');
 
 const defaultResponseStrings = require('./lib/utility/reponse-strings');
 const defaultModuleFiles = fs.readdirSync(__dirname + '/lib/modules')
