@@ -4,7 +4,7 @@ const fs = require('fs');
 const Rx = require('rx');
 const Discord = require('discord.js');
 
-const ModuleManager = require('./lib/managers/module-manager');
+const ModuleService = require('./lib/managers/module-service');
 const CommandService = require('./lib/managers/command-service');
 const DataService = require('./lib/managers/data-service');
 const ConfigService = require('./lib/managers/config-service');
@@ -49,7 +49,7 @@ class NixCore {
     this._commandService = new CommandService(this, config.commands);
     this._configService = new ConfigService(this);
     this._permissionsManager = new PermissionsManager(this);
-    this._moduleManager = new ModuleManager(this, defaultModuleFiles);
+    this._moduleService = new ModuleService(this, defaultModuleFiles);
 
     this._shutdownSubject = new Rx.Subject();
   }
@@ -74,8 +74,8 @@ class NixCore {
     return this._permissionsManager;
   }
 
-  get moduleManager() {
-    return this._moduleManager;
+  get moduleService() {
+    return this._moduleService;
   }
 
   /**
@@ -102,7 +102,7 @@ class NixCore {
    * @param module {Object} The module to add to Nix
    */
   addModule(module) {
-    this.moduleManager.addModule(module);
+    this.moduleService.addModule(module);
   }
 
   /**
@@ -200,7 +200,7 @@ class NixCore {
 
     return Rx.Observable
       .from(guilds.values())
-      .flatMap((guild) => this.moduleManager.prepareDefaultData(this, guild.id))
+      .flatMap((guild) => this.moduleService.prepareDefaultData(this, guild.id))
       .last();
   }
 
@@ -229,7 +229,7 @@ class NixCore {
         this.streams.command$.flatMap((message) => this.commandService.runCommandForMsg(message)),
         this.streams.guildCreate$
           .flatMap((guild) =>
-            this.moduleManager
+            this.moduleService
               .prepareDefaultData(this, guild.id)
               .map(() => guild)
           )
