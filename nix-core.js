@@ -58,10 +58,6 @@ class NixCore {
     return this._commandService;
   }
 
-  get data() {
-    return this.dataService;
-  }
-
   get dataService() {
     return this._dataService;
   }
