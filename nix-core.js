@@ -5,7 +5,7 @@ const Rx = require('rx');
 const Discord = require('discord.js');
 
 const ModuleManager = require('./lib/managers/module-manager');
-const CommandManager = require('./lib/managers/command-manager');
+const CommandService = require('./lib/managers/command-service');
 const DataManager = require('./lib/managers/data-manager');
 const ConfigManager = require('./lib/managers/config-manager');
 const PermissionsManager = require('./lib/managers/permissions-manager');
@@ -46,7 +46,7 @@ class NixCore {
 
     this._dataManager = new DataManager(this, config.dataSource);
 
-    this._commandManager = new CommandManager(this, config.commands);
+    this._commandService = new CommandService(this, config.commands);
     this._configManager = new ConfigManager(this);
     this._permissionsManager = new PermissionsManager(this);
     this._moduleManager = new ModuleManager(this, defaultModuleFiles);
@@ -54,8 +54,8 @@ class NixCore {
     this._shutdownSubject = new Rx.Subject();
   }
 
-  get commandManager() {
-    return this._commandManager;
+  get commandService() {
+    return this._commandService;
   }
 
   get data() {
@@ -84,7 +84,7 @@ class NixCore {
    * @param command {Object} The command to add to Nix
    */
   addCommand(command) {
-    this.commandManager.addCommand(command);
+    this.commandService.addCommand(command);
   }
 
   /**
@@ -125,7 +125,7 @@ class NixCore {
           .do(() => console.log("{INFO}", "DataSource is ready"))
           .flatMap(() =>
             Rx.Observable.merge([
-              this.commandManager.onNixListen(),
+              this.commandService.onNixListen(),
             ])
             .last() //wait for all the onNixListens to complete
             .do(() => console.log("{INFO}", "onNixListen hooks complete"))
@@ -216,7 +216,7 @@ class NixCore {
     });
 
     // Create Nix specific streams
-    this.streams.command$ = this.streams.message$.filter((message) => this.commandManager.msgIsCommand(message))
+    this.streams.command$ = this.streams.message$.filter((message) => this.commandService.msgIsCommand(message))
 
     // Apply takeUntil and share to all streams
     for(let streamName in this.streams) {
@@ -226,7 +226,7 @@ class NixCore {
     // Listen to events
     return Rx.Observable
       .merge([
-        this.streams.command$.flatMap((message) => this.commandManager.runCommandForMsg(message)),
+        this.streams.command$.flatMap((message) => this.commandService.runCommandForMsg(message)),
         this.streams.guildCreate$
           .flatMap((guild) =>
             this.moduleManager
@@ -236,7 +236,7 @@ class NixCore {
           .flatMap((guild) =>
             Rx.Observable
               .merge([
-                this.commandManager.onNixJoinGuild(guild),
+                this.commandService.onNixJoinGuild(guild),
               ])
               .last() // Wait for all onNixJoinGuild hooks to complete
               .map(() => guild)
