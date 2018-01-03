@@ -8,7 +8,7 @@ const ModuleService = require('./lib/managers/module-service');
 const CommandService = require('./lib/managers/command-service');
 const DataService = require('./lib/managers/data-service');
 const ConfigService = require('./lib/managers/config-service');
-const PermissionsManager = require('./lib/managers/permissions-manager');
+const PermissionsService = require('./lib/managers/permissions-service');
 
 const defaultResponseStrings = require('./lib/utility/reponse-strings');
 const defaultModuleFiles = fs.readdirSync(__dirname + '/lib/modules')
@@ -48,7 +48,7 @@ class NixCore {
 
     this._commandService = new CommandService(this, config.commands);
     this._configService = new ConfigService(this);
-    this._permissionsManager = new PermissionsManager(this);
+    this._permissionsService = new PermissionsService(this);
     this._moduleService = new ModuleService(this, defaultModuleFiles);
 
     this._shutdownSubject = new Rx.Subject();
@@ -70,8 +70,8 @@ class NixCore {
     return this._configService;
   }
 
-  get permissionsManager() {
-    return this._permissionsManager;
+  get permissionsService() {
+    return this._permissionsService;
   }
 
   get moduleService() {
