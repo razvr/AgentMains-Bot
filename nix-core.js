@@ -7,7 +7,7 @@ const Discord = require('discord.js');
 const ModuleManager = require('./lib/managers/module-manager');
 const CommandService = require('./lib/managers/command-service');
 const DataManager = require('./lib/managers/data-manager');
-const ConfigManager = require('./lib/managers/config-manager');
+const ConfigService = require('./lib/managers/config-service');
 const PermissionsManager = require('./lib/managers/permissions-manager');
 
 const defaultResponseStrings = require('./lib/utility/reponse-strings');
@@ -47,7 +47,7 @@ class NixCore {
     this._dataManager = new DataManager(this, config.dataSource);
 
     this._commandService = new CommandService(this, config.commands);
-    this._configManager = new ConfigManager(this);
+    this._configService = new ConfigService(this);
     this._permissionsManager = new PermissionsManager(this);
     this._moduleManager = new ModuleManager(this, defaultModuleFiles);
 
@@ -66,8 +66,8 @@ class NixCore {
     return this._dataManager;
   }
 
-  get configManager() {
-    return this._configManager;
+  get configService() {
+    return this._configService;
   }
 
   get permissionsManager() {
@@ -93,7 +93,7 @@ class NixCore {
    * @param configActions {Object} The config module to add to Nix
    */
   addConfigActions(configActions) {
-    this.configManager.addConfigActions(configActions);
+    this.configService.addConfigActions(configActions);
   }
 
   /**
