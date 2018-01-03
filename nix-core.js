@@ -216,7 +216,11 @@ class NixCore {
     });
 
     // Create Nix specific streams
-    this.streams.command$ = this.streams.message$.filter((message) => this.commandManager.msgIsCommand(message))
+    this.streams.command$ =
+      this.streams
+        .message$
+        .filter((message) => message.channel.type === 'text')
+        .filter((message) => this.commandService.msgIsCommand(message))
 
     // Apply takeUntil and share to all streams
     for(let streamName in this.streams) {
