@@ -270,7 +270,7 @@ class NixCore {
         },
         {
           name: 'User:',
-          value: context.user.tag,
+          value: context.author.tag,
         },
         {
           name: 'Message:',
