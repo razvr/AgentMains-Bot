@@ -36,6 +36,10 @@ class NixCore {
       responseStrings: {},
     }, config);
 
+    this._shutdownSubject = undefined;
+    this.shutdown$ = undefined;
+    this.main$ = undefined;
+
     this.responseStrings = Object.assign(defaultResponseStrings, config.responseStrings);
     this.streams = {};
 
@@ -50,8 +54,6 @@ class NixCore {
     this._configService = new ConfigService(this);
     this._permissionsService = new PermissionsService(this);
     this._moduleService = new ModuleService(this, defaultModuleFiles);
-
-    this._shutdownSubject = new Rx.Subject();
   }
 
   get commandService() {
@@ -107,7 +109,14 @@ class NixCore {
    * @return {Rx.Observable} an observable stream to subscribe to
    */
   listen(ready, error, complete) {
-    if (!this.main$) {
+    if (!this.listening) {
+      this._shutdownSubject = new Rx.Subject();
+      this._listenSubject = new Rx.Subject();
+
+      this.shutdown$ = this._shutdownSubject
+        .do(() => console.log("{INFO}", 'Shutdown signal received.'))
+        .share();
+
       this.main$ =
         Rx.Observable
           .return()
@@ -119,6 +128,8 @@ class NixCore {
           .do(() => console.log("{INFO}", "Preparing DataSource"))
           .flatMap(() => this._readyDataSource())
           .do(() => console.log("{INFO}", "DataSource is ready"))
+          .merge(this._startEventStreams())
+          .do(() => console.log("{INFO}", "Event streams started"))
           .flatMap(() =>
             Rx.Observable.merge([
               this.commandService.onNixListen(),
@@ -126,15 +137,28 @@ class NixCore {
             .last() //wait for all the onNixListens to complete
             .do(() => console.log("{INFO}", "onNixListen hooks complete"))
           )
-          .merge(this._startEventStreams())
-          .do(() => console.log("{INFO}", "event streams started"))
-          .map(() => this.messageOwner("I'm now online."))
+          .flatMap(() => this.messageOwner("I'm now online."))
           .do(() => console.log("{INFO}", "Owner messaged, ready to go!"))
           .share();
+
+      this.main$.subscribe(
+        () => this._listenSubject.onNext('Ready'),
+        (error) => this._listenSubject.onError(error),
+        () =>
+          Rx.Observable
+            .return()
+            .do(() => console.log("{INFO}", 'Closing Discord connection'))
+            .flatMap(() => this.discord.destroy())
+            .subscribe(
+              () => console.log("{INFO}", "Discord connection closed"),
+              (error) => this._listenSubject.onError(error),
+              () => this._listenSubject.onCompleted()
+            )
+      );
     }
 
-    this.main$.subscribe(ready, error, complete);
-    return this.main$;
+    this._listenSubject.subscribe(ready, error, complete);
+    return this._listenSubject;
   }
 
   get listening() {
@@ -145,7 +169,9 @@ class NixCore {
    * Triggers a soft shutdown of the bot.
    */
   shutdown() {
+    if (!this.listening) { throw new Error("Bot is not listening."); }
     this._shutdownSubject.onNext(true);
+    this._shutdownSubject.onCompleted();
   }
 
   /**
@@ -208,40 +234,42 @@ class NixCore {
   _startEventStreams() {
     // Create a stream for all the Discord events
     Object.values(Discord.Constants.Events).forEach((eventType) => {
-      this.streams[eventType + '$'] = Rx.Observable.fromEvent(this._discord, eventType)
+      this.streams[eventType + '$'] = Rx.Observable.fromEvent(this._discord, eventType);
     });
 
-    // Create Nix specific streams
+    // Create Nix specific event streams
     this.streams.command$ =
       this.streams
         .message$
         .filter((message) => message.channel.type === 'text')
-        .filter((message) => this.commandService.msgIsCommand(message))
+        .filter((message) => this.commandService.msgIsCommand(message));
 
     // Apply takeUntil and share to all streams
     for(let streamName in this.streams) {
-      this.streams[streamName] = this.streams[streamName].takeUntil(this._shutdownSubject).share();
+      this.streams[streamName] =
+        this.streams[streamName]
+          .takeUntil(this.shutdown$)
+          .share();
     }
 
     // Listen to events
+    this.streams.command$.subscribe(
+      (message) =>
+        this.commandService
+          .runCommandForMsg(message)
+          .subscribe()
+      );
+    this.streams.guildCreate$.subscribe((guild) =>
+      this.moduleService
+        .prepareDefaultData(this, guild.id)
+        .merge([
+          this.commandService.onNixJoinGuild(guild),
+        ])
+        .subscribe()
+    );
+
     return Rx.Observable
-      .merge([
-        this.streams.command$.flatMap((message) => this.commandService.runCommandForMsg(message)),
-        this.streams.guildCreate$
-          .flatMap((guild) =>
-            this.moduleService
-              .prepareDefaultData(this, guild.id)
-              .map(() => guild)
-          )
-          .flatMap((guild) =>
-            Rx.Observable
-              .merge([
-                this.commandService.onNixJoinGuild(guild),
-              ])
-              .last() // Wait for all onNixJoinGuild hooks to complete
-              .map(() => guild)
-          ),
-      ])
+      .merge(Object.values(this.streams))
       .ignoreElements()
       .doOnCompleted(() => this.streams = {})
       .share();
