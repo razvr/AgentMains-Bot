@@ -113,31 +113,31 @@ class NixCore {
       this._listenSubject = new Rx.Subject();
 
       this.shutdown$ = this._shutdownSubject
-        .do(() => console.log("{INFO}", 'Shutdown signal received.'))
+        .do(() => this.logger.info('Shutdown signal received.'))
         .share();
 
       this.main$ =
         Rx.Observable
           .return()
           .flatMap(() => this.discord.login(this._loginToken))
-          .do(() => console.log("{INFO}", 'Logged into Discord'))
-          .do(() => console.log("{INFO}", 'In', this.discord.guilds.size, 'guilds'))
+          .do(() => this.logger.info(`Logged into Discord`))
+          .do(() => this.logger.info(`In ${this.discord.guilds.size} guilds`))
           .flatMap(() => this.findOwner())
-          .do((owner) => console.log("{INFO}", "Found owner", owner.tag))
-          .do(() => console.log("{INFO}", "Preparing DataSource"))
+          .do((owner) => this.logger.info(`Found owner ${owner.tag}`))
+          .do(() => this.logger.info(`Preparing DataSource`))
           .flatMap(() => this._readyDataSource())
-          .do(() => console.log("{INFO}", "DataSource is ready"))
+          .do(() => this.logger.info(`DataSource is ready`))
           .merge(this._startEventStreams())
-          .do(() => console.log("{INFO}", "Event streams started"))
+          .do(() => this.logger.info(`Event streams started`))
           .flatMap(() =>
             Rx.Observable.merge([
               this.commandService.onNixListen(),
             ])
             .last() //wait for all the onNixListens to complete
-            .do(() => console.log("{INFO}", "onNixListen hooks complete"))
+            .do(() => this.logger.info(`onNixListen hooks complete`))
           )
           .flatMap(() => this.messageOwner("I'm now online."))
-          .do(() => console.log("{INFO}", "Owner messaged, ready to go!"))
+          .do(() => this.logger.info(`Owner messaged, ready to go!`))
           .share();
 
       this.main$.subscribe(
@@ -146,10 +146,10 @@ class NixCore {
         () =>
           Rx.Observable
             .return()
-            .do(() => console.log("{INFO}", 'Closing Discord connection'))
+            .do(() => this.logger.info(`Closing Discord connection`))
             .flatMap(() => this.discord.destroy())
             .subscribe(
-              () => console.log("{INFO}", "Discord connection closed"),
+              () => this.logger.info(`Discord connection closed`),
               (error) => this._listenSubject.onError(error),
               () => this._listenSubject.onCompleted()
             )
@@ -275,7 +275,7 @@ class NixCore {
   }
 
   handleError(context, error) {
-    console.error(error);
+    this.logger.error(error);
 
     this.messageOwner(
       this.responseStrings.commandRun.unhandledException.forOwner({}),
