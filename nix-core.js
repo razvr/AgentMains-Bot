@@ -68,26 +68,12 @@ class NixCore {
     this._moduleService = new ModuleService(this, defaultModuleFiles);
   }
 
-  get commandService() {
-    return this._commandService;
-  }
-
-  get dataService() {
-    return this._dataService;
-  }
-
-  get configService() {
-    return this._configService;
-  }
-
-  get permissionsService() {
-    return this._permissionsService;
-  }
-
-  get moduleService() {
-    return this._moduleService;
-  }
   get logger() { return this._logService.logger; }
+  get commandService() { return this._commandService; }
+  get dataService() { return this._dataService; }
+  get configService() { return this._configService; }
+  get permissionsService() { return this._permissionsService; }
+  get moduleService() { return this._moduleService; }
 
   /**
    * alias the addCommand function to the Nix object for easier use.
