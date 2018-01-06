@@ -1,9 +1,9 @@
 'use strict';
-
 const fs = require('fs');
 const Rx = require('rx');
 const Discord = require('discord.js');
 
+const LogService = require('./lib/services/log-service');
 const ModuleService = require('./lib/services/module-service');
 const CommandService = require('./lib/services/command-service');
 const DataService = require('./lib/services/data-service');
@@ -30,11 +30,12 @@ class NixCore {
     config = Object.assign({
       discord: {},
       commands: [],
-      dataSource: {
-        type: 'none',
-      },
+      dataSource: { type: 'memory' },
+      logger: {},
       responseStrings: {},
     }, config);
+
+    this._logService = new LogService(this, config.logger);
 
     this._shutdownSubject = undefined;
     this.shutdown$ = undefined;
@@ -56,25 +57,12 @@ class NixCore {
     this._moduleService = new ModuleService(this, defaultModuleFiles);
   }
 
-  get commandService() {
-    return this._commandService;
-  }
-
-  get dataService() {
-    return this._dataService;
-  }
-
-  get configService() {
-    return this._configService;
-  }
-
-  get permissionsService() {
-    return this._permissionsService;
-  }
-
-  get moduleService() {
-    return this._moduleService;
-  }
+  get logger() { return this._logService.logger; }
+  get commandService() { return this._commandService; }
+  get dataService() { return this._dataService; }
+  get configService() { return this._configService; }
+  get permissionsService() { return this._permissionsService; }
+  get moduleService() { return this._moduleService; }
 
   /**
    * alias the addCommand function to the Nix object for easier use.
@@ -114,22 +102,28 @@ class NixCore {
       this._listenSubject = new Rx.Subject();
 
       this.shutdown$ = this._shutdownSubject
-        .do(() => console.log("{INFO}", 'Shutdown signal received.'))
+        .do(() => this.logger.info('Shutdown signal received.'))
         .share();
 
       this.main$ =
         Rx.Observable
           .return()
+          .do(() => this.logger.debug(`Beginning to listen`))
           .flatMap(() => this.discord.login(this._loginToken))
-          .do(() => console.log("{INFO}", 'Logged into Discord'))
-          .do(() => console.log("{INFO}", 'In', this.discord.guilds.size, 'guilds'))
+          .do(() => this.logger.info(`Logged into Discord. In ${this.discord.guilds.size} guilds`))
+          .do(() =>
+            this.discord
+              .guilds
+              .array()
+              .forEach((guild) => this.logger.debug(`In guild '${guild.name}' (${guild.id})`))
+          )
           .flatMap(() => this.findOwner())
-          .do((owner) => console.log("{INFO}", "Found owner", owner.tag))
-          .do(() => console.log("{INFO}", "Preparing DataSource"))
+          .do((owner) => this.logger.info(`Found owner ${owner.tag}`))
+          .do(() => this.logger.info(`Preparing DataSource`))
           .flatMap(() => this._readyDataSource())
-          .do(() => console.log("{INFO}", "DataSource is ready"))
+          .do(() => this.logger.info(`DataSource is ready`))
           .merge(this._startEventStreams())
-          .do(() => console.log("{INFO}", "Event streams started"))
+          .do(() => this.logger.info(`Event streams started`))
           .do(() => console.log("{INFO}", "Starting onNixListen hooks"))
           .flatMap(() => this.dataService.onNixListen())
           .flatMap(() =>
@@ -156,7 +150,7 @@ class NixCore {
           )
           .do(() => console.log("{INFO}", "onNixJoinGuild hooks complete"))
           .flatMap(() => this.messageOwner("I'm now online."))
-          .do(() => console.log("{INFO}", "Owner messaged, ready to go!"))
+          .do(() => this.logger.info(`Owner messaged, ready to go!`))
           .share();
 
       this.main$.subscribe(
@@ -165,10 +159,10 @@ class NixCore {
         () =>
           Rx.Observable
             .return()
-            .do(() => console.log("{INFO}", 'Closing Discord connection'))
+            .do(() => this.logger.info(`Closing Discord connection`))
             .flatMap(() => this.discord.destroy())
             .subscribe(
-              () => console.log("{INFO}", "Discord connection closed"),
+              () => this.logger.info(`Discord connection closed`),
               (error) => this._listenSubject.onError(error),
               () => this._listenSubject.onCompleted()
             )
@@ -294,7 +288,7 @@ class NixCore {
   }
 
   handleError(context, error) {
-    console.error(error);
+    this.logger.error(error);
 
     this.messageOwner(
       this.responseStrings.commandRun.unhandledException.forOwner({}),

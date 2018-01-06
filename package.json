@@ -22,7 +22,9 @@
   ],
   "repository": "https://github.com/SpyMaster356/nix-core",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "winston": "^3.0.0-rc1"
+  },
   "peerDependencies": {
     "discord.js": "^12.0.0",
     "rx": "^4.1.0"
