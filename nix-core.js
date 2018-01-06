@@ -124,13 +124,31 @@ class NixCore {
           .do(() => this.logger.info(`DataSource is ready`))
           .merge(this._startEventStreams())
           .do(() => this.logger.info(`Event streams started`))
+          .do(() => this.logger.info(`Starting onNixListen hooks`))
+          .flatMap(() => this.dataService.onNixListen())
           .flatMap(() =>
-            Rx.Observable.merge([
-              this.commandService.onNixListen(),
-            ])
-            .last() //wait for all the onNixListens to complete
-            .do(() => this.logger.info(`onNixListen hooks complete`))
+            Rx.Observable
+              .merge([
+                this.moduleService.onNixListen(),
+              ])
+              .last() //wait for all the onNixListens hooks to complete
           )
+          .do(() => this.logger.info(`onNixListen hooks complete`))
+          .do(() => this.logger.info(`Starting startup onNixJoinGuild hooks`))
+          .flatMap(() =>
+            Rx.Observable
+              .from(this.discord.guilds.values())
+              .flatMap((guild) => this.dataService.onNixJoinGuild(guild).map(guild))
+              .flatMap((guild) =>
+                Rx.Observable
+                  .merge([
+                    this.commandService.onNixJoinGuild(guild),
+                    this.moduleService.onNixJoinGuild(guild),
+                  ])
+              )
+              .last() //wait for all the onNixJoinGuild hooks to complete
+          )
+          .do(() => this.logger.info(`onNixJoinGuild hooks complete`))
           .flatMap(() => this.messageOwner("I'm now online."))
           .do(() => this.logger.info(`Owner messaged, ready to go!`))
           .share();
