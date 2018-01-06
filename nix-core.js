@@ -130,13 +130,15 @@ class NixCore {
           .do(() => console.log("{INFO}", "DataSource is ready"))
           .merge(this._startEventStreams())
           .do(() => console.log("{INFO}", "Event streams started"))
+          .do(() => console.log("{INFO}", "Starting onNixListen hooks"))
+          .flatMap(() => this.dataService.onNixListen())
           .flatMap(() =>
             Rx.Observable.merge([
               this.commandService.onNixListen(),
             ])
             .last() //wait for all the onNixListens to complete
-            .do(() => console.log("{INFO}", "onNixListen hooks complete"))
           )
+          .do(() => console.log("{INFO}", "onNixListen hooks complete"))
           .flatMap(() => this.messageOwner("I'm now online."))
           .do(() => console.log("{INFO}", "Owner messaged, ready to go!"))
           .share();
