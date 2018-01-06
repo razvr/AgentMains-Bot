@@ -32,17 +32,7 @@ class NixCore {
       discord: {},
       commands: [],
       dataSource: { type: 'memory' },
-      logger: {
-        level: 'info',
-        format: Winston.format.combine(
-          Winston.format.colorize(),
-          Winston.format.align(),
-          Winston.format.printf(info => `${info.level}: ${info.message}`)
-        ),
-        transports: [
-          new Winston.transports.Console(),
-        ],
-      },
+      logger: {},
       responseStrings: {},
     }, config);
 
@@ -119,9 +109,9 @@ class NixCore {
       this.main$ =
         Rx.Observable
           .return()
+          .do(() => this.logger.debug(`Beginning to listen`))
           .flatMap(() => this.discord.login(this._loginToken))
-          .do(() => this.logger.info(`Logged into Discord`))
-          .do(() => this.logger.info(`In ${this.discord.guilds.size} guilds`))
+          .do(() => this.logger.info(`Logged into Discord. In ${this.discord.guilds.size} guilds`))
           .flatMap(() => this.findOwner())
           .do((owner) => this.logger.info(`Found owner ${owner.tag}`))
           .do(() => this.logger.info(`Preparing DataSource`))
