@@ -149,6 +149,7 @@ class NixCore {
                 Rx.Observable
                   .merge([
                     this.commandService.onNixJoinGuild(guild),
+                    this.moduleService.onNixJoinGuild(guild),
                   ])
               )
               .last() //wait for all the onNixJoinGuild hooks to complete
