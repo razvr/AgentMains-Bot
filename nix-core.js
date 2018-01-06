@@ -1,14 +1,14 @@
 'use strict';
-
 const fs = require('fs');
 const Rx = require('rx');
 const Discord = require('discord.js');
 
-const ModuleManager = require('./lib/managers/module-manager');
-const CommandManager = require('./lib/managers/command-manager');
-const DataManager = require('./lib/managers/data-manager');
-const ConfigManager = require('./lib/managers/config-manager');
-const PermissionsManager = require('./lib/managers/permissions-manager');
+const LogService = require('./lib/services/log-service');
+const ModuleService = require('./lib/services/module-service');
+const CommandService = require('./lib/services/command-service');
+const DataService = require('./lib/services/data-service');
+const ConfigService = require('./lib/services/config-service');
+const PermissionsService = require('./lib/services/permissions-service');
 
 const defaultResponseStrings = require('./lib/utility/reponse-strings');
 const defaultModuleFiles = fs.readdirSync(__dirname + '/lib/modules')
@@ -30,11 +30,16 @@ class NixCore {
     config = Object.assign({
       discord: {},
       commands: [],
-      dataSource: {
-        type: 'none',
-      },
+      dataSource: { type: 'memory' },
+      logger: {},
       responseStrings: {},
     }, config);
+
+    this._logService = new LogService(this, config.logger);
+
+    this._shutdownSubject = undefined;
+    this.shutdown$ = undefined;
+    this.main$ = undefined;
 
     this.responseStrings = Object.assign(defaultResponseStrings, config.responseStrings);
     this.streams = {};
@@ -44,39 +49,20 @@ class NixCore {
     this._ownerUserId = config.ownerUserId;
     this._owner = null;
 
-    this._dataManager = new DataManager(this, config.dataSource);
+    this._dataService = new DataService(this, config.dataSource);
 
-    this._commandManager = new CommandManager(this, config.commands);
-    this._configManager = new ConfigManager(this);
-    this._permissionsManager = new PermissionsManager(this);
-    this._moduleManager = new ModuleManager(this, defaultModuleFiles);
-
-    this._shutdownSubject = new Rx.Subject();
+    this._commandService = new CommandService(this, config.commands);
+    this._configService = new ConfigService(this);
+    this._permissionsService = new PermissionsService(this);
+    this._moduleService = new ModuleService(this, defaultModuleFiles);
   }
 
-  get commandManager() {
-    return this._commandManager;
-  }
-
-  get data() {
-    return this.dataManager;
-  }
-
-  get dataManager() {
-    return this._dataManager;
-  }
-
-  get configManager() {
-    return this._configManager;
-  }
-
-  get permissionsManager() {
-    return this._permissionsManager;
-  }
-
-  get moduleManager() {
-    return this._moduleManager;
-  }
+  get logger() { return this._logService.logger; }
+  get commandService() { return this._commandService; }
+  get dataService() { return this._dataService; }
+  get configService() { return this._configService; }
+  get permissionsService() { return this._permissionsService; }
+  get moduleService() { return this._moduleService; }
 
   /**
    * alias the addCommand function to the Nix object for easier use.
@@ -84,7 +70,7 @@ class NixCore {
    * @param command {Object} The command to add to Nix
    */
   addCommand(command) {
-    this.commandManager.addCommand(command);
+    this.commandService.addCommand(command);
   }
 
   /**
@@ -93,7 +79,7 @@ class NixCore {
    * @param configActions {Object} The config module to add to Nix
    */
   addConfigActions(configActions) {
-    this.configManager.addConfigActions(configActions);
+    this.configService.addConfigActions(configActions);
   }
 
   /**
@@ -102,7 +88,7 @@ class NixCore {
    * @param module {Object} The module to add to Nix
    */
   addModule(module) {
-    this.moduleManager.addModule(module);
+    this.moduleService.addModule(module);
   }
 
   /**
@@ -111,34 +97,80 @@ class NixCore {
    * @return {Rx.Observable} an observable stream to subscribe to
    */
   listen(ready, error, complete) {
-    if (!this.main$) {
+    if (!this.listening) {
+      this._shutdownSubject = new Rx.Subject();
+      this._listenSubject = new Rx.Subject();
+
+      this.shutdown$ = this._shutdownSubject
+        .do(() => this.logger.info('Shutdown signal received.'))
+        .share();
+
       this.main$ =
         Rx.Observable
           .return()
+          .do(() => this.logger.debug(`Beginning to listen`))
           .flatMap(() => this.discord.login(this._loginToken))
-          .do(() => console.log("{INFO}", 'Logged into Discord'))
-          .do(() => console.log("{INFO}", 'In', this.discord.guilds.size, 'guilds'))
-          .flatMap(() => this.findOwner())
-          .do((owner) => console.log("{INFO}", "Found owner", owner.tag))
-          .do(() => console.log("{INFO}", "Preparing DataSource"))
-          .flatMap(() => this._readyDataSource())
-          .do(() => console.log("{INFO}", "DataSource is ready"))
-          .flatMap(() =>
-            Rx.Observable.merge([
-              this.commandManager.onNixListen(),
-            ])
-            .last() //wait for all the onNixListens to complete
-            .do(() => console.log("{INFO}", "onNixListen hooks complete"))
+          .do(() => this.logger.info(`Logged into Discord. In ${this.discord.guilds.size} guilds`))
+          .do(() =>
+            this.discord
+              .guilds
+              .array()
+              .forEach((guild) => this.logger.debug(`In guild '${guild.name}' (${guild.id})`))
           )
+          .flatMap(() => this.findOwner())
+          .do((owner) => this.logger.info(`Found owner ${owner.tag}`))
+          .do(() => this.logger.info(`Preparing DataSource`))
+          .flatMap(() => this._readyDataSource())
+          .do(() => this.logger.info(`DataSource is ready`))
           .merge(this._startEventStreams())
-          .do(() => console.log("{INFO}", "event streams started"))
-          .map(() => this.messageOwner("I'm now online."))
-          .do(() => console.log("{INFO}", "Owner messaged, ready to go!"))
+          .do(() => this.logger.info(`Event streams started`))
+          .do(() => this.logger.info(`Starting onNixListen hooks`))
+          .flatMap(() => this.dataService.onNixListen())
+          .flatMap(() =>
+            Rx.Observable
+              .merge([
+                this.moduleService.onNixListen(),
+              ])
+              .last() //wait for all the onNixListens hooks to complete
+          )
+          .do(() => this.logger.info(`onNixListen hooks complete`))
+          .do(() => this.logger.info(`Starting startup onNixJoinGuild hooks`))
+          .flatMap(() =>
+            Rx.Observable
+              .from(this.discord.guilds.values())
+              .flatMap((guild) => this.dataService.onNixJoinGuild(guild).map(guild))
+              .flatMap((guild) =>
+                Rx.Observable
+                  .merge([
+                    this.commandService.onNixJoinGuild(guild),
+                    this.moduleService.onNixJoinGuild(guild),
+                  ])
+              )
+              .last() //wait for all the onNixJoinGuild hooks to complete
+          )
+          .do(() => this.logger.info(`onNixJoinGuild hooks complete`))
+          .flatMap(() => this.messageOwner("I'm now online."))
+          .do(() => this.logger.info(`Owner messaged, ready to go!`))
           .share();
+
+      this.main$.subscribe(
+        () => this._listenSubject.onNext('Ready'),
+        (error) => this._listenSubject.onError(error),
+        () =>
+          Rx.Observable
+            .return()
+            .do(() => this.logger.info(`Closing Discord connection`))
+            .flatMap(() => this.discord.destroy())
+            .subscribe(
+              () => this.logger.info(`Discord connection closed`),
+              (error) => this._listenSubject.onError(error),
+              () => this._listenSubject.onCompleted()
+            )
+      );
     }
 
-    this.main$.subscribe(ready, error, complete);
-    return this.main$;
+    this._listenSubject.subscribe(ready, error, complete);
+    return this._listenSubject;
   }
 
   get listening() {
@@ -149,7 +181,9 @@ class NixCore {
    * Triggers a soft shutdown of the bot.
    */
   shutdown() {
+    if (!this.listening) { throw new Error("Bot is not listening."); }
     this._shutdownSubject.onNext(true);
+    this._shutdownSubject.onCompleted();
   }
 
   /**
@@ -200,7 +234,7 @@ class NixCore {
 
     return Rx.Observable
       .from(guilds.values())
-      .flatMap((guild) => this.moduleManager.prepareDefaultData(this, guild.id))
+      .flatMap((guild) => this.moduleService.prepareDefaultData(this, guild.id))
       .last();
   }
 
@@ -212,43 +246,49 @@ class NixCore {
   _startEventStreams() {
     // Create a stream for all the Discord events
     Object.values(Discord.Constants.Events).forEach((eventType) => {
-      this.streams[eventType + '$'] = Rx.Observable.fromEvent(this._discord, eventType)
+      this.streams[eventType + '$'] = Rx.Observable.fromEvent(this._discord, eventType);
     });
 
-    // Create Nix specific streams
-    this.streams.command$ = this.streams.message$.filter((message) => this.commandManager.msgIsCommand(message))
+    // Create Nix specific event streams
+    this.streams.command$ =
+      this.streams
+        .message$
+        .filter((message) => message.channel.type === 'text')
+        .filter((message) => this.commandService.msgIsCommand(message));
 
     // Apply takeUntil and share to all streams
     for(let streamName in this.streams) {
-      this.streams[streamName] = this.streams[streamName].takeUntil(this._shutdownSubject).share();
+      this.streams[streamName] =
+        this.streams[streamName]
+          .takeUntil(this.shutdown$)
+          .share();
     }
 
     // Listen to events
+    this.streams.command$.subscribe(
+      (message) =>
+        this.commandService
+          .runCommandForMsg(message)
+          .subscribe()
+      );
+    this.streams.guildCreate$.subscribe((guild) =>
+      this.moduleService
+        .prepareDefaultData(this, guild.id)
+        .merge([
+          this.commandService.onNixJoinGuild(guild),
+        ])
+        .subscribe()
+    );
+
     return Rx.Observable
-      .merge([
-        this.streams.command$.flatMap((message) => this.commandManager.runCommandForMsg(message)),
-        this.streams.guildCreate$
-          .flatMap((guild) =>
-            this.moduleManager
-              .prepareDefaultData(this, guild.id)
-              .map(() => guild)
-          )
-          .flatMap((guild) =>
-            Rx.Observable
-              .merge([
-                this.commandManager.onNixJoinGuild(guild),
-              ])
-              .last() // Wait for all onNixJoinGuild hooks to complete
-              .map(() => guild)
-          ),
-      ])
+      .merge(Object.values(this.streams))
       .ignoreElements()
       .doOnCompleted(() => this.streams = {})
       .share();
   }
 
   handleError(context, error) {
-    console.error(error);
+    this.logger.error(error);
 
     this.messageOwner(
       this.responseStrings.commandRun.unhandledException.forOwner({}),
@@ -270,7 +310,7 @@ class NixCore {
         },
         {
           name: 'User:',
-          value: context.user.tag,
+          value: context.author.tag,
         },
         {
           name: 'Message:',
