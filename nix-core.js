@@ -139,6 +139,13 @@ class NixCore {
             .last() //wait for all the onNixListens to complete
           )
           .do(() => console.log("{INFO}", "onNixListen hooks complete"))
+          .do(() => console.log("{INFO}", "Starting startup onNixJoinGuild hooks"))
+          .flatMap(() =>
+            Rx.Observable
+              .from(this.discord.guilds.values())
+              .flatMap((guild) => this.dataService.onNixJoinGuild(guild).map(guild))
+          )
+          .do(() => console.log("{INFO}", "onNixJoinGuild hooks complete"))
           .flatMap(() => this.messageOwner("I'm now online."))
           .do(() => console.log("{INFO}", "Owner messaged, ready to go!"))
           .share();
