@@ -144,6 +144,13 @@ class NixCore {
             Rx.Observable
               .from(this.discord.guilds.values())
               .flatMap((guild) => this.dataService.onNixJoinGuild(guild).map(guild))
+              .flatMap((guild) =>
+                Rx.Observable
+                  .merge([
+                    this.commandService.onNixJoinGuild(guild),
+                  ])
+              )
+              .last() //wait for all the onNixJoinGuild hooks to complete
           )
           .do(() => console.log("{INFO}", "onNixJoinGuild hooks complete"))
           .flatMap(() => this.messageOwner("I'm now online."))
