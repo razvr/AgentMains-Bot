@@ -111,6 +111,12 @@ class NixCore {
           .do(() => this.logger.debug(`Beginning to listen`))
           .flatMap(() => this.discord.login(this._loginToken))
           .do(() => this.logger.info(`Logged into Discord. In ${this.discord.guilds.size} guilds`))
+          .do(() =>
+            this.discord
+              .guilds
+              .array()
+              .forEach((guild) => this.logger.debug(`In guild '${guild.name}' (${guild.id})`))
+          )
           .flatMap(() => this.findOwner())
           .do((owner) => this.logger.info(`Found owner ${owner.tag}`))
           .do(() => this.logger.info(`Preparing DataSource`))
