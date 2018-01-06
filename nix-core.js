@@ -2,7 +2,6 @@
 const fs = require('fs');
 const Rx = require('rx');
 const Discord = require('discord.js');
-const Winston = require('winston');
 
 const LogService = require('./lib/services/log-service');
 const ModuleService = require('./lib/services/module-service');
