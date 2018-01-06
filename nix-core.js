@@ -1,9 +1,10 @@
 'use strict';
-
 const fs = require('fs');
 const Rx = require('rx');
 const Discord = require('discord.js');
+const Winston = require('winston');
 
+const LogService = require('./lib/services/log-service');
 const ModuleService = require('./lib/services/module-service');
 const CommandService = require('./lib/services/command-service');
 const DataService = require('./lib/services/data-service');
@@ -30,11 +31,22 @@ class NixCore {
     config = Object.assign({
       discord: {},
       commands: [],
-      dataSource: {
-        type: 'none',
+      dataSource: { type: 'memory' },
+      logger: {
+        level: 'info',
+        format: Winston.format.combine(
+          Winston.format.colorize(),
+          Winston.format.align(),
+          Winston.format.printf(info => `${info.level}: ${info.message}`)
+        ),
+        transports: [
+          new Winston.transports.Console(),
+        ],
       },
       responseStrings: {},
     }, config);
+
+    this._logService = new LogService(this, config.logger);
 
     this._shutdownSubject = undefined;
     this.shutdown$ = undefined;
@@ -75,6 +87,7 @@ class NixCore {
   get moduleService() {
     return this._moduleService;
   }
+  get logger() { return this._logService.logger; }
 
   /**
    * alias the addCommand function to the Nix object for easier use.
