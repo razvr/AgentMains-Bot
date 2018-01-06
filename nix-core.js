@@ -133,10 +133,11 @@ class NixCore {
           .do(() => console.log("{INFO}", "Starting onNixListen hooks"))
           .flatMap(() => this.dataService.onNixListen())
           .flatMap(() =>
-            Rx.Observable.merge([
-              this.commandService.onNixListen(),
-            ])
-            .last() //wait for all the onNixListens to complete
+            Rx.Observable
+              .merge([
+                this.moduleService.onNixListen(),
+              ])
+              .last() //wait for all the onNixListens hooks to complete
           )
           .do(() => console.log("{INFO}", "onNixListen hooks complete"))
           .do(() => console.log("{INFO}", "Starting startup onNixJoinGuild hooks"))
