@@ -7,11 +7,11 @@ const LogService = require('./lib/services/log-service');
 const ModuleService = require('./lib/services/module-service');
 const CommandService = require('./lib/services/command-service');
 const DataService = require('./lib/services/data-service');
-const ConfigService = require('./lib/services/config-service');
+const ConfigActionService = require('./lib/services/config-action-service');
 const PermissionsService = require('./lib/services/permissions-service');
 
 const defaultResponseStrings = require('./lib/utility/reponse-strings');
-const defaultModuleFiles = fs.readdirSync(__dirname + '/lib/modules')
+const modules = fs.readdirSync(__dirname + '/lib/modules')
   .map((file) => require(__dirname + '/lib/modules/' + file));
 
 class NixCore {
@@ -27,50 +27,68 @@ class NixCore {
    * @param config.responseStrings {Object}
    */
   constructor(config) {
-    config = Object.assign({
+    this.config = Object.assign({
       discord: {},
-      commands: [],
       dataSource: { type: 'memory' },
       logger: {},
       responseStrings: {},
     }, config);
 
-    this._logService = new LogService(this, config.logger);
+    this._logService = new LogService(this);
+    this._dataService = new DataService(this);
+
+    this.services = {
+      core: {
+        CommandService: new CommandService(this),
+        ConfigActionService: new ConfigActionService(this),
+        PermissionsService: new PermissionsService(this),
+        ModuleService: new ModuleService(this),
+      },
+    };
 
     this._shutdownSubject = undefined;
     this.shutdown$ = undefined;
     this.main$ = undefined;
 
-    this.responseStrings = Object.assign(defaultResponseStrings, config.responseStrings);
+    this.responseStrings = Object.assign(defaultResponseStrings, this.config.responseStrings);
     this.streams = {};
 
-    this._discord = new Discord.Client(config.discord);
-    this._loginToken = config.loginToken;
-    this._ownerUserId = config.ownerUserId;
+    this._discord = new Discord.Client(this.config.discord);
     this._owner = null;
 
-    this._dataService = new DataService(this, config.dataSource);
-
-    this._commandService = new CommandService(this, config.commands);
-    this._configService = new ConfigService(this);
-    this._permissionsService = new PermissionsService(this);
-    this._moduleService = new ModuleService(this, defaultModuleFiles);
+    modules.forEach((module) => this.moduleService.addModule(module));
   }
 
   get logger() { return this._logService.logger; }
-  get commandService() { return this._commandService; }
   get dataService() { return this._dataService; }
-  get configService() { return this._configService; }
-  get permissionsService() { return this._permissionsService; }
-  get moduleService() { return this._moduleService; }
+  get commandService() { return this.getService('core', 'CommandService'); }
+  get configActionService() { return this.getService('core', 'ConfigActionService'); }
+  get permissionsService() { return this.getService('core', 'PermissionsService'); }
+  get moduleService() { return this.getService('core', 'ModuleService'); }
 
-  /**
-   * alias the addCommand function to the Nix object for easier use.
-   *
-   * @param command {Object} The command to add to Nix
-   */
-  addCommand(command) {
-    this.commandService.addCommand(command);
+  addService(module, Service) {
+    this.logger.debug(`adding Service: ${module}.${Service.name}`);
+    let moduleServices = this.services[module];
+    if (!moduleServices) {
+      moduleServices = {};
+      this.services[module] = moduleServices;
+    }
+
+    moduleServices[Service.name] = new Service(this);
+  }
+
+  getService(module, serviceName) {
+    let moduleServices = this.services[module];
+    if (!moduleServices) { throw new Error('Module has no services'); }
+    return moduleServices[serviceName];
+  }
+
+  get _allServices() {
+    let list = [];
+    Object.values(this.services).forEach((moduleServices) => {
+      list = list.concat(Object.values(moduleServices));
+    });
+    return list;
   }
 
   /**
@@ -79,7 +97,7 @@ class NixCore {
    * @param configActions {Object} The config module to add to Nix
    */
   addConfigActions(configActions) {
-    this.configService.addConfigActions(configActions);
+    this.configActionService.addConfigActions(configActions);
   }
 
   /**
@@ -98,8 +116,9 @@ class NixCore {
    */
   listen(ready, error, complete) {
     if (!this.listening) {
-      this._shutdownSubject = new Rx.Subject();
-      this._listenSubject = new Rx.Subject();
+      //use replay subjects to let future subscribers know that the event has already passed.
+      this._shutdownSubject = new Rx.ReplaySubject();
+      this._listenSubject = new Rx.ReplaySubject();
 
       this.shutdown$ = this._shutdownSubject
         .do(() => this.logger.info('Shutdown signal received.'))
@@ -109,7 +128,7 @@ class NixCore {
         Rx.Observable
           .return()
           .do(() => this.logger.debug(`Beginning to listen`))
-          .flatMap(() => this.discord.login(this._loginToken))
+          .flatMap(() => this.discord.login(this.config.loginToken))
           .do(() => this.logger.info(`Logged into Discord. In ${this.discord.guilds.size} guilds`))
           .do(() =>
             this.discord
@@ -128,9 +147,10 @@ class NixCore {
           .flatMap(() => this.dataService.onNixListen())
           .flatMap(() =>
             Rx.Observable
-              .merge([
-                this.moduleService.onNixListen(),
-              ])
+              .from(this._allServices)
+              .filter((service) => typeof service.onNixListen !== 'undefined')
+              .flatMap((service) => service.onNixListen())
+              .defaultIfEmpty(true)
               .last() //wait for all the onNixListens hooks to complete
           )
           .do(() => this.logger.info(`onNixListen hooks complete`))
@@ -141,11 +161,11 @@ class NixCore {
               .flatMap((guild) => this.dataService.onNixJoinGuild(guild).map(guild))
               .flatMap((guild) =>
                 Rx.Observable
-                  .merge([
-                    this.commandService.onNixJoinGuild(guild),
-                    this.moduleService.onNixJoinGuild(guild),
-                  ])
+                  .from(this._allServices)
+                  .filter((service) => typeof service.onNixJoinGuild !== 'undefined')
+                  .flatMap((service) => service.onNixJoinGuild(guild))
               )
+              .defaultIfEmpty(true)
               .last() //wait for all the onNixJoinGuild hooks to complete
           )
           .do(() => this.logger.info(`onNixJoinGuild hooks complete`))
@@ -222,7 +242,7 @@ class NixCore {
 
   findOwner() {
     return Rx.Observable
-      .fromPromise(this._discord.users.fetch(this._ownerUserId))
+      .fromPromise(this._discord.users.fetch(this.config.ownerUserId))
       .do((user) => this._owner = user);
   }
 
