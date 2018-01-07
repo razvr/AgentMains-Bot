@@ -34,15 +34,17 @@ class NixCore {
       responseStrings: {},
     }, config);
 
-    this.services = {};
-    this.addServices('core', [
-      DataService,
-      LogService,
-      CommandService,
-      ConfigActionService,
-      PermissionsService,
-      ModuleService,
-    ]);
+    this._logService = new LogService(this);
+    this._dataService = new DataService(this);
+
+    this.services = {
+      core: {
+        CommandService: new CommandService(this),
+        ConfigActionService: new ConfigActionService(this),
+        PermissionsService: new PermissionsService(this),
+        ModuleService: new ModuleService(this),
+      },
+    };
 
     this._shutdownSubject = undefined;
     this.shutdown$ = undefined;
@@ -57,18 +59,15 @@ class NixCore {
     modules.forEach((module) => this.moduleService.addModule(module));
   }
 
-  get logger() { return this.getService('core', 'LogService').logger; }
-  get dataService() { return this.getService('core', 'DataService'); }
+  get logger() { return this._logService.logger; }
+  get dataService() { return this._dataService; }
   get commandService() { return this.getService('core', 'CommandService'); }
   get configActionService() { return this.getService('core', 'ConfigActionService'); }
   get permissionsService() { return this.getService('core', 'PermissionsService'); }
   get moduleService() { return this.getService('core', 'ModuleService'); }
 
-  addServices(module, Services) {
-    Services.forEach((Service) => this.addService(module, Service))
-  }
-
   addService(module, Service) {
+    this.logger.debug(`adding Service: ${module}.${Service.name}`);
     let moduleServices = this.services[module];
     if (!moduleServices) {
       moduleServices = {};
@@ -84,13 +83,12 @@ class NixCore {
     return moduleServices[serviceName];
   }
 
-  /**
-   * alias the addCommand function to the Nix object for easier use.
-   *
-   * @param command {Object} The command to add to Nix
-   */
-  addCommand(command) {
-    this.commandService.addCommand(command);
+  get _allServices() {
+    let list = [];
+    Object.values(this.services).forEach((moduleServices) => {
+      list = list.concat(Object.values(moduleServices));
+    });
+    return list;
   }
 
   /**
@@ -118,8 +116,9 @@ class NixCore {
    */
   listen(ready, error, complete) {
     if (!this.listening) {
-      this._shutdownSubject = new Rx.Subject();
-      this._listenSubject = new Rx.Subject();
+      //use replay subjects to let future subscribers know that the event has already passed.
+      this._shutdownSubject = new Rx.ReplaySubject();
+      this._listenSubject = new Rx.ReplaySubject();
 
       this.shutdown$ = this._shutdownSubject
         .do(() => this.logger.info('Shutdown signal received.'))
@@ -148,9 +147,10 @@ class NixCore {
           .flatMap(() => this.dataService.onNixListen())
           .flatMap(() =>
             Rx.Observable
-              .merge([
-                this.moduleService.onNixListen(),
-              ])
+              .from(this._allServices)
+              .filter((service) => typeof service.onNixListen !== 'undefined')
+              .flatMap((service) => service.onNixListen())
+              .defaultIfEmpty(true)
               .last() //wait for all the onNixListens hooks to complete
           )
           .do(() => this.logger.info(`onNixListen hooks complete`))
@@ -161,11 +161,11 @@ class NixCore {
               .flatMap((guild) => this.dataService.onNixJoinGuild(guild).map(guild))
               .flatMap((guild) =>
                 Rx.Observable
-                  .merge([
-                    this.commandService.onNixJoinGuild(guild),
-                    this.moduleService.onNixJoinGuild(guild),
-                  ])
+                  .from(this._allServices)
+                  .filter((service) => typeof service.onNixJoinGuild !== 'undefined')
+                  .flatMap((service) => service.onNixJoinGuild(guild))
               )
+              .defaultIfEmpty(true)
               .last() //wait for all the onNixJoinGuild hooks to complete
           )
           .do(() => this.logger.info(`onNixJoinGuild hooks complete`))
