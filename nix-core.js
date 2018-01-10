@@ -9,6 +9,7 @@ const CommandService = require('./lib/services/command-service');
 const DataService = require('./lib/services/data-service');
 const ConfigActionService = require('./lib/services/config-action-service');
 const PermissionsService = require('./lib/services/permissions-service');
+const UserService = require('./lib/services/user-service');
 
 const defaultResponseStrings = require('./lib/utility/reponse-strings');
 const modules = fs.readdirSync(__dirname + '/lib/modules')
@@ -43,6 +44,7 @@ class NixCore {
         ConfigActionService: new ConfigActionService(this),
         PermissionsService: new PermissionsService(this),
         ModuleService: new ModuleService(this),
+        UserService: new UserService(this),
       },
     };
 
@@ -65,6 +67,7 @@ class NixCore {
   get configActionService() { return this.getService('core', 'ConfigActionService'); }
   get permissionsService() { return this.getService('core', 'PermissionsService'); }
   get moduleService() { return this.getService('core', 'ModuleService'); }
+  get userService() { return this.getService('core', 'UserService'); }
 
   addService(module, Service) {
     this.logger.debug(`adding Service: ${module}.${Service.name}`);
@@ -308,7 +311,7 @@ class NixCore {
   }
 
   handleError(context, error) {
-    this.logger.error(error);
+    this.logger.error(`Error in command:\n${error.stack}`);
 
     this.messageOwner(
       this.responseStrings.commandRun.unhandledException.forOwner({}),
