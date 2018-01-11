@@ -12,3 +12,5 @@ lib/built-in/commands/error.js
 \.idea/
 
 config/config\.js
+
+lib/modules/core/commands/test\.js
