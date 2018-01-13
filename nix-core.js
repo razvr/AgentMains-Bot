@@ -160,7 +160,7 @@ class NixCore {
           .do(() => this.logger.info(`Starting startup onNixJoinGuild hooks`))
           .flatMap(() =>
             Rx.Observable
-              .from(this.discord.guilds.values())
+              .from(this.discord.guilds.array())
               .flatMap((guild) => this.dataService.onNixJoinGuild(guild).map(guild))
               .flatMap((guild) =>
                 Rx.Observable
@@ -245,7 +245,7 @@ class NixCore {
 
   findOwner() {
     return Rx.Observable
-      .fromPromise(this._discord.users.fetch(this.config.ownerUserId))
+      .fromPromise(this._discord.fetchUser(this.config.ownerUserId))
       .do((user) => this._owner = user);
   }
 
@@ -269,7 +269,9 @@ class NixCore {
   _startEventStreams() {
     // Create a stream for all the Discord events
     Object.values(Discord.Constants.Events).forEach((eventType) => {
-      this.streams[eventType + '$'] = Rx.Observable.fromEvent(this._discord, eventType);
+      let streamName = eventType + '$';
+      this.logger.debug(`adding stream nix.streams.${streamName}`);
+      this.streams[streamName] = Rx.Observable.fromEvent(this._discord, eventType);
     });
 
     // Create Nix specific event streams
