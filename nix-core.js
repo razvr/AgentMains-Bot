@@ -1,5 +1,6 @@
 'use strict';
 const fs = require('fs');
+const util = require('util');
 const Rx = require('rx');
 const Discord = require('discord.js');
 
@@ -271,7 +272,16 @@ class NixCore {
     Object.values(Discord.Constants.Events).forEach((eventType) => {
       let streamName = eventType + '$';
       this.logger.debug(`adding stream nix.streams.${streamName}`);
-      this.streams[streamName] = Rx.Observable.fromEvent(this._discord, eventType);
+      this.streams[streamName] =
+        Rx.Observable
+          .fromEvent(
+            this._discord,
+            eventType,
+            function(...args) {
+              if(args.length > 1) { return args; }
+              return args[0];
+            }
+          );
     });
 
     // Create Nix specific event streams
