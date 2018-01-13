@@ -26,11 +26,11 @@
     "winston": "^3.0.0-rc1"
   },
   "peerDependencies": {
-    "discord.js": "^12.0.0",
+    "discord.js": "^11.3.0",
     "rx": "^4.1.0"
   },
   "devDependencies": {
-    "discord.js": "github:hydrabolt/discord.js#master",
+    "discord.js": "github:hydrabolt/discord.js#11.3-dev",
     "eslint": "^4.14.0",
     "glob": "^7.1.2",
     "rx": "^4.1.0"
