@@ -1,6 +1,6 @@
 {
   "name": "nix-core",
-  "version": "0.8.0-dev",
+  "version": "0.8.0-rc.1",
   "description": "A framework for discord bots",
   "homepage": "",
   "author": {
