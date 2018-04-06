@@ -5,6 +5,7 @@ const Discord = require('discord.js');
 
 const NixConfig = require("./index").NixConfig;
 const NixLogger = require("./lib/utility/nix-logger");
+const ServicesManager = require('./lib/utility/services-manager');
 
 const ModuleService = require('./lib/services/module-service');
 const CommandService = require('./lib/services/command-service');
@@ -41,6 +42,10 @@ class NixCore {
 
     this.discord = new Discord.Client(this.config.discord);
     this._owner = null;
+
+    this.servicesManager = new ServicesManager(this);
+    this.addService = this.servicesManager.addService;
+    this.getService = this.servicesManager.getService;
 
     this.addService('core', DataService);
     this.addService('core', ModuleService);
@@ -104,60 +109,6 @@ class NixCore {
   get userService() {
     this.logger.warn("Deprecation Warning: Accessing userService directly is deprecated. Please use nix.getService('core', 'userService') instead.");
     return this.getService('core', 'UserService');
-  }
-
-  /**
-   * Adds a service to Nix for use by modules, commands, and other services.
-   *
-   * @param moduleName {string} the name of the module that the server is part of
-   * @param service {Service} The service to add
-   */
-  addService(moduleName, service) {
-    if (typeof service === "function") {
-      this.logger.warn("Deprecation Warning: Passing a Class as the service is deprecated. Please pass an instance of Service");
-
-      let Service = service;
-      service = new Service(this);
-      service.name = Service.name;
-    }
-
-    let serviceKey = `${moduleName}.${service.name}`;
-
-    if (this.services[serviceKey.toLowerCase()]) {
-      let error = new Error(`The service ${serviceKey} has already been added.`);
-      error.name = "ServiceAlreadyExistsError";
-      throw error;
-    }
-
-    service._nix = this;
-
-    if (service.onInitalize) {
-      this.logger.verbose(`initializing Service: ${serviceKey}`);
-      service.onInitalize(this.config);
-    }
-
-    this.logger.verbose(`added Service: ${serviceKey}`);
-    this.services[serviceKey.toLowerCase()] = service;
-  }
-
-  /**
-   * Get a Nix service
-   *
-   * @param moduleName {string} the name of the module the service is from
-   * @param serviceName {string} tjhe name of the service
-   * @returns {*} the requested service
-   */
-  getService(moduleName, serviceName) {
-    let serviceKey = `${moduleName}.${serviceName}`;
-    let service = this.services[serviceKey.toLowerCase()];
-
-    if (!service) {
-      let error = new Error(`The service ${serviceKey} could not be found`);
-      error.name = "ServiceNotFoundError";
-      throw error;
-    }
-
-    return service;
   }
 
   /**
