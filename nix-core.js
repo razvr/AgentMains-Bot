@@ -31,12 +31,12 @@ class NixCore {
     this.config.verifyConfig(); // Confirm the config is valid
 
     this.logger = NixLogger.createLogger(this.config.logger);
-    this.responseStrings = Object.assign(defaultResponseStrings, this.config.responseStrings);
-    this.services = {};
 
-    this._shutdownSubject = undefined;
-    this.shutdown$ = undefined;
-    this.main$ = undefined;
+    this.responseStrings = Object.assign(defaultResponseStrings, this.config.responseStrings);
+
+    this._shutdownSubject = null;
+    this.shutdown$ = null;
+    this.main$ = null;
 
     this.streams = {};
 
@@ -47,14 +47,32 @@ class NixCore {
     this.addService = this.servicesManager.addService;
     this.getService = this.servicesManager.getService;
 
+    // Bootstrapping complete, load the core services and modules
+    this._loadCoreServices();
+    this._loadCoreModules();
+  }
+
+  /**
+   * Loads the core services provided by Nix
+   * @private
+   */
+  _loadCoreServices() {
     this.addService('core', DataService);
     this.addService('core', ModuleService);
     this.addService('core', CommandService);
     this.addService('core', ConfigActionService);
     this.addService('core', PermissionsService);
     this.addService('core', UserService);
+  }
 
-    builtInModules.forEach((module) => this.addModule(module));
+  /**
+   * Loads all core modules provided by Nix
+   * @private
+   */
+  _loadCoreModules() {
+    fs.readdirSync(__dirname + '/lib/modules')
+      .map((file) => require(__dirname + '/lib/modules/' + file))
+      .map((module) => this.addModule(module));
   }
 
   /**
