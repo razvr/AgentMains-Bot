@@ -4,8 +4,8 @@ const Rx = require('rx');
 const Discord = require('discord.js');
 
 const NixConfig = require("./index").NixConfig;
+const NixLogger = require("./lib/utility/nix-logger");
 
-const LogService = require('./lib/services/log-service');
 const ModuleService = require('./lib/services/module-service');
 const CommandService = require('./lib/services/command-service');
 const DataService = require('./lib/services/data-service');
@@ -27,7 +27,8 @@ class NixCore {
     this.config = config;
     this.config.verifyConfig(); // Confirm the config is valid
 
-    this._logService = new LogService(this);
+    this.logger = NixLogger.createLogger(this.config.logger);
+
     this._dataService = new DataService(this);
 
     this.services = {
@@ -53,7 +54,6 @@ class NixCore {
     modules.forEach((module) => this.moduleService.addModule(module));
   }
 
-  get logger() { return this._logService.logger; }
   get dataService() { return this._dataService; }
   get commandService() { return this.getService('core', 'CommandService'); }
   get configActionService() { return this.getService('core', 'ConfigActionService'); }
