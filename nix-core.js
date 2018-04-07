@@ -173,53 +173,24 @@ class NixCore {
           .do(() => this.logger.debug(`Beginning to listen`))
           .flatMap(() => this.discord.login(this.config.loginToken))
           .do(() => this.logger.info(`Logged into Discord. In ${this.discord.guilds.size} guilds`))
-          .do(() =>
-            this.discord
-              .guilds
-              .array()
-              .forEach((guild) => this.logger.verbose(`In guild '${guild.name}' (${guild.id})`))
-          )
           .flatMap(() => this.findOwner())
           .do((owner) => this.logger.info(`Found owner ${owner.tag}`))
-          .do(() => this.logger.info(`Preparing DataSource`))
           .flatMap(() => this._readyDataSource())
-          .do(() => this.logger.info(`DataSource is ready`))
-          .merge(this._startEventStreams())
-          .do(() => this.logger.info(`Event streams started`))
-          .do(() => this.logger.info(`Starting onNixListen hooks`))
-          .flatMap(() => dataService.onNixListen()) // prepare dataService first
-          .flatMap(() =>
-            Rx.Observable
-              .from(Object.values(this.services))
-              .filter((service) => service.name !== 'DataService')
-              .filter((service) => typeof service.onNixListen !== 'undefined')
-              .flatMap((service) => service.onNixListen())
-              .defaultIfEmpty(true)
-              .last() //wait for all the onNixListens hooks to complete
-          )
-          .do(() => this.logger.info(`onNixListen hooks complete`))
-          .do(() => this.logger.info(`Starting startup onNixJoinGuild hooks`))
-          .flatMap(() =>
-            Rx.Observable
-              .from(this.discord.guilds.array())
-              .flatMap((guild) => dataService.onNixJoinGuild(guild).map(guild))
-              .flatMap((guild) =>
-                Rx.Observable
-                  .from(Object.values(this.services))
-                  .filter((service) => service.name !== 'DataService')
-                  .filter((service) => typeof service.onNixJoinGuild !== 'undefined')
-                  .flatMap((service) => service.onNixJoinGuild(guild))
-              )
-              .defaultIfEmpty(true)
-              .last() //wait for all the onNixJoinGuild hooks to complete
-          )
-          .do(() => this.logger.info(`onNixJoinGuild hooks complete`))
-          .flatMap(() => this.messageOwner("I'm now online."))
-          .do(() => this.logger.info(`Owner messaged, ready to go!`))
+          .flatMap(() => this._startEventStreams())
+          .flatMap(() => this._doOnNixListenHooks())
+          .flatMap(() => this._doOnNixJoinGuildHooks())
+          .do(() => {
+            if (this.config.messageOwnerOnBoot) {
+              this.messageOwner("I'm now online.");
+            }
+          })
           .share();
 
       this.main$.subscribe(
-        () => this._listenSubject.onNext('Ready'),
+        () => {
+          this.logger.info(`Ready!`);
+          this._listenSubject.onNext('Ready');
+        },
         (error) => this._listenSubject.onError(error),
         () =>
           Rx.Observable
@@ -236,6 +207,61 @@ class NixCore {
 
     this._listenSubject.subscribe(ready, error, complete);
     return this._listenSubject;
+  }
+
+  _doOnNixListenHooks() {
+    let dataService = this.getService('core', 'dataService');
+
+    return Rx.Observable.of('')
+      .do(() => this.logger.info(`Starting onNixListen hooks`))
+      .flatMap(() => this._triggerHook(dataService, 'onNixListen')) // prepare dataService first
+      .flatMap(() =>
+        Rx.Observable.concat(
+          Rx.Observable.from(this.servicesManager.services)
+            .filter((service) => service.name !== 'DataService')
+        )
+      )
+      .flatMap((hookListener) => this._triggerHook(hookListener, 'onNixListen'))
+      .last() //wait for all the onNixListens hooks to complete
+      .do(() => this.logger.info(`onNixListen hooks complete`));
+  }
+
+  _doOnNixJoinGuildHooks() {
+    let dataService = this.getService('core', 'dataService');
+
+    this.logger.info(`Starting onNixJoinGuild hooks`);
+    return Rx.Observable.from(this.discord.guilds.array())
+      .flatMap((guild) => this._triggerHook(dataService, 'onNixJoinGuild', [guild]).map(() => guild)) // prepare dataService first
+      .flatMap((guild) =>
+        Rx.Observable.concat(
+          Rx.Observable.from(this.servicesManager.services)
+            .filter((service) => service.name !== 'DataService')
+        )
+        .flatMap((hookListener) => this._triggerHook(hookListener, 'onNixJoinGuild', [guild]))
+      )
+      .last() //wait for all the onNixJoinGuilds hooks to complete
+      .do(() => this.logger.info(`onNixJoinGuild hooks complete`));
+  }
+
+  _triggerHook(hookListener, hookName, args) {
+    if (!hookListener[hookName]) {
+      return Rx.Observable.of(true);
+    }
+
+    let returnValue = hookListener[hookName].apply(hookListener, args);
+
+    if (typeof returnValue === 'undefined') {
+      return Rx.Observable.of(true);
+    }
+    else if (returnValue instanceof Rx.Observable) {
+      return returnValue;
+    }
+    else if (typeof returnValue.then === 'function') {
+      return Rx.Observable.fromPromise(returnValue);
+    }
+    else {
+      return Rx.Observable.of(true);
+    }
   }
 
   /**
@@ -296,6 +322,8 @@ class NixCore {
    * @returns {Rx.Observable<any>}
    */
   _readyDataSource() {
+    this.logger.info(`Preparing DataSource`);
+
     let moduleService = this.getService('core', 'moduleService');
 
     let guilds = this.discord.guilds;
@@ -306,7 +334,8 @@ class NixCore {
     return Rx.Observable
       .from(guilds.values())
       .flatMap((guild) => moduleService.prepareDefaultData(this, guild.id))
-      .last();
+      .last()
+      .do(() => this.logger.info(`DataSource is ready`));
   }
 
   /**
@@ -315,6 +344,8 @@ class NixCore {
    * @private
    */
   _startEventStreams() {
+    this.logger.info(`Starting event streams`);
+
     let moduleService = this.getService('core', 'moduleService');
     let commandService = this.getService('core', 'commandService');
 
@@ -364,11 +395,14 @@ class NixCore {
         (error) => { throw error; }
       );
 
-    return Rx.Observable
-      .merge(Object.values(this.streams))
-      .ignoreElements()
-      .doOnCompleted(() => this.streams = {})
-      .share();
+    let eventStreams$ =
+      Rx.Observable.merge(Object.values(this.streams))
+        .ignoreElements()
+        .doOnCompleted(() => this.streams = {})
+
+    return Rx.Observable.of('')
+      .merge(eventStreams$)
+      .do(() => this.logger.info(`Event streams started`));
   }
 
   handleError(context, error) {
