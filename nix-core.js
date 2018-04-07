@@ -178,7 +178,11 @@ class NixCore {
           .flatMap(() => this._readyDataSource())
           .flatMap(() => this._startEventStreams())
           .flatMap(() => this._doOnNixListenHooks())
-          .flatMap(() => this._doOnNixJoinGuildHooks())
+          .flatMap(() =>
+            Rx.Observable.from(this.discord.guilds.array())
+              .flatMap((guild) => this._doOnNixJoinGuildHooks(guild))
+              .last()
+          )
           .do(() => {
             if (this.config.messageOwnerOnBoot) {
               this.messageOwner("I'm now online.");
@@ -226,13 +230,13 @@ class NixCore {
       .do(() => this.logger.info(`onNixListen hooks complete`));
   }
 
-  _doOnNixJoinGuildHooks() {
+  _doOnNixJoinGuildHooks(guild) {
     let dataService = this.getService('core', 'dataService');
 
-    this.logger.info(`Starting onNixJoinGuild hooks`);
-    return Rx.Observable.from(this.discord.guilds.array())
-      .flatMap((guild) => this._triggerHook(dataService, 'onNixJoinGuild', [guild]).map(() => guild)) // prepare dataService first
-      .flatMap((guild) =>
+    this.logger.info(`Starting onNixJoinGuild hooks for guild '${guild.name}' (${guild.id})`);
+    return Rx.Observable.of('')
+      .flatMap(() => this._triggerHook(dataService, 'onNixJoinGuild', [guild]))
+      .flatMap(() =>
         Rx.Observable.concat(
           Rx.Observable.from(this.servicesManager.services)
             .filter((service) => service.name !== 'DataService')
@@ -240,7 +244,7 @@ class NixCore {
         .flatMap((hookListener) => this._triggerHook(hookListener, 'onNixJoinGuild', [guild]))
       )
       .last() //wait for all the onNixJoinGuilds hooks to complete
-      .do(() => this.logger.info(`onNixJoinGuild hooks complete`));
+      .do(() => this.logger.info(`Completed onNixJoinGuild hooks for guild ${guild.id} (${guild.name})`));
   }
 
   _triggerHook(hookListener, hookName, args) {
@@ -388,8 +392,7 @@ class NixCore {
       );
 
     this.streams.guildCreate$
-      .flatMap((guild) => moduleService.prepareDefaultData(this, guild.id).map(() => guild))
-      .flatMap((guild) => commandService.onNixJoinGuild(guild))
+      .flatMap((guild) => this._doOnNixJoinGuildHooks(guild))
       .subscribe(
         () => {},
         (error) => { throw error; }
@@ -398,7 +401,7 @@ class NixCore {
     let eventStreams$ =
       Rx.Observable.merge(Object.values(this.streams))
         .ignoreElements()
-        .doOnCompleted(() => this.streams = {})
+        .doOnCompleted(() => this.streams = {};
 
     return Rx.Observable.of('')
       .merge(eventStreams$)
