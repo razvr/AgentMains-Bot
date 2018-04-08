@@ -156,10 +156,8 @@ class NixCore {
    * @return {Rx.Observable<string>} an observable stream to subscribe to
    */
   listen(ready, error, complete) {
-    let dataService = this.getService('core', 'dataService');
-
     if (!this.listening) {
-      //use replay subjects to let future subscribers know that the event has already passed.
+      //use replay subjects to let future subscribers know that Nix has already started listening.
       this._shutdownSubject = new Rx.ReplaySubject();
       this._listenSubject = new Rx.ReplaySubject();
 
@@ -168,9 +166,10 @@ class NixCore {
         .share();
 
       this.main$ =
-        Rx.Observable
-          .return()
-          .do(() => this.logger.debug(`Beginning to listen`))
+        Rx.Observable.of('')
+          .do(() => this.logger.info(`Configuring Services`))
+          .flatMap(() => this.servicesManager.configureServices())
+          .do(() => this.logger.info(`Logging into Discord`))
           .flatMap(() => this.discord.login(this.config.loginToken))
           .do(() => this.logger.info(`Logged into Discord. In ${this.discord.guilds.size} guilds`))
           .flatMap(() => this.findOwner())
@@ -195,7 +194,10 @@ class NixCore {
           this.logger.info(`Ready!`);
           this._listenSubject.onNext('Ready');
         },
-        (error) => this._listenSubject.onError(error),
+        (error) => {
+          this._listenSubject.onError(error);
+          throw error;
+        },
         () =>
           Rx.Observable
             .return()
