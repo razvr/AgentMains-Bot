@@ -401,7 +401,7 @@ class NixCore {
     let eventStreams$ =
       Rx.Observable.merge(Object.values(this.streams))
         .ignoreElements()
-        .doOnCompleted(() => this.streams = {};
+        .doOnCompleted(() => this.streams = {});
 
     return Rx.Observable.of('')
       .merge(eventStreams$)
