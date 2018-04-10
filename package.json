@@ -16,7 +16,7 @@
     "bot": "node --preserve-symlinks ./bot.js",
     "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks ./bot.js"
   },
-  "main": "nix-core.js",
+  "main": "index.js",
   "keywords": [
     "discord",
     "bot",

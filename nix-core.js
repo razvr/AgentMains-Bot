@@ -1,8 +1,9 @@
 'use strict';
 const fs = require('fs');
-const util = require('util');
 const Rx = require('rx');
 const Discord = require('discord.js');
+
+const NixConfig = require("./index").NixConfig;
 
 const LogService = require('./lib/services/log-service');
 const ModuleService = require('./lib/services/module-service');
@@ -19,22 +20,12 @@ const modules = fs.readdirSync(__dirname + '/lib/modules')
 class NixCore {
   /**
    * Create a new instance of Nix
-   *
-   * @param config {Object} The settings for Nix to use
-   * @param config.discord {Object} The instance of a Discord.js Client for Nix to use.
-   * @param config.loginToken {String} A Discord login token to authenticate with Discord.
-   * @param config.ownerUserId {String} The user ID of the owner of the bot.
-   * @param config.commands {Array}
-   * @param config.dataSource {Object} Configuration settings for the data source
-   * @param config.responseStrings {Object}
+   * @param config {NixConfig} configuration settings for this Nix bot
    */
   constructor(config) {
-    this.config = Object.assign({
-      discord: {},
-      dataSource: { type: 'memory' },
-      logger: {},
-      responseStrings: {},
-    }, config);
+    if (!(config instanceof NixConfig)) { config = new NixConfig(config); }
+    this.config = config;
+    this.config.verifyConfig(); // Confirm the config is valid
 
     this._logService = new LogService(this);
     this._dataService = new DataService(this);
