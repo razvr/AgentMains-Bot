@@ -5,8 +5,8 @@ const Discord = require('discord.js');
 
 const NixConfig = require("./index").NixConfig;
 const NixLogger = require("./lib/utility/nix-logger");
-const ServicesManager = require('./lib/utility/services-manager');
-const ModuleManager = require('./lib/utility/module-manager');
+const ServicesManager = require('./lib/managers/services-manager');
+const ModuleManager = require('./lib/managers/module-manager');
 
 const ModuleService = require('./lib/services/module-service');
 const CommandService = require('./lib/services/command-service');
