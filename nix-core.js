@@ -178,6 +178,8 @@ class NixCore {
 
       this.main$ =
         Rx.Observable.of('')
+          .do(() => this.logger.info(`Beginning to listen`))
+          .do(() => this._logStats())
           .do(() => this.logger.info(`Configuring Services`))
           .flatMap(() => this.servicesManager.configureServices())
           .do(() => this.logger.info(`Logging into Discord`))
@@ -224,6 +226,18 @@ class NixCore {
 
     this._listenSubject.subscribe(ready, error, complete);
     return this._listenSubject;
+  }
+
+  _logStats() {
+    let commandService = this.getService('core', 'commandService')
+
+    let services = this.servicesManager.services;
+    let modules = this.moduleManager.modules;
+    let commands = Object.values(commandService.commands);
+
+    this.logger.info(`${services.length} Services loaded`);
+    this.logger.info(`${modules.length} Modules loaded`);
+    this.logger.info(`${commands.length} Commands loaded`);
   }
 
   _doOnNixListenHooks() {
