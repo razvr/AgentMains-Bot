@@ -13,8 +13,8 @@
   ],
   "scripts": {
     "lint": "./node_modules/.bin/eslint **/*.js",
-    "bot": "node --preserve-symlinks ./bot.js",
-    "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks ./bot.js"
+    "bot": "node --preserve-symlinks ./test/test-bot.js",
+    "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks ./test/test-bot.js"
   },
   "main": "index.js",
   "keywords": [
