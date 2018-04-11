@@ -6,6 +6,7 @@ const Discord = require('discord.js');
 const NixConfig = require("./index").NixConfig;
 const NixLogger = require("./lib/utility/nix-logger");
 const ServicesManager = require('./lib/utility/services-manager');
+const ModuleManager = require('./lib/utility/module-manager');
 
 const ModuleService = require('./lib/services/module-service');
 const CommandService = require('./lib/services/command-service');
@@ -15,10 +16,6 @@ const PermissionsService = require('./lib/services/permissions-service');
 const UserService = require('./lib/services/user-service');
 
 const defaultResponseStrings = require('./lib/utility/reponse-strings');
-
-// noinspection JSUnresolvedFunction
-const builtInModules = fs.readdirSync(__dirname + '/lib/modules')
-  .map((file) => require(__dirname + '/lib/modules/' + file));
 
 class NixCore {
   /**
@@ -46,10 +43,15 @@ class NixCore {
     this.servicesManager = new ServicesManager(this);
     this.addService = this.servicesManager.addService;
     this.getService = this.servicesManager.getService;
+    this._loadCoreServices();
+    this._loadConfigServices();
 
     // Bootstrapping complete, load the core services and modules
-    this._loadCoreServices();
+    this.moduleManager = new ModuleManager(this);
+    this.addModule = this.moduleManager.addModule;
+    this.getModule = this.moduleManager.getModule;
     this._loadCoreModules();
+    this._loadConfigModules();
   }
 
   /**
@@ -66,6 +68,16 @@ class NixCore {
   }
 
   /**
+   * Loads all services that have been added via the config file
+   * @private
+   */
+  _loadConfigServices() {
+    Object.entries(this.config.services).forEach(([moduleName, services]) => {
+      services.forEach((service) => this.addService(moduleName, service));
+    });
+  }
+
+  /**
    * Loads all core modules provided by Nix
    * @private
    */
@@ -73,6 +85,14 @@ class NixCore {
     fs.readdirSync(__dirname + '/lib/modules')
       .map((file) => require(__dirname + '/lib/modules/' + file))
       .map((module) => this.addModule(module));
+  }
+
+  /**
+   * Loads all modules that have been added via the config file
+   * @private
+   */
+  _loadConfigModules() {
+    this.config.modules.forEach((module) => this.addModule(module));
   }
 
   /**
@@ -136,15 +156,6 @@ class NixCore {
    */
   addConfigActions(configActions) {
     this.getService('core', 'configActionService').addConfigActions(configActions);
-  }
-
-  /**
-   * alias the addModule function to the Nix object for easier use.
-   *
-   * @param module {Object} The module to add to Nix
-   */
-  addModule(module) {
-    this.getService('core', 'moduleService').addModule(module);
   }
 
   /**
@@ -340,7 +351,7 @@ class NixCore {
     return Rx.Observable
       .from(guilds.values())
       .flatMap((guild) => moduleService.prepareDefaultData(this, guild.id))
-      .last()
+      .toArray()
       .do(() => this.logger.info(`DataSource is ready`));
   }
 
