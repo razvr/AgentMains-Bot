@@ -13,8 +13,8 @@
   ],
   "scripts": {
     "lint": "./node_modules/.bin/eslint **/*.js",
-    "bot": "node --preserve-symlinks ./test/test-bot.js",
-    "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks ./test/test-bot.js"
+    "bot": "node --preserve-symlinks ./test/test-bot/index.js",
+    "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks ./test/test-bot/index.js"
   },
   "main": "index.js",
   "keywords": [
@@ -26,18 +26,20 @@
   "repository": "https://github.com/SpyMaster356/nix-core",
   "license": "MIT",
   "dependencies": {
-    "winston": "^3.0.0-rc1",
-    "nix-data-memory": "github:nix-core/nix-data-memory#master"
+    "nix-data-memory": "github:nix-core/nix-data-memory#master",
+    "winston": "^3.0.0-rc1"
   },
   "peerDependencies": {
     "discord.js": "^11.3.0",
     "rx": "^4.1.0"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
     "discord.js": "github:hydrabolt/discord.js#11.3-dev",
     "eslint": "^4.14.0",
     "glob": "^7.1.2",
-    "rx": "^4.1.0",
-    "nix-data-disk": "github:nix-core/nix-data-disk#master"
+    "mocha": "^5.2.0",
+    "nix-data-disk": "github:nix-core/nix-data-disk#v0.0.0",
+    "rx": "^4.1.0"
   }
 }
