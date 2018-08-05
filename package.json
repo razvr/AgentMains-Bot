@@ -13,6 +13,7 @@
   ],
   "scripts": {
     "lint": "./node_modules/.bin/eslint **/*.js",
+    "lint-watch": "./node_modules/.bin/esw **/*.js -w",
     "bot": "node --preserve-symlinks ./test/test-bot/index.js",
     "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks ./test/test-bot/index.js"
   },
@@ -37,6 +38,7 @@
     "chai": "^4.1.2",
     "discord.js": "github:hydrabolt/discord.js#11.3-dev",
     "eslint": "^4.14.0",
+    "eslint-watch": "^4.0.2",
     "glob": "^7.1.2",
     "mocha": "^5.2.0",
     "nix-data-disk": "github:nix-core/nix-data-disk#v0.0.0",
