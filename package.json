@@ -26,6 +26,10 @@
   ],
   "repository": "https://github.com/SpyMaster356/nix-core",
   "license": "MIT",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
   "dependencies": {
     "nix-data-memory": "github:nix-core/nix-data-memory#master",
     "winston": "^3.0.0-rc1"
@@ -42,6 +46,8 @@
     "glob": "^7.1.2",
     "mocha": "^5.2.0",
     "nix-data-disk": "github:nix-core/nix-data-disk#v0.0.0",
-    "rx": "^4.1.0"
+    "rx": "^4.1.0",
+    "sinon": "^6.1.4",
+    "sinon-chai": "^3.2.0"
   }
 }

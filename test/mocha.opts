@@ -1,2 +1,2 @@
---require chai/register-expect
+--require ./test/test-helper.js
 test/**/*.test.js
