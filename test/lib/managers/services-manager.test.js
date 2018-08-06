@@ -2,7 +2,7 @@ const Rx = require('rx');
 
 const ServicesManager = require('../../../lib/managers/services-manager');
 const Service = require("../../../lib/models/service");
-const MockNixLogger = require("../../mock-logger");
+const MockNixLogger = require("../../support/mock-logger");
 
 describe('ServicesManager', function () {
   beforeEach(function () {
