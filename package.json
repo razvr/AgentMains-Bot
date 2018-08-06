@@ -15,7 +15,8 @@
     "lint": "./node_modules/.bin/eslint **/*.js",
     "lint-watch": "./node_modules/.bin/esw **/*.js -w",
     "bot": "node --preserve-symlinks ./test/test-bot/index.js",
-    "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks ./test/test-bot/index.js"
+    "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks ./test/test-bot/index.js",
+    "test": "./node_modules/.bin/mocha"
   },
   "main": "index.js",
   "keywords": [
