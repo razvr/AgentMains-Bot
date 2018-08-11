@@ -4,28 +4,13 @@ const Service = require("../../../lib/models/service");
 
 describe('ModuleManager', function () {
   beforeEach(function () {
-    this.services = {
-      core: {
-        configActionService: {
-          name: "configActionService",
-          addAction: sinon.fake(),
-        },
-        commandService: {
-          name: "commandService",
-          addCommand: sinon.fake(),
-        },
-        permissionsService: {
-          name: "permissionsService",
-          addPermissionLevel: sinon.fake(),
-        },
-      },
-    };
-
     this.nix = {
       logger: new MockNixLogger(),
       config: {key: "value"},
-      getService: (module, service) => this.services[module][service],
       addService: sinon.fake(),
+      addCommand: sinon.fake(),
+      addConfigAction: sinon.fake(),
+      addPermissionLevel: sinon.fake(),
     };
 
     this.moduleManager = new ModuleManager(this.nix);
@@ -71,22 +56,6 @@ describe('ModuleManager', function () {
     });
   });
 
-  describe("#injectServices", function () {
-    it('loads the required services', function () {
-      this.moduleManager.injectServices();
-
-      expect([
-        this.moduleManager.configActionService,
-        this.moduleManager.commandService,
-        this.moduleManager.permissionsService,
-      ]).to.deep.eq([
-        this.services.core.configActionService,
-        this.services.core.commandService,
-        this.services.core.permissionsService,
-      ]);
-    });
-  });
-
   describe("#getModule", function () {
     context('when the module has been added', function() {
       beforeEach(function () {
@@ -111,7 +80,6 @@ describe('ModuleManager', function () {
   describe("#addModule", function () {
     beforeEach(function () {
       this.testModule = {name: "TestModule"};
-      this.moduleManager.injectServices();
     });
 
     it('makes the module retrievable via #getModule', function () {
@@ -166,9 +134,9 @@ describe('ModuleManager', function () {
       it('adds all config actions to nix', function () {
         this.moduleManager.addModule(this.testModule);
 
-        expect(this.services.core.configActionService.addAction).to.have.been
+        expect(this.nix.addConfigAction).to.have.been
           .calledWith("TestModule", this.testModule.configActions[0]);
-        expect(this.services.core.configActionService.addAction).to.have.been
+        expect(this.nix.addConfigAction).to.have.been
           .calledWith("TestModule", this.testModule.configActions[1]);
       });
     });
@@ -184,9 +152,9 @@ describe('ModuleManager', function () {
       it('adds all commands to nix', function () {
         this.moduleManager.addModule(this.testModule);
 
-        expect(this.services.core.commandService.addCommand).to.have.been
+        expect(this.nix.addCommand).to.have.been
           .calledWith(this.testModule.commands[0]);
-        expect(this.services.core.commandService.addCommand).to.have.been
+        expect(this.nix.addCommand).to.have.been
           .calledWith(this.testModule.commands[1]);
       });
     });
@@ -202,9 +170,9 @@ describe('ModuleManager', function () {
       it('adds all permission levels to nix', function () {
         this.moduleManager.addModule(this.testModule);
 
-        expect(this.services.core.permissionsService.addPermissionLevel).to.have.been
+        expect(this.nix.addPermissionLevel).to.have.been
           .calledWith(this.testModule.permissions[0]);
-        expect(this.services.core.permissionsService.addPermissionLevel).to.have.been
+        expect(this.nix.addPermissionLevel).to.have.been
           .calledWith(this.testModule.permissions[1]);
       });
     });
