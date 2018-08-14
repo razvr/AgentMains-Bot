@@ -1,6 +1,7 @@
 const MemoryDataSource = require('nix-data-memory');
 const DiskDataSource = require('nix-data-disk');
 const path = require('path');
+const fs = require('fs');
 
 const MockNixLogger = require("../../support/mock-logger");
 const DataManager = require('../../../lib/managers/data-manager');
@@ -35,10 +36,10 @@ describe('DataManager', function () {
 
     context('when a datasource is specified in the nix config', function() {
       beforeEach(function () {
-        this.tmpDir = path.resolve([__dirname, "../../tmp"]);
+        this.tmpDir = path.resolve(__dirname, "../../tmp");
 
         this.nix.config.dataSource.type = "disk";
-        this.nix.config.dataSource.path = this.tmpDir;
+        this.nix.config.dataSource.dataDir = this.tmpDir;
       });
       
       it('correctly loads the datasource', function () {
@@ -47,13 +48,20 @@ describe('DataManager', function () {
       });
 
       afterEach(function () {
-
+        fs.rmdirSync(this.tmpDir);
       });
     });
   });
 
   describe('#type', function () {
+    it('returns the type from the DataSource', function () {
+      class MockDataSource {
+        constructor() { this.type = "Mock"; }
+      }
 
+      this.dataManager._dataSource = new MockDataSource();
+      expect(this.dataManager.type).to.eq("Mock");
+    });
   });
 
   describe('#onNixListen', function () {
