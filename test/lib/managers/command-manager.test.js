@@ -95,7 +95,6 @@ describe('CommandManager', function () {
       expect(this.commandManager.getCommand('commandOne').name).to.eq(this.command.name);
     });
 
-
     context('when a command with the same name has already been added', function () {
       beforeEach(function () {
         this.otherCommand = {moduleName: 'test', name: "commandOne", run: () => {}};
@@ -108,7 +107,6 @@ describe('CommandManager', function () {
         );
       });
     });
-
   });
 
   describe("#getCommand", function () {
