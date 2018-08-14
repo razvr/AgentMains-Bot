@@ -504,12 +504,12 @@ diff@3.5.0, diff@^3.5.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/diff/-/diff-3.5.0.tgz#800c0dd1e0a8bfbc95835c202ad220fe317e5a12"
 
-"discord.js@github:hydrabolt/discord.js#11.3-dev":
-  version "11.3.2"
-  resolved "https://codeload.github.com/hydrabolt/discord.js/tar.gz/e5bd6ec150baee5ee4ca0830b80753b7c59f4844"
+discord.js@^11.3.0:
+  version "11.4.2"
+  resolved "https://registry.yarnpkg.com/discord.js/-/discord.js-11.4.2.tgz#54586981926521572051f2a30b984aad2b49786e"
   dependencies:
     long "^4.0.0"
-    prism-media "^0.0.2"
+    prism-media "^0.0.3"
     snekfetch "^3.6.4"
     tweetnacl "^1.0.0"
     ws "^4.0.0"
@@ -1489,9 +1489,9 @@ prelude-ls@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
 
-prism-media@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/prism-media/-/prism-media-0.0.2.tgz#aa917b084576c4df6488e4ea8e7d6d44aed4b411"
+prism-media@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/prism-media/-/prism-media-0.0.3.tgz#8842d4fae804f099d3b48a9a38e3c2bab6f4855b"
 
 process-nextick-args@~2.0.0:
   version "2.0.0"
