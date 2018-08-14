@@ -3,7 +3,7 @@ const NixLogger = require("../../../lib/utility/nix-logger");
 describe('NixLogger', function () {
   describe('::createLogger', function () {
     it('Creates an logger', function () {
-      let logger = NixLogger.createLogger({})
+      let logger = NixLogger.createLogger({});
 
       expect(logger).to.respondTo("error");
       expect(logger).to.respondTo("warn");
