@@ -2,22 +2,20 @@ const Rx = require('rx');
 
 const ServicesManager = require('../../../lib/managers/services-manager');
 const Service = require("../../../lib/models/service");
-const MockNixLogger = require("../../support/mock-logger");
+const MockNix = require("../../support/mock-nix");
 
 describe('ServicesManager', function () {
   beforeEach(function () {
-    this.services = {
+    this.nix = new MockNix();
+
+    this.nix.services = {
       core: {
         serviceOne: {name: "serviceOne"},
         serviceTwo: {name: "serviceTwo"},
       },
     };
 
-    this.nix = {
-      logger: new MockNixLogger(),
-      getService: (module, serviceName) => this.services[module][serviceName],
-      config: {key: "value"},
-    };
+    this.nix.config = {key: "value"};
 
     this.servicesManager = new ServicesManager(this.nix);
   });
@@ -36,14 +34,9 @@ describe('ServicesManager', function () {
     });
 
     context('when services have been added to the manager', function () {
-      class ServiceOne extends Service {
-      }
-
-      class ServiceTwo extends Service {
-      }
-
-      class ServiceThree extends Service {
-      }
+      class ServiceOne extends Service {}
+      class ServiceTwo extends Service {}
+      class ServiceThree extends Service {}
 
       beforeEach(function () {
         this.servicesManager.addService('test', ServiceOne);
@@ -116,7 +109,7 @@ describe('ServicesManager', function () {
 
   describe('#configureServices', function () {
     context('when services have been added to the manager', function () {
-      class ConfigrableService extends Service {
+      class ConfigurableService extends Service {
         configureService(config) {
           this.configured = true;
           this.configuredWith = config;
@@ -125,14 +118,9 @@ describe('ServicesManager', function () {
         }
       }
 
-      class ServiceOne extends ConfigrableService {
-      }
-
-      class ServiceTwo extends ConfigrableService {
-      }
-
-      class ServiceThree extends ConfigrableService {
-      }
+      class ServiceOne extends ConfigurableService {}
+      class ServiceTwo extends ConfigurableService {}
+      class ServiceThree extends ConfigurableService {}
 
       beforeEach(function () {
         this.servicesManager.addService('test', ServiceOne);
@@ -223,16 +211,16 @@ describe('ServicesManager', function () {
         this.servicesManager.injectDependencies();
 
         let testServiceOne = this.servicesManager.getService("test", "testServiceOne");
-        expect(testServiceOne.serviceOne).to.eq(this.services.core.serviceOne);
+        expect(testServiceOne.serviceOne).to.eq(this.nix.services.core.serviceOne);
         expect(testServiceOne.serviceTwo).to.be.undefined;
 
         let testServiceTwo = this.servicesManager.getService("test", "testServiceTwo");
         expect(testServiceTwo.serviceOne).to.be.undefined;
-        expect(testServiceTwo.serviceTwo).to.eq(this.services.core.serviceTwo);
+        expect(testServiceTwo.serviceTwo).to.eq(this.nix.services.core.serviceTwo);
 
         let testServiceThree = this.servicesManager.getService("test", "testServiceThree");
-        expect(testServiceThree.serviceOne).to.eq(this.services.core.serviceOne);
-        expect(testServiceThree.serviceTwo).to.eq(this.services.core.serviceTwo);
+        expect(testServiceThree.serviceOne).to.eq(this.nix.services.core.serviceOne);
+        expect(testServiceThree.serviceTwo).to.eq(this.nix.services.core.serviceTwo);
       });
     });
   });

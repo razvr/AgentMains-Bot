@@ -1,18 +1,10 @@
-const MockNixLogger = require("../../support/mock-logger");
+const MockNix = require("../../support/mock-nix");
 const ModuleManager = require('../../../lib/managers/module-manager');
 const Service = require("../../../lib/models/service");
 
 describe('ModuleManager', function () {
   beforeEach(function () {
-    this.nix = {
-      logger: new MockNixLogger(),
-      config: {key: "value"},
-      addService: sinon.fake(),
-      addCommand: sinon.fake(),
-      addConfigAction: sinon.fake(),
-      addPermissionLevel: sinon.fake(),
-    };
-
+    this.nix = new MockNix();
     this.moduleManager = new ModuleManager(this.nix);
   });
 

@@ -1,19 +1,17 @@
-const MockNixLogger = require("../../support/mock-logger");
+const MockNix = require("../../support/mock-nix");
 const CommandManager = require("../../../lib/managers/command-manager");
 
 describe('CommandManager', function () {
   beforeEach(function () {
-    this.services = {
+    this.nix = new MockNix();
+
+    this.nix.services = {
       core: {
         serviceOne: {name: "serviceOne"},
         serviceTwo: {name: "serviceTwo"},
       },
     };
 
-    this.nix = {
-      logger: new MockNixLogger(),
-      getService: (module, serviceName) => this.services[module][serviceName],
-    };
     this.commandManager = new CommandManager(this.nix);
   });
 
@@ -180,16 +178,16 @@ describe('CommandManager', function () {
         this.commandManager.injectDependencies();
 
         let commandOne = this.commandManager.getCommand("commandOne");
-        expect(commandOne.serviceOne).to.eq(this.services.core.serviceOne);
+        expect(commandOne.serviceOne).to.eq(this.nix.services.core.serviceOne);
         expect(commandOne.serviceTwo).to.be.undefined;
 
         let commandTwo = this.commandManager.getCommand("commandTwo");
         expect(commandTwo.serviceOne).to.be.undefined;
-        expect(commandTwo.serviceTwo).to.eq(this.services.core.serviceTwo);
+        expect(commandTwo.serviceTwo).to.eq(this.nix.services.core.serviceTwo);
 
         let commandThree = this.commandManager.getCommand("commandThree");
-        expect(commandThree.serviceOne).to.eq(this.services.core.serviceOne);
-        expect(commandThree.serviceTwo).to.eq(this.services.core.serviceTwo);
+        expect(commandThree.serviceOne).to.eq(this.nix.services.core.serviceOne);
+        expect(commandThree.serviceTwo).to.eq(this.nix.services.core.serviceTwo);
       });
     });
   });

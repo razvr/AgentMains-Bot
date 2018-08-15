@@ -4,15 +4,13 @@ const path = require('path');
 const fs = require('fs');
 const Rx = require('rx');
 
-const MockNixLogger = require("../../support/mock-logger");
+const MockNix = require("../../support/mock-nix");
 const DataManager = require('../../../lib/managers/data-manager');
 
 describe('DataManager', function () {
   beforeEach(function () {
-    this.nix = {
-      config: { dataSource: {} },
-      logger: new MockNixLogger(),
-    };
+    this.nix = new MockNix();
+    this.nix.config = { dataSource: {} };
 
     this.dataManager = new DataManager(this.nix);
   });

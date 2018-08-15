@@ -1,11 +1,9 @@
-const MockNixLogger = require("../../support/mock-logger");
+const MockNix = require("../../support/mock-nix");
 const PermissionsManager = require("../../../lib/managers/permissions-manager");
 
 describe('PermissionsManager', function () {
   beforeEach(function () {
-    this.nix = {
-      logger: new MockNixLogger(),
-    };
+    this.nix = new MockNix();
     this.permissionsManager = new PermissionsManager(this.nix);
   });
 
