@@ -2,6 +2,7 @@ const MemoryDataSource = require('nix-data-memory');
 const DiskDataSource = require('nix-data-disk');
 const path = require('path');
 const fs = require('fs');
+const Rx = require('rx');
 
 const MockNixLogger = require("../../support/mock-logger");
 const DataManager = require('../../../lib/managers/data-manager');
@@ -73,10 +74,20 @@ describe('DataManager', function () {
   });
 
   describe('#setGuildData', function () {
-
+    it('calls through to the datasource setData', function () {
+      this.dataManager._dataSource.setData = sinon.fake.returns(Rx.Observable.of(true));
+      this.dataManager.setGuildData("guildId", "keyword", "data")
+      expect(this.dataManager._dataSource.setData).to.have.been
+        .calledWith("guild", "guildId", "keyword", "data");
+    });
   });
 
   describe('#getGuildData', function () {
-
+    it('calls through to the datasource getData', function () {
+      this.dataManager._dataSource.getData = sinon.fake.returns(Rx.Observable.of(true));
+      this.dataManager.getGuildData("guildId", "keyword");
+      expect(this.dataManager._dataSource.getData).to.have.been
+        .calledWith("guild", "guildId", "keyword");
+    });
   });
 });
