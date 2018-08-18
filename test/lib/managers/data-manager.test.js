@@ -5,6 +5,7 @@ const fs = require('fs');
 const Rx = require('rx');
 
 const MockNix = require("../../support/mock-nix");
+const MockDataSource = require("../../support/mock-data-source");
 const DataManager = require('../../../lib/managers/data-manager');
 
 describe('DataManager', function () {
@@ -12,7 +13,10 @@ describe('DataManager', function () {
     this.nix = new MockNix();
     this.nix.config = { dataSource: {} };
 
+    this.dataSource = new MockDataSource();
     this.dataManager = new DataManager(this.nix);
+
+    this.dataManager._dataSource = this.dataSource;
   });
 
   describe(".nix", function () {
@@ -54,37 +58,95 @@ describe('DataManager', function () {
 
   describe('#type', function () {
     it('returns the type from the DataSource', function () {
-      class MockDataSource {
-        constructor() { this.type = "Mock"; }
-      }
-
-      this.dataManager._dataSource = new MockDataSource();
-      expect(this.dataManager.type).to.eq("Mock");
+      this.dataSource.type = "DataSource";
+      expect(this.dataManager.type).to.eq("DataSource");
     });
   });
 
   describe('#onNixListen', function () {
+    context('when the datasource does not have a onNixListen', function () {
+      beforeEach(function () {
+        delete this.dataSource.onNixListen;
+      });
 
+      it("returns an Observable of true", function (done) {
+        let hook$ = this.dataManager.onNixListen();
+        expect(hook$).to.be.an.instanceOf(Rx.Observable);
+
+        hook$.subscribe(
+          (value) => {
+            expect(value).to.eq(true);
+            done();
+          },
+          (error) => {
+            done(error);
+          }
+        );
+      });
+    });
+
+    context('when the datasource has a onNixListen', function () {
+      beforeEach(function () {
+        this.dataSource.onNixListen = sinon.fake.returns(Rx.Observable.of(true));
+      });
+
+      it("calls the datasource's onNixListen", function () {
+        let hook$ = this.dataManager.onNixListen();
+        expect(hook$).to.be.an.instanceOf(Rx.Observable);
+        expect(this.dataManager._dataSource.onNixListen).to.have.been.called;
+      });
+    });
   });
 
   describe('#onNixJoinGuild', function () {
+    context('when the datasource does not have a onNixJoinGuild', function() {
+      beforeEach(function () {
+        delete this.dataSource.onNixJoinGuild;
+      });
 
+      it("returns an Observable of true", function (done) {
+        let hook$ = this.dataManager.onNixJoinGuild();
+        expect(hook$).to.be.an.instanceOf(Rx.Observable);
+
+        hook$.subscribe(
+          (value) => {
+            expect(value).to.eq(true);
+            done();
+          },
+          (error) => {
+            done(error);
+          }
+        );
+      });
+    });
+
+    context('when the datasource has a onNixJoinGuild', function () {
+      beforeEach(function () {
+        this.dataSource.onNixJoinGuild = sinon.fake.returns(Rx.Observable.of(true));
+      });
+
+      it("calls the datasource's onNixListen", function () {
+        let hook$ = this.dataManager.onNixJoinGuild();
+        expect(hook$).to.be.an.instanceOf(Rx.Observable);
+        expect(this.dataManager._dataSource.onNixJoinGuild).to.have.been.called;
+      });
+    });
   });
 
   describe('#setGuildData', function () {
     it('calls through to the datasource setData', function () {
-      this.dataManager._dataSource.setData = sinon.fake.returns(Rx.Observable.of(true));
-      this.dataManager.setGuildData("guildId", "keyword", "data")
-      expect(this.dataManager._dataSource.setData).to.have.been
+      this.dataSource.setData = sinon.fake.returns(Rx.Observable.of(true));
+      this.dataManager.setGuildData("guildId", "keyword", "data");
+      expect(this.dataSource.setData).to.have.been
         .calledWith("guild", "guildId", "keyword", "data");
     });
   });
 
   describe('#getGuildData', function () {
     it('calls through to the datasource getData', function () {
-      this.dataManager._dataSource.getData = sinon.fake.returns(Rx.Observable.of(true));
+      this.dataSource.getData = sinon.fake.returns(Rx.Observable.of(true));
       this.dataManager.getGuildData("guildId", "keyword");
-      expect(this.dataManager._dataSource.getData).to.have.been
+      expect(this.dataSource.getData).to.have.been
         .calledWith("guild", "guildId", "keyword");
     });
   });
