@@ -1,3 +1,5 @@
+const Rx = require('rx');
+
 const MockNixLogger = require("./mock-logger");
 const defaultResponseStrings = require("../../lib/utility/reponse-strings");
 
@@ -15,6 +17,8 @@ class MockNix {
     this.addPermissionLevel = sinon.fake();
 
     this.responseStrings = defaultResponseStrings;
+
+    this.handleHook = sinon.fake.returns(Rx.Observable.of(''));
   }
 
   getService(module, serviceName) {
