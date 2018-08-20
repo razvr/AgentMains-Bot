@@ -1,9 +1,11 @@
 class MockMessage {
   constructor() {
-    this.guild = "mock_guild";
-    this.author = "mock_author";
-    this.member = "mock_member";
-    this.channel = "mock_channel";
+    this.guild = sinon.mock("guild");
+    this.author = sinon.mock("author");
+    this.member = sinon.mock("member");
+    this.channel = sinon.mock("channel");
+
+    this.reply = sinon.fake();
   }
 }
 
