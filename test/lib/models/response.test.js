@@ -57,7 +57,7 @@ describe('Response', function () {
           () => {
             expect(this.nextCallback).not.to.have.been.called;
             done();
-          },
+          }
         );
       });
     });
@@ -83,7 +83,7 @@ describe('Response', function () {
           () => {
             expect(this.nextCallback).to.have.been.calledOnceWith("discordResponse");
             done();
-          },
+          }
         );
       });
     });
@@ -111,7 +111,7 @@ describe('Response', function () {
           () => {
             expect(this.nextCallback).to.have.been.calledOnceWith("discordResponse");
             done();
-          },
+          }
         );
       });
     });
@@ -125,7 +125,7 @@ describe('Response', function () {
       it("sends an embed to the channel", function () {
         this.response.send();
         expect(this.message.channel.send).to.have.been.calledOnceWith(
-          this.response.content, {embed: this.response.embed},
+          this.response.content, {embed: this.response.embed}
         );
       });
 
@@ -139,7 +139,7 @@ describe('Response', function () {
           () => {
             expect(this.nextCallback).to.have.been.calledOnceWith("discordResponse");
             done();
-          },
+          }
         );
       });
     });
@@ -165,7 +165,7 @@ describe('Response', function () {
           () => {
             expect(this.nextCallback).to.have.been.calledOnceWith("discordResponse");
             done();
-          },
+          }
         );
       });
     });
@@ -247,7 +247,7 @@ describe('Response', function () {
         it('sends the correct response', function () {
           this.response.send(this.options);
           expect(this.message.channel.send).to.have.been.calledOnceWith(
-            '', {embed: this.response.embed},
+            '', {embed: this.response.embed}
           );
         });
       });
