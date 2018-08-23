@@ -20,7 +20,6 @@ describe('Nix', function () {
     };
 
     this.nix = new Nix(this.config);
-    this.nextCallback = sinon.fake();
   });
 
   describe('constructor', function () {
@@ -124,6 +123,7 @@ describe('Nix', function () {
     });
 
     it('returns an observable that emits when the bot is ready', function (done) {
+      let callback = sinon.fake();
       let result$ = this.nix.listen();
       expect(result$).to.be.an.instanceOf(Rx.Observable);
 
@@ -155,6 +155,7 @@ describe('Nix', function () {
       });
 
       it('turns the value into an Observable', function (done) {
+        let nextCallback = sinon.fake();
         let result$ = this.nix.handleHook(this.returnValue);
         expect(result$).to.be.an.instanceOf(Rx.Observable);
 
@@ -171,6 +172,7 @@ describe('Nix', function () {
       });
 
       it('turns the value into an Observable', function (done) {
+        let nextCallback = sinon.fake();
         let result$ = this.nix.handleHook(this.returnValue);
         expect(result$).to.be.an.instanceOf(Rx.Observable);
 
@@ -187,6 +189,7 @@ describe('Nix', function () {
       });
 
       it('turns the value into an Observable', function (done) {
+        let nextCallback = sinon.fake();
         let result$ = this.nix.handleHook(this.returnValue);
         expect(result$).to.be.an.instanceOf(Rx.Observable);
 
@@ -203,6 +206,7 @@ describe('Nix', function () {
       });
 
       it('turns the value into an Observable', function (done) {
+        let nextCallback = sinon.fake();
         let result$ = this.nix.handleHook(this.returnValue);
         expect(result$).to.be.an.instanceOf(Rx.Observable);
 
