@@ -1,3 +1,23 @@
+class Collection {
+  constructor() {
+    this.items = [];
+
+    this.map = this.items.map.bind(this.items);
+  }
+
+  get size() {
+    return this.items.length;
+  }
+
+  values() {
+    return this.items;
+  }
+
+  array() {
+    return this.items;
+  }
+}
+
 class MockClient {
   constructor() {
     this.login = () => new Promise((resolve) => resolve(true));
@@ -7,12 +27,7 @@ class MockClient {
       send: sinon.fake.resolves(''),
     }));
 
-    this.guilds = {
-      size: 0,
-      values: sinon.fake.returns([]),
-      array: sinon.fake.returns([]),
-      map: sinon.fake.returns([]),
-    };
+    this.guilds = new Collection();
 
     this.addEventListener = () => {};
     this.removeEventListener = () => {};
