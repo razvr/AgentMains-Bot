@@ -129,15 +129,35 @@ describe('Nix', function () {
 
       result$.subscribe(
         (next) => {
-          this.nextCallback(next);
+          callback(next);
           this.nix.shutdown();
         },
         (error) => done(error),
         () => {
-          expect(this.nextCallback).to.have.been.calledOnceWith('Ready');
+          expect(callback).to.have.been.calledOnce;
+          expect(callback).to.have.been.calledWith('Ready');
           done();
         }
       );
+    });
+
+    context('when passed observable handlers', function() {
+      beforeEach(function () {
+        sinon.spy(Rx.ReplaySubject.prototype, 'subscribe');
+      });
+
+      afterEach(function () {
+        Rx.ReplaySubject.prototype.subscribe.restore();
+      });
+
+      it('subscribes the handlers', function () {
+        let nextCallback = sinon.fake();
+        let errorCallback = sinon.fake();
+        let completeCallback = sinon.fake();
+
+        let stream$ = this.nix.listen(nextCallback, errorCallback, completeCallback);
+        expect(stream$.subscribe).to.have.been.calledWith(nextCallback, errorCallback, completeCallback);
+      });
     });
 
     it('returns the same stream for multiple calls', function () {
@@ -145,6 +165,345 @@ describe('Nix', function () {
       let result2$ = this.nix.listen();
 
       expect(result1$).to.eq(result2$);
+    });
+
+    it('replays the ready signal', function (done) {
+      let secondListenCallback = sinon.fake();
+      this.nix.listen()
+        .do(() => this.nix.listen(secondListenCallback))
+        .subscribe(
+          () => this.nix.shutdown(),
+          (error) => done(error),
+          () => {
+            expect(secondListenCallback).to.have.been.calledWith('Ready');
+            done();
+          }
+        );
+    });
+
+    describe('bootstrap process', function () {
+      it('injects dependencies into services', function (done) {
+        sinon.spy(this.nix.servicesManager, 'injectDependencies');
+
+        this.nix.listen(
+          () => {
+            expect(this.nix.servicesManager.injectDependencies).to.have.been.called;
+            done();
+          },
+          (error) => done(error)
+        );
+      });
+
+      context('when injecting into services fails', function() {
+        beforeEach(function () {
+          this.error = new Error("mock error");
+          sinon.stub(this.nix.servicesManager, 'injectDependencies').throws(this.error);
+        });
+
+        it('triggers the error callback', function (done) {
+          this.nix.listen(
+            () => done("Error callback was not called"),
+            (error) => {
+              expect(error).to.eq(this.error);
+              done();
+            }
+          );
+        });
+      });
+
+      it('injects dependencies into commands', function (done) {
+        sinon.spy(this.nix.commandManager, 'injectDependencies');
+
+        this.nix.listen(
+          () => {
+            expect(this.nix.commandManager.injectDependencies).to.have.been.called;
+            done();
+          },
+          (error) => done(error)
+        );
+      });
+
+      context('when injecting into commands fails', function () {
+        beforeEach(function () {
+          this.error = new Error("mock error");
+          sinon.stub(this.nix.commandManager, 'injectDependencies').throws(this.error);
+        });
+
+        it('triggers the error callback', function (done) {
+          this.nix.listen(
+            () => done("Error callback was not called"),
+            (error) => {
+              expect(error).to.eq(this.error);
+              done();
+            }
+          );
+        });
+      });
+
+      it('configures services', function (done) {
+        sinon.spy(this.nix.servicesManager, 'configureServices');
+
+        this.nix.listen(
+          () => {
+            expect(this.nix.servicesManager.configureServices).to.have.been.called;
+            done();
+          },
+          (error) => done(error)
+        );
+      });
+
+      context('when configuring services fails', function () {
+        beforeEach(function () {
+          this.error = new Error("mock error");
+          sinon.stub(this.nix.commandManager, 'injectDependencies').throws(this.error);
+        });
+
+        it('triggers the error callback', function (done) {
+          this.nix.listen(
+            () => done("Error callback was not called"),
+            (error) => {
+              expect(error).to.eq(this.error);
+              done();
+            }
+          );
+        });
+      });
+
+      it('logs into discord', function (done) {
+        sinon.spy(this.nix.discord, 'login');
+
+        this.nix
+          .listen(
+            () => {
+              expect(this.nix.discord.login).to.have.been.calledWith(this.config.loginToken);
+              done();
+            },
+            (error) => done(error)
+          );
+      });
+
+      context('when logging into discord fails', function () {
+        beforeEach(function () {
+          this.error = new Error("mock error");
+          sinon.stub(this.nix.discord, 'login').rejects(this.error);
+        });
+
+        it('triggers the error callback', function (done) {
+          this.nix.listen(
+            () => done("Error callback was not called"),
+            (error) => {
+              expect(error).to.eq(this.error);
+              done();
+            }
+          );
+        });
+      });
+
+      it('tries to find the owner', function (done) {
+        sinon.spy(this.nix, 'findOwner');
+
+        this.nix.listen(
+          () => {
+            expect(this.nix.findOwner).to.have.been.calledWith();
+            done();
+          },
+          (error) => done(error)
+        );
+      });
+
+      context('when finding the owner into discord fails', function () {
+        beforeEach(function () {
+          this.error = new Error("mock error");
+          sinon.stub(this.nix, 'findOwner').returns(Rx.Observable.throw(this.error));
+        });
+
+        it('triggers the error callback', function (done) {
+          this.nix.listen(
+            () => done("Error callback was not called"),
+            (error) => {
+              expect(error).to.eq(this.error);
+              done();
+            }
+          );
+        });
+      });
+
+      it('triggers the DataSource onNixListen hook', function (done) {
+        sinon.spy(this.nix.dataManager, 'onNixListen');
+
+        this.nix.listen(
+          () => {
+            expect(this.nix.dataManager.onNixListen).to.have.been.calledWith();
+            done();
+          },
+          (error) => done(error)
+        );
+      });
+
+      context('when DataSource onNixListen hook fails', function () {
+        beforeEach(function () {
+          this.error = new Error("mock error");
+          sinon.stub(this.nix.dataManager, 'onNixListen').returns(Rx.Observable.throw(this.error));
+        });
+
+        it('triggers the error callback', function (done) {
+          this.nix.listen(
+            () => done("Error callback was not called"),
+            (error) => {
+              expect(error).to.eq(this.error);
+              done();
+            }
+          );
+        });
+      });
+
+      it('starts all Discord event streams', function (done) {
+        this.nix.listen(
+          () => {
+            Object.values(Discord.Constants.Events).forEach((eventType) => {
+              expect(this.nix.streams[eventType + '$']).to.be.an.instanceOf(Rx.Observable);
+            });
+            done();
+          },
+          (error) => done(error)
+        );
+      });
+
+      it('starts nix related event streams', function (done) {
+        this.nix.listen(
+          () => {
+            expect(this.nix.streams.command$).to.be.an.instanceOf(Rx.Observable);
+            done();
+          },
+          (error) => done(error)
+        );
+      });
+
+      it('triggers the servicesManager onNixListen hook', function (done) {
+        sinon.spy(this.nix.servicesManager, 'onNixListen');
+
+        this.nix.listen(
+          () => {
+            expect(this.nix.servicesManager.onNixListen).to.have.been.called;
+            done();
+          },
+          (error) => done(error)
+        );
+      });
+
+      context('when servicesManager onNixListen hook fails', function () {
+        beforeEach(function () {
+          this.error = new Error("mock error");
+          sinon.stub(this.nix.servicesManager, 'onNixListen').returns(Rx.Observable.throw(this.error));
+        });
+
+        it('triggers the error callback', function (done) {
+          this.nix.listen(
+            () => done("Error callback was not called"),
+            (error) => {
+              expect(error).to.eq(this.error);
+              done();
+            }
+          );
+        });
+      });
+
+      it('triggers the moduleManager onNixListen hook', function (done) {
+        sinon.spy(this.nix.servicesManager, 'onNixListen');
+
+        this.nix.listen(
+          () => {
+            expect(this.nix.servicesManager.onNixListen).to.have.been.called;
+            done();
+          },
+          (error) => done(error)
+        );
+      });
+
+      context('when servicesManager onNixListen hook fails', function () {
+        beforeEach(function () {
+          this.error = new Error("mock error");
+          sinon.stub(this.nix.moduleManager, 'onNixListen').returns(Rx.Observable.throw(this.error));
+        });
+
+        it('triggers the error callback', function (done) {
+          this.nix.listen(
+            () => done("Error callback was not called"),
+            (error) => {
+              expect(error).to.eq(this.error);
+              done();
+            }
+          );
+        });
+      });
+
+      context('when the bot has joined guilds', function () {
+        beforeEach(function () {
+          this.guild1 = {id: 'mock_id_1'};
+          this.guild2 = {id: 'mock_id_2'};
+          this.guild3 = {id: 'mock_id_3'};
+          this.nix.discord.guilds.items.push(this.guild1);
+          this.nix.discord.guilds.items.push(this.guild2);
+          this.nix.discord.guilds.items.push(this.guild3);
+        });
+
+        it('runs the dataManager onNixJoinGuild for each', function (done) {
+          sinon.spy(this.nix.dataManager, 'onNixJoinGuild');
+
+          this.nix.listen(
+            () => {
+              expect(this.nix.dataManager.onNixJoinGuild).to.have.been.calledWith(this.guild1);
+              expect(this.nix.dataManager.onNixJoinGuild).to.have.been.calledWith(this.guild2);
+              expect(this.nix.dataManager.onNixJoinGuild).to.have.been.calledWith(this.guild3);
+              done();
+            },
+            (error) => done(error)
+          );
+        });
+
+        it('prepares default data for each', function (done) {
+          let moduleService = this.nix.getService('core', 'moduleService');
+          sinon.spy(moduleService, 'prepareDefaultData');
+
+          this.nix.listen(
+            () => {
+              expect(moduleService.prepareDefaultData).to.have.been.calledWith(this.nix, this.guild1.id);
+              expect(moduleService.prepareDefaultData).to.have.been.calledWith(this.nix, this.guild2.id);
+              expect(moduleService.prepareDefaultData).to.have.been.calledWith(this.nix, this.guild3.id);
+              done();
+            },
+            (error) => done(error)
+          );
+        });
+
+        it('runs the servicesManager onNixJoinGuild for each', function (done) {
+          sinon.spy(this.nix.servicesManager, 'onNixJoinGuild');
+
+          this.nix.listen(
+            () => {
+              expect(this.nix.servicesManager.onNixJoinGuild).to.have.been.calledWith(this.guild1);
+              expect(this.nix.servicesManager.onNixJoinGuild).to.have.been.calledWith(this.guild2);
+              expect(this.nix.servicesManager.onNixJoinGuild).to.have.been.calledWith(this.guild3);
+              done();
+            },
+            (error) => done(error)
+          );
+        });
+
+        it('runs the moduleManager onNixJoinGuild for each', function (done) {
+          sinon.spy(this.nix.moduleManager, 'onNixJoinGuild');
+
+          this.nix.listen(
+            () => {
+              expect(this.nix.moduleManager.onNixJoinGuild).to.have.been.calledWith(this.guild1);
+              expect(this.nix.moduleManager.onNixJoinGuild).to.have.been.calledWith(this.guild2);
+              expect(this.nix.moduleManager.onNixJoinGuild).to.have.been.calledWith(this.guild3);
+              done();
+            },
+            (error) => done(error)
+          );
+        });
+      });
     });
   });
 
@@ -159,8 +518,8 @@ describe('Nix', function () {
         let result$ = this.nix.handleHook(this.returnValue);
         expect(result$).to.be.an.instanceOf(Rx.Observable);
 
-        result$.subscribe(this.nextCallback, (error) => done(error), () => {
-          expect(this.nextCallback).to.have.been.calledOnceWith('');
+        result$.subscribe(nextCallback, (error) => done(error), () => {
+          expect(nextCallback).to.have.been.calledOnceWith('');
           done();
         });
       });
@@ -176,8 +535,8 @@ describe('Nix', function () {
         let result$ = this.nix.handleHook(this.returnValue);
         expect(result$).to.be.an.instanceOf(Rx.Observable);
 
-        result$.subscribe(this.nextCallback, (error) => done(error), () => {
-          expect(this.nextCallback).to.have.been.calledOnceWith('response');
+        result$.subscribe(nextCallback, (error) => done(error), () => {
+          expect(nextCallback).to.have.been.calledOnceWith('response');
           done();
         });
       });
@@ -193,8 +552,8 @@ describe('Nix', function () {
         let result$ = this.nix.handleHook(this.returnValue);
         expect(result$).to.be.an.instanceOf(Rx.Observable);
 
-        result$.subscribe(this.nextCallback, (error) => done(error), () => {
-          expect(this.nextCallback).to.have.been.calledOnceWith('response');
+        result$.subscribe(nextCallback, (error) => done(error), () => {
+          expect(nextCallback).to.have.been.calledOnceWith('response');
           done();
         });
       });
@@ -210,8 +569,8 @@ describe('Nix', function () {
         let result$ = this.nix.handleHook(this.returnValue);
         expect(result$).to.be.an.instanceOf(Rx.Observable);
 
-        result$.subscribe(this.nextCallback, (error) => done(error), () => {
-          expect(this.nextCallback).to.have.been.calledOnceWith(this.returnValue);
+        result$.subscribe(nextCallback, (error) => done(error), () => {
+          expect(nextCallback).to.have.been.calledOnceWith(this.returnValue);
           done();
         });
       });
