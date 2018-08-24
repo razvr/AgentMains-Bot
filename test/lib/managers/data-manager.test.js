@@ -38,20 +38,34 @@ describe('DataManager', function () {
     });
 
     context('when a datasource is specified in the nix config', function() {
-      beforeEach(function () {
-        this.tmpDir = path.resolve(__dirname, "../../tmp");
+      context('when the npm module is installed', function () {
+        beforeEach(function () {
+          this.tmpDir = path.resolve(__dirname, "../../tmp");
 
-        this.nix.config.dataSource.type = "disk";
-        this.nix.config.dataSource.dataDir = this.tmpDir;
-      });
-      
-      it('correctly loads the datasource', function () {
-        this.dataManager = new DataManager(this.nix);
-        expect(this.dataManager._dataSource).to.be.a.instanceOf(DiskDataSource);
+          this.nix.config.dataSource.type = "disk";
+          this.nix.config.dataSource.dataDir = this.tmpDir;
+        });
+
+        afterEach(function () {
+          fs.rmdirSync(this.tmpDir);
+        });
+
+        it('correctly loads the datasource', function () {
+          this.dataManager = new DataManager(this.nix);
+          expect(this.dataManager._dataSource).to.be.a.instanceOf(DiskDataSource);
+        });
       });
 
-      afterEach(function () {
-        fs.rmdirSync(this.tmpDir);
+      context('when the npm module is not installed', function() {
+        beforeEach(function () {
+          this.nix.config.dataSource.type = "test";
+        });
+
+        it('raises an error', function () {
+          expect(() => new DataManager(this.nix)).to.throw(
+            DataManager.DataSourceError, "Unable to load data source 'nix-data-test'. Is the npm module 'nix-data-test' installed?"
+          );
+        });
       });
     });
   });
