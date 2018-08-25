@@ -141,7 +141,7 @@ describe('Nix', function () {
       );
     });
 
-    context('when passed observable handlers', function() {
+    context('when passed observable handlers', function () {
       beforeEach(function () {
         sinon.spy(Rx.ReplaySubject.prototype, 'subscribe');
       });
@@ -194,7 +194,7 @@ describe('Nix', function () {
         );
       });
 
-      context('when injecting into services fails', function() {
+      context('when injecting into services fails', function () {
         beforeEach(function () {
           this.error = new Error("mock error");
           sinon.stub(this.nix.servicesManager, 'injectDependencies').throws(this.error);
@@ -439,9 +439,9 @@ describe('Nix', function () {
 
       context('when the bot has joined guilds', function () {
         beforeEach(function () {
-          this.guild1 = {id: 'mock_id_1'};
-          this.guild2 = {id: 'mock_id_2'};
-          this.guild3 = {id: 'mock_id_3'};
+          this.guild1 = { id: 'mock_id_1' };
+          this.guild2 = { id: 'mock_id_2' };
+          this.guild3 = { id: 'mock_id_3' };
           this.nix.discord.guilds.items.push(this.guild1);
           this.nix.discord.guilds.items.push(this.guild2);
           this.nix.discord.guilds.items.push(this.guild3);
