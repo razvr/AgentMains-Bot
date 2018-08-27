@@ -8,3 +8,5 @@ node_js:
 script:
 - yarn run lint
 - yarn test
+
+after_success: npm run coverage
