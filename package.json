@@ -16,7 +16,7 @@
     "lint-watch": "./node_modules/.bin/esw **/*.js -w",
     "bot": "node --preserve-symlinks ./test/test-bot/index.js",
     "bot-debug": "node %NODE_DEBUG_OPTION% --preserve-symlinks ./test/test-bot/index.js",
-    "test": "./node_modules/.bin/nyc ./node_modules/.bin/mocha"
+    "test": "./node_modules/.bin/mocha"
   },
   "main": "index.js",
   "keywords": [
@@ -40,7 +40,6 @@
     "rx": "^4.1.0"
   },
   "devDependencies": {
-    "nyc": "^12.0.2",
     "chai": "^4.1.2",
     "discord.js": "~11.4.2",
     "eslint": "^4.14.0",
