@@ -70,10 +70,82 @@ describe('Command', function () {
       this.command = new Command(this.nix, this.cmdConfig);
       expect(this.command.nix).to.eq(this.nix);
     });
+
+    context('when the name is missing', function () {
+      beforeEach(function () {
+        delete this.cmdConfig.name;
+      });
+
+      it('raises an error', function () {
+        expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
+          Error, "Name for command is missing."
+        );
+      });
+    });
+
+    context('when the name not a string', function () {
+      beforeEach(function () {
+        this.cmdConfig.name = {};
+      });
+
+      it('raises an error', function () {
+        expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
+          Error, "Name for command is missing."
+        );
+      });
+    });
+
+    context('when the module name is missing', function () {
+      beforeEach(function () {
+        delete this.cmdConfig.moduleName;
+      });
+
+      it('raises an error', function () {
+        expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
+          Error, `moduleName for command ${this.cmdConfig.name} is missing.`
+        );
+      });
+    });
+
+    context('when the module name not a string', function () {
+      beforeEach(function () {
+        this.cmdConfig.moduleName = {};
+      });
+
+      it('raises an error', function () {
+        expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
+          Error, `moduleName for command ${this.cmdConfig.name} is missing.`
+        );
+      });
+    });
+
+    context('when the run method is missing', function () {
+      beforeEach(function () {
+        delete this.cmdConfig.run;
+      });
+
+      it('raises an error', function () {
+        expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
+          Error, `run function for command ${this.cmdConfig.name} is missing.`
+        );
+      });
+    });
+
+    context('when the run method is not a function', function () {
+      beforeEach(function () {
+        this.cmdConfig.run = 'not a function';
+      });
+
+      it('raises an error', function () {
+        expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
+          Error, `run function for command ${this.cmdConfig.name} is missing.`
+        );
+      });
+    });
   });
 
   describe('.requiredArgs', function () {
-    context('when there are no arguments', function() {
+    context('when there are no arguments', function () {
       beforeEach(function () {
         this.command.args = [];
       });
@@ -86,8 +158,8 @@ describe('Command', function () {
     context('when there are no required arguments', function () {
       beforeEach(function () {
         this.command.args = [
-          {name: 'arg1'},
-          {name: 'arg2'},
+          { name: 'arg1' },
+          { name: 'arg2' },
         ];
       });
 
@@ -99,17 +171,17 @@ describe('Command', function () {
     context('when there are required arguments', function () {
       beforeEach(function () {
         this.command.args = [
-          {name: 'arg1'},
-          {name: 'arg2'},
-          {name: 'reqArg1', required: true },
-          {name: 'reqArg2', required: true },
+          { name: 'arg1' },
+          { name: 'arg2' },
+          { name: 'reqArg1', required: true },
+          { name: 'reqArg2', required: true },
         ];
       });
 
       it('returns an array of just required args', function () {
         expect(this.command.requiredArgs).to.deep.eq([
-          {name: 'reqArg1', required: true},
-          {name: 'reqArg2', required: true},
+          { name: 'reqArg1', required: true },
+          { name: 'reqArg2', required: true },
         ]);
       });
     });
@@ -166,6 +238,8 @@ describe('Command', function () {
     beforeEach(function () {
       this.context = new MockContext();
       this.response = new MockResponse();
+
+      this.context.nix = this.nix;
     });
 
     it("sends an embed type response", function () {
@@ -181,10 +255,12 @@ describe('Command', function () {
     beforeEach(function () {
       this.context = new MockContext();
       this.response = new MockResponse();
+
+      this.context.nix = this.nix;
     });
 
     it("sends an embed type response", function () {
-      this.command.help(this.context, this.response);
+      this.command.argsMissing(this.context, this.response);
       expect(this.response.type).to.eq('embed');
       expect(this.response.content).not.to.be.undefined;
       expect(this.response.embed).not.to.be.undefined;

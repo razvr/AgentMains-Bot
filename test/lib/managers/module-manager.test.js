@@ -15,13 +15,13 @@ describe('ModuleManager', function () {
   });
 
   describe(".modules", function () {
-    context('when no modules have been added', function() {
+    context('when no modules have been added', function () {
       it('returns an empty list of modules', function () {
         expect(this.moduleManager.modules).to.deep.eq([]);
       });
     });
 
-    context('when modules have been added', function() {
+    context('when modules have been added', function () {
       beforeEach(function () {
         this.moduleOne = { name: "moduleOne" };
         this.moduleTwo = { name: "moduleTwo" };
@@ -49,7 +49,7 @@ describe('ModuleManager', function () {
   });
 
   describe("#getModule", function () {
-    context('when the module has been added', function() {
+    context('when the module has been added', function () {
       beforeEach(function () {
         this.testModule = { name: "TestModule" };
         this.moduleManager.addModule(this.testModule);
@@ -60,7 +60,7 @@ describe('ModuleManager', function () {
       });
     });
 
-    context('when the module has not been added', function() {
+    context('when the module has not been added', function () {
       it('raises an error', function () {
         expect(() => this.moduleManager.getModule('TestModule')).to.throw(
           Error, "Module 'TestModule' could not be found."
@@ -71,7 +71,7 @@ describe('ModuleManager', function () {
 
   describe("#addModule", function () {
     beforeEach(function () {
-      this.testModule = {name: "TestModule"};
+      this.testModule = { name: "TestModule" };
     });
 
     it('makes the module retrievable via #getModule', function () {
@@ -90,8 +90,8 @@ describe('ModuleManager', function () {
         );
       });
     });
-    
-    context('when the module has services', function() {
+
+    context('when the module has services', function () {
       class ServiceOne extends Service {
       }
 
@@ -114,12 +114,12 @@ describe('ModuleManager', function () {
           .calledWith("TestModule", this.testModule.services[1]);
       });
     });
-    
-    context('when the module has config actions', function() {
+
+    context('when the module has config actions', function () {
       beforeEach(function () {
         this.testModule.configActions = [
-          {name: "testActionOne"},
-          {name: "testActionTwo"},
+          { name: "testActionOne" },
+          { name: "testActionTwo" },
         ];
       });
 
@@ -132,12 +132,12 @@ describe('ModuleManager', function () {
           .calledWith("TestModule", this.testModule.configActions[1]);
       });
     });
-    
-    context('when the module has commands', function() {
+
+    context('when the module has commands', function () {
       beforeEach(function () {
         this.testModule.commands = [
-          {name: "testActionOne"},
-          {name: "testActionTwo"},
+          { name: "testActionOne" },
+          { name: "testActionTwo" },
         ];
       });
 
@@ -150,8 +150,8 @@ describe('ModuleManager', function () {
           .calledWith(this.testModule.commands[1]);
       });
     });
-    
-    context('when the module has new permission levels', function() {
+
+    context('when the module has new permission levels', function () {
       beforeEach(function () {
         this.testModule.permissions = [
           "test1",
@@ -166,6 +166,56 @@ describe('ModuleManager', function () {
           .calledWith(this.testModule.permissions[0]);
         expect(this.nix.addPermissionLevel).to.have.been
           .calledWith(this.testModule.permissions[1]);
+      });
+    });
+  });
+
+  describe('#onNixListen', function () {
+    context('when modules have a onNixListen hook', function () {
+      beforeEach(function () {
+        this.testModule1 = { name: "TestModule1", onNixListen: sinon.fake() };
+        this.testModule2 = { name: "TestModule2", onNixListen: sinon.fake() };
+        this.testModule3 = { name: "TestModule3", onNixListen: sinon.fake() };
+
+        this.moduleManager.addModule(this.testModule1);
+        this.moduleManager.addModule(this.testModule2);
+        this.moduleManager.addModule(this.testModule3);
+      });
+
+      it('triggers the hook for each', function (done) {
+        this.moduleManager
+          .onNixListen()
+          .subscribe(() => {}, (error) => done(error), () => {
+            expect(this.testModule1.onNixListen).to.have.been.calledOnce;
+            expect(this.testModule2.onNixListen).to.have.been.calledOnce;
+            expect(this.testModule3.onNixListen).to.have.been.calledOnce;
+            done();
+          });
+      });
+    });
+  });
+
+  describe('#onNixJoinGuild', function () {
+    context('when modules have a onNixJoinGuild hook', function () {
+      beforeEach(function () {
+        this.testModule1 = { name: "TestModule1", onNixJoinGuild: sinon.fake() };
+        this.testModule2 = { name: "TestModule2", onNixJoinGuild: sinon.fake() };
+        this.testModule3 = { name: "TestModule3", onNixJoinGuild: sinon.fake() };
+
+        this.moduleManager.addModule(this.testModule1);
+        this.moduleManager.addModule(this.testModule2);
+        this.moduleManager.addModule(this.testModule3);
+      });
+
+      it('triggers the hook for each', function (done) {
+        this.moduleManager
+          .onNixJoinGuild()
+          .subscribe(() => {}, (error) => done(error), () => {
+            expect(this.testModule1.onNixJoinGuild).to.have.been.calledOnce;
+            expect(this.testModule2.onNixJoinGuild).to.have.been.calledOnce;
+            expect(this.testModule3.onNixJoinGuild).to.have.been.calledOnce;
+            done();
+          });
       });
     });
   });

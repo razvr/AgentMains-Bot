@@ -4,18 +4,21 @@ const ServicesManager = require('../../../lib/managers/services-manager');
 const Service = require("../../../lib/models/service");
 const MockNix = require("../../support/mock-nix");
 
+const ModuleService = require('../../../lib/services/module-service');
+const CommandService = require('../../../lib/services/command-service');
+const PermissionsService = require('../../../lib/services/permissions-service');
+const UserService = require('../../../lib/services/user-service');
+
 describe('ServicesManager', function () {
   beforeEach(function () {
     this.nix = new MockNix();
 
     this.nix.services = {
       core: {
-        serviceOne: {name: "serviceOne"},
-        serviceTwo: {name: "serviceTwo"},
+        serviceOne: { name: "serviceOne" },
+        serviceTwo: { name: "serviceTwo" },
       },
     };
-
-    this.nix.config = {key: "value"};
 
     this.servicesManager = new ServicesManager(this.nix);
   });
@@ -35,7 +38,9 @@ describe('ServicesManager', function () {
 
     context('when services have been added to the manager', function () {
       class ServiceOne extends Service {}
+
       class ServiceTwo extends Service {}
+
       class ServiceThree extends Service {}
 
       beforeEach(function () {
@@ -107,6 +112,47 @@ describe('ServicesManager', function () {
     });
   });
 
+  describe('#loadServices', function () {
+    beforeEach(function () {
+      sinon.spy(this.servicesManager, 'addService');
+    });
+
+    it('loads all core services', function () {
+      this.servicesManager.loadServices();
+
+      expect(this.servicesManager.addService).to.have.been.calledWith('core', ModuleService);
+      expect(this.servicesManager.addService).to.have.been.calledWith('core', CommandService);
+      expect(this.servicesManager.addService).to.have.been.calledWith('core', PermissionsService);
+      expect(this.servicesManager.addService).to.have.been.calledWith('core', UserService);
+    });
+
+    context('when there are services in the nix config', function () {
+      class ConfigService1 extends Service {}
+
+      class ConfigService2 extends Service {}
+
+      class ConfigService3 extends Service {}
+
+      beforeEach(function () {
+        this.nix.config.services = {
+          test: [
+            ConfigService1,
+            ConfigService2,
+            ConfigService3,
+          ],
+        };
+      });
+
+      it('loads services from the config', function () {
+        this.servicesManager.loadServices();
+
+        expect(this.servicesManager.addService).to.have.been.calledWith('test', ConfigService1);
+        expect(this.servicesManager.addService).to.have.been.calledWith('test', ConfigService2);
+        expect(this.servicesManager.addService).to.have.been.calledWith('test', ConfigService3);
+      });
+    });
+  });
+
   describe('#configureServices', function () {
     context('when services have been added to the manager', function () {
       class ConfigurableService extends Service {
@@ -119,7 +165,9 @@ describe('ServicesManager', function () {
       }
 
       class ServiceOne extends ConfigurableService {}
+
       class ServiceTwo extends ConfigurableService {}
+
       class ServiceThree extends ConfigurableService {}
 
       beforeEach(function () {
