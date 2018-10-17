@@ -156,9 +156,8 @@ describe('ServicesManager', function () {
   describe('#configureServices', function () {
     context('when services have been added to the manager', function () {
       class ConfigurableService extends Service {
-        configureService(config) {
+        configureService() {
           this.configured = true;
-          this.configuredWith = config;
 
           return Rx.Observable.of(true);
         }
@@ -188,7 +187,6 @@ describe('ServicesManager', function () {
               ];
 
               expect(services.every((service) => service.configured)).to.eq(true);
-              expect(services.every((service) => service.configuredWith === this.nix.config)).to.eq(true);
 
               done();
             },
@@ -196,79 +194,6 @@ describe('ServicesManager', function () {
               done(error);
             }
           );
-      });
-    });
-  });
-
-  describe('#injectDependencies', function () {
-    context('when there are no service added', function () {
-      it('does not add raise an error', function () {
-        expect(() => this.servicesManager.injectDependencies()).to.not.throw();
-      });
-    });
-
-    context('when there are services added', function () {
-      beforeEach(function () {
-        class TestServiceOne extends Service {
-          constructor(nix) {
-            super(nix);
-
-            this.services = {
-              core: [
-                "serviceOne",
-              ],
-            };
-          }
-        }
-
-        class TestServiceTwo extends Service {
-          constructor(nix) {
-            super(nix);
-
-            this.services = {
-              core: [
-                "serviceTwo",
-              ],
-            };
-          }
-        }
-
-        class TestServiceThree extends Service {
-          constructor(nix) {
-            super(nix);
-
-            this.services = {
-              core: [
-                "serviceOne",
-                "serviceTwo",
-              ],
-            };
-          }
-        }
-
-        this.testServiceOne = TestServiceOne;
-        this.testServiceTwo = TestServiceTwo;
-        this.testServiceThree = TestServiceThree;
-
-        this.servicesManager.addService("test", TestServiceOne);
-        this.servicesManager.addService("test", TestServiceTwo);
-        this.servicesManager.addService("test", TestServiceThree);
-      });
-
-      it('injects the requested services', function () {
-        this.servicesManager.injectDependencies();
-
-        let testServiceOne = this.servicesManager.getService("test", "testServiceOne");
-        expect(testServiceOne.serviceOne).to.eq(this.nix.services.core.serviceOne);
-        expect(testServiceOne.serviceTwo).to.be.undefined;
-
-        let testServiceTwo = this.servicesManager.getService("test", "testServiceTwo");
-        expect(testServiceTwo.serviceOne).to.be.undefined;
-        expect(testServiceTwo.serviceTwo).to.eq(this.nix.services.core.serviceTwo);
-
-        let testServiceThree = this.servicesManager.getService("test", "testServiceThree");
-        expect(testServiceThree.serviceOne).to.eq(this.nix.services.core.serviceOne);
-        expect(testServiceThree.serviceTwo).to.eq(this.nix.services.core.serviceTwo);
       });
     });
   });

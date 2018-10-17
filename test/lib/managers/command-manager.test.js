@@ -128,66 +128,50 @@ describe('CommandManager', function () {
     });
   });
 
-  describe("#injectDependencies", function (){
-    context('when there are no commands added', function() {
-      it('does not add raise an error', function () {
-        expect(() => this.commandManager.injectDependencies()).to.not.throw();
-      });
-    });
-
-    context('when there are commands added', function() {
+  describe('#configureCommands', function () {
+    context('when commands have been added to the manager', function () {
       beforeEach(function () {
-        this.commandOne = {
+        this.commandManager.addCommand({
           moduleName: 'test',
           name: "commandOne",
+          configureCommand() { this.configured = true; },
           run: () => {},
-          services: {
-            core: [
-              "serviceOne",
-            ],
-          },
-        };
-        this.commandTwo = {
+        });
+
+        this.commandManager.addCommand({
           moduleName: 'test',
           name: "commandTwo",
+          configureCommand() { this.configured = true; },
           run: () => {},
-          services: {
-            core: [
-              "serviceTwo",
-            ],
-          },
-        };
-        this.commandThree = {
+        });
+
+        this.commandManager.addCommand({
           moduleName: 'test',
           name: "commandThree",
+          configureCommand() { this.configured = true; },
           run: () => {},
-          services: {
-            core: [
-              "serviceOne",
-              "serviceTwo",
-            ],
-          },
-        };
-
-        this.commandManager.addCommand(this.commandOne);
-        this.commandManager.addCommand(this.commandTwo);
-        this.commandManager.addCommand(this.commandThree);
+        });
       });
 
-      it('injects the requested services', function () {
-        this.commandManager.injectDependencies();
+      it('configures all commands', function (done) {
+        this.commandManager
+          .configureCommands()
+          .subscribe(
+            () => {
+              let commands = [
+                this.commandManager.getCommand('commandOne'),
+                this.commandManager.getCommand('commandTwo'),
+                this.commandManager.getCommand('commandThree'),
+              ];
 
-        let commandOne = this.commandManager.getCommand("commandOne");
-        expect(commandOne.serviceOne).to.eq(this.nix.services.core.serviceOne);
-        expect(commandOne.serviceTwo).to.be.undefined;
+              expect(commands.every((command) => command.configured)).to.eq(true);
 
-        let commandTwo = this.commandManager.getCommand("commandTwo");
-        expect(commandTwo.serviceOne).to.be.undefined;
-        expect(commandTwo.serviceTwo).to.eq(this.nix.services.core.serviceTwo);
-
-        let commandThree = this.commandManager.getCommand("commandThree");
-        expect(commandThree.serviceOne).to.eq(this.nix.services.core.serviceOne);
-        expect(commandThree.serviceTwo).to.eq(this.nix.services.core.serviceTwo);
+              done();
+            },
+            (error) => {
+              done(error);
+            }
+          );
       });
     });
   });

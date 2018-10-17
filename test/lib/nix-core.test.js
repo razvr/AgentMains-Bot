@@ -181,64 +181,6 @@ describe('Nix', function () {
     });
 
     describe('bootstrap process', function () {
-      it('injects dependencies into services', function (done) {
-        sinon.spy(this.nix.servicesManager, 'injectDependencies');
-
-        this.nix.listen(
-          () => {
-            expect(this.nix.servicesManager.injectDependencies).to.have.been.called;
-            done();
-          },
-          (error) => done(error)
-        );
-      });
-
-      context('when injecting into services fails', function () {
-        beforeEach(function () {
-          this.error = new Error("mock error");
-          sinon.stub(this.nix.servicesManager, 'injectDependencies').throws(this.error);
-        });
-
-        it('triggers the error callback', function (done) {
-          this.nix.listen(
-            () => done("Error callback was not called"),
-            (error) => {
-              expect(error).to.eq(this.error);
-              done();
-            }
-          );
-        });
-      });
-
-      it('injects dependencies into commands', function (done) {
-        sinon.spy(this.nix.commandManager, 'injectDependencies');
-
-        this.nix.listen(
-          () => {
-            expect(this.nix.commandManager.injectDependencies).to.have.been.called;
-            done();
-          },
-          (error) => done(error)
-        );
-      });
-
-      context('when injecting into commands fails', function () {
-        beforeEach(function () {
-          this.error = new Error("mock error");
-          sinon.stub(this.nix.commandManager, 'injectDependencies').throws(this.error);
-        });
-
-        it('triggers the error callback', function (done) {
-          this.nix.listen(
-            () => done("Error callback was not called"),
-            (error) => {
-              expect(error).to.eq(this.error);
-              done();
-            }
-          );
-        });
-      });
-
       it('configures services', function (done) {
         sinon.spy(this.nix.servicesManager, 'configureServices');
 
@@ -254,7 +196,37 @@ describe('Nix', function () {
       context('when configuring services fails', function () {
         beforeEach(function () {
           this.error = new Error("mock error");
-          sinon.stub(this.nix.commandManager, 'injectDependencies').throws(this.error);
+          sinon.stub(this.nix.servicesManager, 'configureServices').throws(this.error);
+        });
+
+        it('triggers the error callback', function (done) {
+          this.nix.listen(
+            () => done("Error callback was not called"),
+            (error) => {
+              expect(error).to.eq(this.error);
+              done();
+            }
+          );
+        });
+      });
+
+
+      it('configures commands', function (done) {
+        sinon.spy(this.nix.commandManager, 'configureCommands');
+
+        this.nix.listen(
+          () => {
+            expect(this.nix.commandManager.configureCommands).to.have.been.called;
+            done();
+          },
+          (error) => done(error)
+        );
+      });
+
+      context('when configuring commands fails', function () {
+        beforeEach(function () {
+          this.error = new Error("mock error");
+          sinon.stub(this.nix.commandManager, 'configureCommands').throws(this.error);
         });
 
         it('triggers the error callback', function (done) {
@@ -854,8 +826,14 @@ describe('Nix', function () {
   });
 
   describe('#onNixJoinGuild', function () {
-    beforeEach(function () {
+    beforeEach(function (done) {
       this.guild = { id: 'mock_id' };
+      this.nix.handleError = sinon.fake((error) => {
+        throw error;
+      });
+
+      this.nix.servicesManager.configureServices()
+        .subscribe(() => {}, (error) => done(error), () => done());
     });
 
     it('returns an Observable', function () {
