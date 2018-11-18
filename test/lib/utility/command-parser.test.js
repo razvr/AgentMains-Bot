@@ -1,6 +1,44 @@
-let CommandParser = require('../../../lib/utility/command-parser');
+const CommandParser = require('../../../lib/utility/command-parser');
+const { InvalidPrefixError } = require("../../../lib/errors/command-parse-errors");
+const CommandManager = require('../../../lib/managers/command-manager');
 
 describe('CommandParser', function () {
+  describe('::parse', function() {
+    beforeEach(function () {
+      this.validPrefixes = ['!'];
+      this.message = {
+        content: '!command',
+      };
+      this.commandManager = new CommandManager({});
+    });
+
+    context('when the message does not start with a valid prefix', function() {
+      beforeEach(function () {
+        this.validPrefixes = ['!'];
+        this.message.content = ":command";
+      });
+
+      it('raises a InvalidPrefixError', function () {
+        expect(() =>
+          CommandParser.parse(this.message, this.validPrefixes, this.commandManager)
+        ).to.throw(InvalidPrefixError, 'Message does not start with a valid prefix');
+      });
+    });
+
+    context('when the message does not have a valid command', function () {
+      beforeEach(function () {
+        this.validPrefixes = ['!'];
+        this.message.content = "!command";
+      });
+
+      it('raises a InvalidPrefixError', function () {
+        expect(() =>
+          CommandParser.parse(this.message, this.validPrefixes, this.commandManager)
+        ).to.throw(Error, 'Command \'command\' does not exist');
+      });
+    });
+  });
+
   describe('::nextParamValue', function () {
     it("when the paramString is empty it returns undefined", function () {
       let paramsString = "";
@@ -104,7 +142,7 @@ describe('CommandParser', function () {
 
         expect(function () {
           return CommandParser.processMessage(self.message, self.prefixes);
-        }).to.throw(Error, "Message does not start with a valid prefix");
+        }).to.throw(InvalidPrefixError, "Message does not start with a valid prefix");
       });
     });
 

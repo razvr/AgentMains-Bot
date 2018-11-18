@@ -2,18 +2,23 @@ const MockNix = require("../../support/mock-nix");
 const MockMessage = require("../../support/mock-message");
 const MockCommand = require("../../support/mock-command");
 const Context = require('../../../lib/models/context');
+const ParsedCommand = require('../../../lib/utility/parsed-command');
 
 describe('Context', function () {
   beforeEach(function () {
-    this.message = new MockMessage();
     this.nix = new MockNix();
+    this.message = new MockMessage();
     this.command = new MockCommand();
-    this.params = {
-      args: {},
-      flags: {},
-    };
+    this.params = { args: {}, flags: {} };
 
-    this.context = new Context(this.message, this.nix, this.command, this.params);
+    this.parsedCommand = new ParsedCommand(
+      this.message,
+      this.command,
+      this.params.args,
+      this.params.flags
+    );
+
+    this.context = new Context(this.parsedCommand, this.nix);
   });
 
   describe('constructor', function () {
