@@ -32,7 +32,7 @@
     "test": "test"
   },
   "dependencies": {
-    "nix-data-memory": "github:nix-core/nix-data-memory#master",
+    "nix-data-memory": "github:nix-core/nix-data-memory#v0.0.1",
     "winston": "^3.0.0"
   },
   "peerDependencies": {
