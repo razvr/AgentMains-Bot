@@ -1,24 +1,23 @@
 const MockNix = require("../../support/mock-nix");
 const MockMessage = require("../../support/mock-message");
 const MockCommand = require("../../support/mock-command");
-const Context = require('../../../lib/models/context');
-const ParsedCommand = require('../../../lib/utility/parsed-command');
+const Context = require('../../../lib/models/command-context');
 
 describe('Context', function () {
   beforeEach(function () {
     this.nix = new MockNix();
     this.message = new MockMessage();
     this.command = new MockCommand();
-    this.params = { args: {}, flags: {} };
+    this.args = {};
+    this.flags = {};
 
-    this.parsedCommand = new ParsedCommand(
+    this.context = new Context(
+      this.nix,
       this.message,
       this.command,
-      this.params.args,
-      this.params.flags
+      this.args,
+      this.flags
     );
-
-    this.context = new Context(this.parsedCommand, this.nix);
   });
 
   describe('constructor', function () {
@@ -26,8 +25,8 @@ describe('Context', function () {
       expect(this.context.message).to.eq(this.message);
       expect(this.context.nix).to.eq(this.nix);
       expect(this.context.command).to.eq(this.command);
-      expect(this.context.args).to.eq(this.params.args);
-      expect(this.context.flags).to.eq(this.params.flags);
+      expect(this.context.args).to.eq(this.args);
+      expect(this.context.flags).to.eq(this.flags);
     });
   });
 
@@ -51,9 +50,7 @@ describe('Context', function () {
 
   describe(".user", function() {
     context("when the member is unknown", function () {
-      beforeEach(function () {
-        this.message.member = null;
-      });
+      beforeEach(function () { this.message.member = null; });
 
       it('returns the author of the message', function () {
         expect(this.context.author).to.eq(this.message.author);
@@ -61,9 +58,7 @@ describe('Context', function () {
     });
 
     context("when the member is known", function () {
-      beforeEach(function () {
-        this.message.member = 'member';
-      });
+      beforeEach(function () { this.message.member = 'member'; });
 
       it('returns the member of the message', function () {
         expect(this.context.member).to.eq(this.message.member);
