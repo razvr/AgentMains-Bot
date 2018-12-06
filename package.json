@@ -46,6 +46,7 @@
     "glob": "^7.1.2",
     "mocha": "^5.2.0",
     "nix-data-disk": "github:nix-core/nix-data-disk#v0.0.0",
+    "nix-data-memory": "github:nix-core/nix-data-memory#v0.0.2",
     "rx": "^4.1.0",
     "sinon": "^6.1.4",
     "sinon-chai": "^3.2.0"
