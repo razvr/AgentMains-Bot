@@ -9,7 +9,10 @@ describe('CommandParser', function () {
       this.message = {
         content: '!command',
       };
-      this.commandManager = new CommandManager({});
+
+      this.nix = {
+        commandManager: new CommandManager({}),
+      };
     });
 
     context('when the message does not start with a valid prefix', function() {
@@ -20,7 +23,7 @@ describe('CommandParser', function () {
 
       it('raises a InvalidPrefixError', function () {
         expect(() =>
-          CommandParser.parse(this.message, this.validPrefixes, this.commandManager)
+          CommandParser.parse(this.nix, this.message, this.validPrefixes)
         ).to.throw(InvalidPrefixError, 'Message does not start with a valid prefix');
       });
     });
@@ -33,7 +36,7 @@ describe('CommandParser', function () {
 
       it('raises a InvalidPrefixError', function () {
         expect(() =>
-          CommandParser.parse(this.message, this.validPrefixes, this.commandManager)
+          CommandParser.parse(this.nix, this.message, this.validPrefixes)
         ).to.throw(Error, 'Command \'command\' does not exist');
       });
     });
