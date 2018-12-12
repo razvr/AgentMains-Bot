@@ -63,7 +63,7 @@ describe('ModuleManager', function () {
     context('when the module has not been added', function () {
       it('raises an error', function () {
         expect(() => this.moduleManager.getModule('TestModule')).to.throw(
-          Error, "Module 'TestModule' could not be found."
+          Error, "Module 'TestModule' could not be found.",
         );
       });
     });
@@ -86,7 +86,7 @@ describe('ModuleManager', function () {
 
       it('raises an error', function () {
         expect(() => this.moduleManager.addModule(this.testModule)).to.throw(
-          Error, "Module 'TestModule' has already been added."
+          Error, "Module 'TestModule' has already been added.",
         );
       });
     });

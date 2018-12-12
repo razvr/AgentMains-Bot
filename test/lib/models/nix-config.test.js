@@ -69,7 +69,7 @@ describe('NixConfig', function () {
 
       it('throws an error', function () {
         expect(() => this.nixConfig.verifyConfig()).to.throw(
-          NixConfig.InvalidConfigError, "ownerUserId is required"
+          NixConfig.InvalidConfigError, "ownerUserId is required",
         );
       });
     });
@@ -81,7 +81,7 @@ describe('NixConfig', function () {
 
       it('throws an error', function () {
         expect(() => this.nixConfig.verifyConfig()).to.throw(
-          NixConfig.InvalidConfigError, "loginToken is required"
+          NixConfig.InvalidConfigError, "loginToken is required",
         );
       });
     });

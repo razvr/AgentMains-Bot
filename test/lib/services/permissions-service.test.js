@@ -58,7 +58,7 @@ describe('PermissionsService', function () {
               expect(this.nix.setGuildData).to.have.been.calledWith(
                 this.guild.id,
                 `core.permissions.${this.level}`,
-                { users: [], roles: [] }
+                { users: [], roles: [] },
               );
             });
         });
@@ -126,7 +126,7 @@ describe('PermissionsService', function () {
           expect(this.nix.setGuildData).to.have.been.calledWith(
             this.guild.id,
             `core.permissions.${this.level}`,
-            this.data
+            this.data,
           );
         });
       });
@@ -160,7 +160,7 @@ describe('PermissionsService', function () {
             {
               users: [this.user.id],
               roles: [],
-            }
+            },
           );
         });
     });
@@ -192,7 +192,7 @@ describe('PermissionsService', function () {
         expect(this.permissionsService.addUser(this.guild, this.level, this.user))
           .to.throw(Error, {
             name: 'PermLevelError',
-            message: `The user ${this.user.username} already has the permission level ${this.level}`
+            message: `The user ${this.user.username} already has the permission level ${this.level}`,
           })
           .and.close(done);
       });

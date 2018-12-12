@@ -83,7 +83,7 @@ describe('ServicesManager', function () {
 
       it('raises an error', function () {
         expect(() => this.servicesManager.addService('test', TestService)).to.throw(
-          Error, "The service 'test.TestService' has already been added."
+          Error, "The service 'test.TestService' has already been added.",
         );
       });
     });
@@ -106,7 +106,7 @@ describe('ServicesManager', function () {
     context('when the service has not been added to the manager', function () {
       it('raises an error', function () {
         expect(() => this.servicesManager.getService('test', 'TestService')).to.throw(
-          Error, "The service 'test.TestService' could not be found"
+          Error, "The service 'test.TestService' could not be found",
         );
       });
     });
@@ -192,7 +192,7 @@ describe('ServicesManager', function () {
             },
             (error) => {
               done(error);
-            }
+            },
           );
       });
     });

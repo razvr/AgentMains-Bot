@@ -63,7 +63,7 @@ describe('ConfigManager', function () {
     context('when the config action has not been added', function () {
       it('raises an error', function () {
         expect(() => this.configManager.getConfigAction('test', 'testAction')).to.throw(
-          Error, "The config action 'test.testAction' could not be found."
+          Error, "The config action 'test.testAction' could not be found.",
         );
       });
     });
@@ -86,7 +86,7 @@ describe('ConfigManager', function () {
 
       it('raises an error', function () {
         expect(() => this.configManager.addConfigAction('test', this.testAction)).to.throw(
-          Error, "The config action 'test.testAction' has already been added."
+          Error, "The config action 'test.testAction' has already been added.",
         );
       });
     });

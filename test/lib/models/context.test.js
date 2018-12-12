@@ -16,7 +16,7 @@ describe('Context', function () {
       this.message,
       this.command,
       this.args,
-      this.flags
+      this.flags,
     );
   });
 

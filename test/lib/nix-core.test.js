@@ -136,7 +136,7 @@ describe('Nix', function () {
           expect(callback).to.have.been.calledOnce;
           expect(callback).to.have.been.calledWith('Ready');
           done();
-        }
+        },
       );
     });
 
@@ -176,7 +176,7 @@ describe('Nix', function () {
           () => {
             expect(secondListenCallback).to.have.been.calledWith('Ready');
             done();
-          }
+          },
         );
     });
 
@@ -189,7 +189,7 @@ describe('Nix', function () {
             expect(this.nix.servicesManager.configureServices).to.have.been.called;
             done();
           },
-          (error) => done(error)
+          (error) => done(error),
         );
       });
 
@@ -205,7 +205,7 @@ describe('Nix', function () {
             (error) => {
               expect(error).to.eq(this.error);
               done();
-            }
+            },
           );
         });
       });
@@ -219,7 +219,7 @@ describe('Nix', function () {
             expect(this.nix.commandManager.configureCommands).to.have.been.called;
             done();
           },
-          (error) => done(error)
+          (error) => done(error),
         );
       });
 
@@ -235,7 +235,7 @@ describe('Nix', function () {
             (error) => {
               expect(error).to.eq(this.error);
               done();
-            }
+            },
           );
         });
       });
@@ -249,7 +249,7 @@ describe('Nix', function () {
               expect(this.nix.discord.login).to.have.been.calledWith(this.config.loginToken);
               done();
             },
-            (error) => done(error)
+            (error) => done(error),
           );
       });
 
@@ -265,7 +265,7 @@ describe('Nix', function () {
             (error) => {
               expect(error).to.eq(this.error);
               done();
-            }
+            },
           );
         });
       });
@@ -278,7 +278,7 @@ describe('Nix', function () {
             expect(this.nix.findOwner).to.have.been.calledWith();
             done();
           },
-          (error) => done(error)
+          (error) => done(error),
         );
       });
 
@@ -294,7 +294,7 @@ describe('Nix', function () {
             (error) => {
               expect(error).to.eq(this.error);
               done();
-            }
+            },
           );
         });
       });
@@ -307,7 +307,7 @@ describe('Nix', function () {
             expect(this.nix.onNixListen).to.have.been.calledWith();
             done();
           },
-          (error) => done(error)
+          (error) => done(error),
         );
       });
 
@@ -323,7 +323,7 @@ describe('Nix', function () {
             (error) => {
               expect(error).to.eq(this.error);
               done();
-            }
+            },
           );
         });
       });
@@ -336,7 +336,7 @@ describe('Nix', function () {
             });
             done();
           },
-          (error) => done(error)
+          (error) => done(error),
         );
       });
 
@@ -346,7 +346,7 @@ describe('Nix', function () {
             expect(this.nix.streams.command$).to.be.an.instanceOf(Rx.Observable);
             done();
           },
-          (error) => done(error)
+          (error) => done(error),
         );
       });
 
@@ -370,7 +370,7 @@ describe('Nix', function () {
               expect(this.nix.onNixJoinGuild).to.have.been.calledWith(this.guild3);
               done();
             },
-            (error) => done(error)
+            (error) => done(error),
           );
         });
       });
@@ -387,7 +387,7 @@ describe('Nix', function () {
         this.ready$.subscribe(
           () => this.nix.shutdown(),
           (error) => done(error),
-          () => done()
+          () => done(),
         );
       });
     });
@@ -395,7 +395,7 @@ describe('Nix', function () {
     context('when nix is not listening', function () {
       it('throws an error', function () {
         expect(() => this.nix.shutdown()).to.throw(
-          Error, "Bot is not listening"
+          Error, "Bot is not listening",
         );
       });
     });
@@ -501,7 +501,7 @@ describe('Nix', function () {
             expect(this.nix.owner).to.eq(this.user);
             done();
           },
-          (error) => done(error)
+          (error) => done(error),
         );
       });
     });
@@ -682,7 +682,7 @@ describe('Nix', function () {
               .subscribe(() => done('next was called'), (error) => {
                   expect(error).to.eq(this.error);
                   done();
-                }
+                },
               );
           });
         });
@@ -706,7 +706,7 @@ describe('Nix', function () {
       this.nix.handleError(this.error)
         .subscribe(() => {}, (error) => done(error), () => {
           expect(this.nix.messageOwner).to.have.been.calledOnceWith(
-            "I ran into an unhandled exception:", { embed }
+            "I ran into an unhandled exception:", { embed },
           );
           done();
         });
@@ -800,7 +800,7 @@ describe('Nix', function () {
           .subscribe(() => done('next was called'), (error) => {
               expect(error).to.eq(this.error);
               done();
-            }
+            },
           );
       });
     });
@@ -819,7 +819,7 @@ describe('Nix', function () {
           .subscribe(() => done('next was called'), (error) => {
               expect(error).to.eq(this.error);
               done();
-            }
+            },
           );
       });
     });
@@ -904,7 +904,7 @@ describe('Nix', function () {
           .subscribe(() => done('next was called'), (error) => {
               expect(error).to.eq(this.error);
               done();
-            }
+            },
           );
       });
     });
@@ -923,7 +923,7 @@ describe('Nix', function () {
           .subscribe(() => done('next was called'), (error) => {
               expect(error).to.eq(this.error);
               done();
-            }
+            },
           );
       });
     });

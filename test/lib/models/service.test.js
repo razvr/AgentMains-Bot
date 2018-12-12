@@ -42,7 +42,7 @@ describe('Service', function () {
         },
         (error) => {
           done(error);
-        }
+        },
       );
     });
   });
@@ -59,7 +59,7 @@ describe('Service', function () {
         },
         (error) => {
           done(error);
-        }
+        },
       );
     });
   });
@@ -76,7 +76,7 @@ describe('Service', function () {
         },
         (error) => {
           done(error);
-        }
+        },
       );
     });
   });

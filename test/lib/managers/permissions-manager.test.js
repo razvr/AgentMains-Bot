@@ -78,7 +78,7 @@ describe('PermissionsManager', function () {
     context('when the permission levels has not been added', function () {
       it('raises an error', function () {
         expect(() => this.permissionsManager.getPermissionLevel('testOne')).to.throw(
-          Error, "The permission level 'testOne' could not be found."
+          Error, "The permission level 'testOne' could not be found.",
         );
       });
     });

@@ -78,7 +78,7 @@ describe('Command', function () {
 
       it('raises an error', function () {
         expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, "Name for command is missing."
+          Error, "Name for command is missing.",
         );
       });
     });
@@ -90,7 +90,7 @@ describe('Command', function () {
 
       it('raises an error', function () {
         expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, "Name for command is missing."
+          Error, "Name for command is missing.",
         );
       });
     });
@@ -102,7 +102,7 @@ describe('Command', function () {
 
       it('raises an error', function () {
         expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, `moduleName for command ${this.cmdConfig.name} is missing.`
+          Error, `moduleName for command ${this.cmdConfig.name} is missing.`,
         );
       });
     });
@@ -114,7 +114,7 @@ describe('Command', function () {
 
       it('raises an error', function () {
         expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, `moduleName for command ${this.cmdConfig.name} is missing.`
+          Error, `moduleName for command ${this.cmdConfig.name} is missing.`,
         );
       });
     });
@@ -126,7 +126,7 @@ describe('Command', function () {
 
       it('raises an error', function () {
         expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, `run function for command ${this.cmdConfig.name} is missing.`
+          Error, `run function for command ${this.cmdConfig.name} is missing.`,
         );
       });
     });
@@ -138,7 +138,7 @@ describe('Command', function () {
 
       it('raises an error', function () {
         expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, `run function for command ${this.cmdConfig.name} is missing.`
+          Error, `run function for command ${this.cmdConfig.name} is missing.`,
         );
       });
     });

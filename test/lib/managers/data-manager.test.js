@@ -63,7 +63,7 @@ describe('DataManager', function () {
 
         it('raises an error', function () {
           expect(() => new DataManager(this.nix)).to.throw(
-            DataManager.DataSourceError, "Unable to load data source 'nix-data-test'. Is the npm module 'nix-data-test' installed?"
+            DataManager.DataSourceError, "Unable to load data source 'nix-data-test'. Is the npm module 'nix-data-test' installed?",
           );
         });
       });
@@ -94,7 +94,7 @@ describe('DataManager', function () {
           },
           (error) => {
             done(error);
-          }
+          },
         );
       });
     });
@@ -129,7 +129,7 @@ describe('DataManager', function () {
           },
           (error) => {
             done(error);
-          }
+          },
         );
       });
     });

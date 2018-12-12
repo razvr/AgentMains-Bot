@@ -101,7 +101,7 @@ describe('CommandManager', function () {
 
       it('raises an error', function () {
         expect(() => this.commandManager.addCommand(this.command)).to.throw(
-          Error, "Command 'commandOne' has already been added."
+          Error, "Command 'commandOne' has already been added.",
         );
       });
     });
@@ -122,7 +122,7 @@ describe('CommandManager', function () {
     context('when the command has not been added', function () {
       it('raises an error', function () {
         expect(() => this.commandManager.getCommand('commandOne')).to.throw(
-          Error, "Command 'commandOne' does not exist"
+          Error, "Command 'commandOne' does not exist",
         );
       });
     });
@@ -170,7 +170,7 @@ describe('CommandManager', function () {
             },
             (error) => {
               done(error);
-            }
+            },
           );
       });
     });
