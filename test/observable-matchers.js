@@ -18,12 +18,24 @@ module.exports = function (chai) {
   });
 
   Assertion.overwriteMethod('throw', function (_super) {
-    return function (errorLike, errMsgMatcher, msg) {
+    return function (errorLike, errMatcher) {
       if (this._obj instanceof Rx.Observable) {
         this._obj
           .subscribe(
             () => {},
-            (error) => { new Assertion(error).to.be.an.instanceOf(errorLike); },
+            (error) => {
+              new Assertion(error).to.be.an.instanceOf(errorLike);
+
+              if (errMatcher) {
+                if (typeof errMatcher === "string") {
+                  new Assertion(error.message).to.eq(errMatcher);
+                } else {
+                  Object.entries(errMatcher).forEach(([property, expected]) => {
+                    new Assertion(error[property]).to.eq(expected);
+                  });
+                }
+              }
+            },
             () => { throw new Error("Expected stream to throw an error."); });
       } else {
         return _super.apply(this, arguments);

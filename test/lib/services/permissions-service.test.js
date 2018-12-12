@@ -10,12 +10,6 @@ describe('PermissionsService', function () {
     this.permissionsService = new PermissionsService(this.nix);
   });
 
-  describe('constructor', function () {
-    it('sets an empty list of permission levels', function () {
-      expect(this.permissionsService.levels).to.be.empty;
-    });
-  });
-
   describe('#getDatakey', function () {
     beforeEach(function () {
       this.level = "testLevel";
@@ -38,7 +32,10 @@ describe('PermissionsService', function () {
 
       it('raises a PermissionLevelNotFound error', function (done) {
         expect(this.permissionsService.getPermissionsData(this.guild.id, this.level))
-          .to.throw(Error)
+          .to.throw(Error, {
+            name: 'PermLevelNotFoundError',
+            message: `The permission level '${this.level}' could not be found.`,
+          })
           .and.close(done);
       });
     });
@@ -106,9 +103,12 @@ describe('PermissionsService', function () {
         this.level = "foobar";
       });
 
-      it('raises a PermissionLevelNotFound error', function (done) {
+      it('raises a PermLevelNotFoundError error', function (done) {
         expect(this.permissionsService.setPermissionsData(this.guild.id, this.level, this.data))
-          .to.throw(Error)
+          .to.throw(Error, {
+            name: 'PermLevelNotFoundError',
+            message: `The permission level '${this.level}' could not be found.`,
+          })
           .and.close(done);
       });
     });
@@ -116,7 +116,7 @@ describe('PermissionsService', function () {
     context('when the permission level is known', function () {
       beforeEach(function () {
         this.level = "admin";
-        this.permissionsService.levels = [this.level];
+        this.nix.addPermissionLevel(this.level);
       });
 
       it('saves the passed data to the guild data', function (done) {
@@ -139,12 +139,64 @@ describe('PermissionsService', function () {
     });
   });
 
-  describe('#addPermissionLevel', function () {
-
-  });
-
   describe('#addUser', function () {
+    beforeEach(function () {
+      this.guild = {id: "guild-00001"};
+      this.level = "admin";
+      this.user = {id: "user-00001", username: "exampleUser"};
 
+      this.permissionsService.levels = ["admin"];
+    });
+
+    it('adds the user to the given permission level', function (done) {
+      sinon.stub(this.permissionsService, 'setPermissionsData')
+        .callsFake((guildId, level, data) => Rx.Observable.of(data));
+
+      expect(this.permissionsService.addUser(this.guild, this.level, this.user))
+        .to.complete(done, () => {
+          expect(this.permissionsService.setPermissionsData).to.have.been.calledWith(
+            this.guild.id,
+            this.level,
+            {
+              users: [this.user.id],
+              roles: [],
+            }
+          );
+        });
+    });
+
+    context('when the permission level does not exist', function() {
+      beforeEach(function () {
+        this.level = "foobar";
+      });
+
+      it('raises a PermLevelNotFoundError', function (done) {
+        expect(this.permissionsService.addUser(this.guild, this.level, this.user))
+          .to.throw(Error, {
+            name: 'PermLevelNotFoundError',
+            message: `The permission level '${this.level}' could not be found.`,
+          })
+          .and.close(done);
+      });
+    });
+
+    context('when the user has already been added to the permission level', function() {
+      beforeEach(function () {
+        sinon.stub(this.permissionsService, 'getPermissionsData').returns(Rx.Observable.of({
+          users: [this.user.id],
+          roles: [],
+        }));
+      });
+
+      it('raises a PermLevelError', function (done) {
+        expect(this.permissionsService.addUser(this.guild, this.level, this.user))
+          .to.throw(Error, {
+            name: 'PermLevelError',
+            message: `The user ${this.user.username} already has the permission level ${this.level}`
+          })
+          .and.close(done);
+      });
+    });
   });
 
   describe('#removeUser', function () {
