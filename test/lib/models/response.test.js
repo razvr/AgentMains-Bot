@@ -1,10 +1,9 @@
 const Rx = require('rx');
-const MockMessage = require("../../support/mock-message");
 const Response = require('../../../lib/models/response');
 
 describe('Response', function () {
   beforeEach(function () {
-    this.message = new MockMessage();
+    this.message = Mockery.create("Message");
     this.response = new Response(this.message);
   });
 

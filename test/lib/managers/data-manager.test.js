@@ -4,16 +4,14 @@ const path = require('path');
 const fs = require('fs');
 const Rx = require('rx');
 
-const MockNix = require("../../support/mock-nix");
-const MockDataSource = require("../../support/mock-data-source");
 const DataManager = require('../../../lib/managers/data-manager');
 
 describe('DataManager', function () {
   beforeEach(function () {
-    this.nix = new MockNix();
+    this.nix = createNixStub();
     this.nix.config = { dataSource: {} };
 
-    this.dataSource = new MockDataSource();
+    this.dataSource = new MemoryDataSource();
     this.dataManager = new DataManager(this.nix);
 
     this.dataManager._dataSource = this.dataSource;

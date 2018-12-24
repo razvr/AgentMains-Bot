@@ -1,8 +1,6 @@
 const Rx = require('rx');
 const Discord = require('discord.js');
 
-const MockClient = require('../support/discord/mock-client');
-
 const Nix = require('../../lib/nix-core');
 const DataManager = require('../../lib/managers/data-manager');
 const CommandManager = require('../../lib/managers/command-manager');
@@ -22,7 +20,7 @@ describe('Nix', function () {
     this.nix = new Nix(this.config);
 
     // Disable outbound connections
-    this.nix.discord = new MockClient();
+    this.nix.discord = Mockery.create("Client");
   });
 
   afterEach(function (done) {
@@ -210,7 +208,6 @@ describe('Nix', function () {
         });
       });
 
-
       it('configures commands', function (done) {
         sinon.spy(this.nix.commandManager, 'configureCommands');
 
@@ -241,8 +238,6 @@ describe('Nix', function () {
       });
 
       it('logs into discord', function (done) {
-        sinon.spy(this.nix.discord, 'login');
-
         this.nix
           .listen(
             () => {
@@ -256,7 +251,7 @@ describe('Nix', function () {
       context('when logging into discord fails', function () {
         beforeEach(function () {
           this.error = new Error("mock error");
-          sinon.stub(this.nix.discord, 'login').rejects(this.error);
+          this.nix.discord.login = fake.rejects(this.error);
         });
 
         it('triggers the error callback', function (done) {
@@ -355,9 +350,9 @@ describe('Nix', function () {
           this.guild1 = { id: 'mock_id_1' };
           this.guild2 = { id: 'mock_id_2' };
           this.guild3 = { id: 'mock_id_3' };
-          this.nix.discord.guilds.items.push(this.guild1);
-          this.nix.discord.guilds.items.push(this.guild2);
-          this.nix.discord.guilds.items.push(this.guild3);
+          this.nix.discord.guilds.set(this.guild1.id, this.guild1);
+          this.nix.discord.guilds.set(this.guild2.id, this.guild2);
+          this.nix.discord.guilds.set(this.guild3.id, this.guild3);
         });
 
         it('runs the onNixJoinGuild for each', function (done) {

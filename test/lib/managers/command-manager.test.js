@@ -1,9 +1,8 @@
-const MockNix = require("../../support/mock-nix");
 const CommandManager = require("../../../lib/managers/command-manager");
 
 describe('CommandManager', function () {
   beforeEach(function () {
-    this.nix = new MockNix();
+    this.nix = createNixStub();
 
     this.nix.services = {
       core: {

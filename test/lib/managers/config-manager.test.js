@@ -1,9 +1,8 @@
-const MockNix = require("../../support/mock-nix");
 const ConfigManager = require('../../../lib/managers/config-manager');
 
 describe('ConfigManager', function () {
   beforeEach(function () {
-    this.nix = new MockNix();
+    this.nix = createNixStub();
     this.configManager = new ConfigManager(this.nix);
   });
 

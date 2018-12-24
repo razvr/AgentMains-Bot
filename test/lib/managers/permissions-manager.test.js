@@ -1,9 +1,8 @@
-const MockNix = require("../../support/mock-nix");
 const PermissionsManager = require("../../../lib/managers/permissions-manager");
 
 describe('PermissionsManager', function () {
   beforeEach(function () {
-    this.nix = new MockNix();
+    this.nix = createNixStub();
     this.permissionsManager = new PermissionsManager(this.nix);
   });
 
