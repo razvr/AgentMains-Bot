@@ -1,6 +1,10 @@
 class Mockery {
   constructor() {
     this._factories = {};
+
+    this.define = this.define.bind(this);
+    this.create = this.create.bind(this);
+    this.seq = this.seq.bind(this);
   }
 
   define(name, defaultProps={}, options={}) {

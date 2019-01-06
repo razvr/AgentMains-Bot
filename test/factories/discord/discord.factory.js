@@ -1,12 +1,15 @@
 const { Collection } = require('discord.js');
+create = Mockery.create;
+seq = Mockery.seq;
+define = Mockery.define;
 
-Mockery.define("Client", {
+define("Client", {
   guilds: new Collection(),
 
   login: fake.resolves(true),
   fetchUser: fake((userId) => {
     return new Promise((resolve) => {
-      resolve(Mockery.create("User", {
+      resolve(create("User", {
         id: userId,
       }));
     });
@@ -16,27 +19,27 @@ Mockery.define("Client", {
   destroy: fake.resolves(true),
 });
 
-Mockery.define("Guild");
+define("Guild");
 
-Mockery.define("User", {
-  id: Mockery.seq((index) => `User-${index}`),
+define("User", {
+  id: seq((index) => `User-${index}`),
 
   send: fake((msg) => new Promise((resolve) => resolve(msg))),
 });
 
-Mockery.define("GuildMember");
+define("GuildMember");
 
-Mockery.define("TextChannel", {
+define("TextChannel", {
   permissions: new Collection(),
 
-  permissionsFor: Mockery.seq(() => fake.returns(Mockery.create("Permissions"))),
+  permissionsFor: Mockery.seq(() => fake.returns(create("Permissions"))),
 });
 
-Mockery.define("Message", {
-  author: Mockery.seq(() => Mockery.create('User')),
-  channel: Mockery.seq(() => Mockery.create('TextChannel')),
+define("Message", {
+  author: seq(() => create('User')),
+  channel: seq(() => create('TextChannel')),
 });
 
-Mockery.define("Permissions", {
+define("Permissions", {
   has: fake.returns(false),
 });
