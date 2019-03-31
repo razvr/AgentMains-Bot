@@ -22,7 +22,8 @@ define("Client", {
 define("Guild");
 
 define("User", {
-  id: seq((index) => `User-${index}`),
+  id: seq((index) => `0000${index}`),
+  tag: seq((index) => `User${index}#0000`),
 
   send: fake((msg) => new Promise((resolve) => resolve(msg))),
 });
@@ -31,13 +32,16 @@ define("GuildMember");
 
 define("TextChannel", {
   permissions: new Collection(),
+  type: 'text',
 
-  permissionsFor: Mockery.seq(() => fake.returns(create("Permissions"))),
+  send: fake((msg) => new Promise((resolve) => resolve(msg))),
+  permissionsFor: seq(() => fake.returns(create("Permissions"))),
 });
 
 define("Message", {
   author: seq(() => create('User')),
   channel: seq(() => create('TextChannel')),
+  reply: fake((msg) => new Promise((resolve) => resolve(msg))),
 });
 
 define("Permissions", {
