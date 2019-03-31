@@ -5,5 +5,5 @@
 
 *.log
 
-config/config\.js
+/config.js
 
