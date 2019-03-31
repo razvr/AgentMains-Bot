@@ -30,6 +30,8 @@ global.createNixStub = () => {
   let nix = new NixCore({
     ownerUserId: 'user-00001',
     loginToken: 'example-token',
+
+    logger: { silent: true },
   });
 
   nix.stubService = (moduleName, serviceName, service) => {
@@ -37,7 +39,16 @@ global.createNixStub = () => {
     nix.servicesManager._services[serviceKey] = service;
   };
 
-  sinon.stub(nix, 'handleError').callsFake((error) => { throw error; });
+  sinon.stub(nix, 'handleError').callsFake((error) => {
+    return new Promise((resolve, reject) => reject(error));
+  });
+
+  // Setup mocks and stubs for discord
+  nix.discord.user = Mockery.create('User');
+
+  sinon.stub(nix.discord, 'login').resolves(Mockery.create('User'));
+  sinon.stub(nix.discord, 'fetchUser').resolves(Mockery.create('User'));
+  sinon.stub(nix.discord, 'destroy').resolves();
 
   return nix;
 };
