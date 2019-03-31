@@ -1,10 +1,9 @@
-const MockNix = require("../../support/mock-nix");
 const ModuleManager = require('../../../lib/managers/module-manager');
 const Service = require("../../../lib/models/service");
 
 describe('ModuleManager', function () {
   beforeEach(function () {
-    this.nix = new MockNix();
+    this.nix = createNixStub();
     this.moduleManager = new ModuleManager(this.nix);
   });
 
@@ -63,7 +62,7 @@ describe('ModuleManager', function () {
     context('when the module has not been added', function () {
       it('raises an error', function () {
         expect(() => this.moduleManager.getModule('TestModule')).to.throw(
-          Error, "Module 'TestModule' could not be found."
+          Error, "Module 'TestModule' could not be found.",
         );
       });
     });
@@ -86,7 +85,7 @@ describe('ModuleManager', function () {
 
       it('raises an error', function () {
         expect(() => this.moduleManager.addModule(this.testModule)).to.throw(
-          Error, "Module 'TestModule' has already been added."
+          Error, "Module 'TestModule' has already been added.",
         );
       });
     });
@@ -106,6 +105,8 @@ describe('ModuleManager', function () {
       });
 
       it('adds all services to nix', function () {
+        spy(this.nix, 'addService');
+
         this.moduleManager.addModule(this.testModule);
 
         expect(this.nix.addService).to.have.been
@@ -124,6 +125,8 @@ describe('ModuleManager', function () {
       });
 
       it('adds all config actions to nix', function () {
+        spy(this.nix, 'addConfigAction');
+
         this.moduleManager.addModule(this.testModule);
 
         expect(this.nix.addConfigAction).to.have.been
@@ -136,12 +139,14 @@ describe('ModuleManager', function () {
     context('when the module has commands', function () {
       beforeEach(function () {
         this.testModule.commands = [
-          { name: "testActionOne" },
-          { name: "testActionTwo" },
+          { name: "testActionOne", run: fake() },
+          { name: "testActionTwo", run: fake() },
         ];
       });
 
       it('adds all commands to nix', function () {
+        spy(this.nix, 'addCommand');
+
         this.moduleManager.addModule(this.testModule);
 
         expect(this.nix.addCommand).to.have.been
@@ -160,6 +165,8 @@ describe('ModuleManager', function () {
       });
 
       it('adds all permission levels to nix', function () {
+        spy(this.nix, 'addPermissionLevel');
+
         this.moduleManager.addModule(this.testModule);
 
         expect(this.nix.addPermissionLevel).to.have.been

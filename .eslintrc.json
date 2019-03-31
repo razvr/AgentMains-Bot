@@ -1,9 +1,9 @@
 {
   "parserOptions": {
-    "ecmaVersion": 6,
+    "ecmaVersion": 2017,
     "sourceType": "module",
     "ecmaFeatures": {
-      "jsx": true
+      "experimentalObjectRestSpread": true
     }
   },
   "env": {
@@ -16,7 +16,7 @@
       "objects": "always-multiline",
       "imports": "always-multiline",
       "exports": "always-multiline",
-      "functions": "ignore"
+      "functions": "always-multiline"
     }],
     "semi": ["error", "always"],
     "arrow-parens": ["error", "always"]

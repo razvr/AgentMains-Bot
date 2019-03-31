@@ -1,9 +1,8 @@
-const MockNix = require("../../support/mock-nix");
 const PermissionsManager = require("../../../lib/managers/permissions-manager");
 
 describe('PermissionsManager', function () {
   beforeEach(function () {
-    this.nix = new MockNix();
+    this.nix = createNixStub();
     this.permissionsManager = new PermissionsManager(this.nix);
   });
 
@@ -78,7 +77,7 @@ describe('PermissionsManager', function () {
     context('when the permission levels has not been added', function () {
       it('raises an error', function () {
         expect(() => this.permissionsManager.getPermissionLevel('testOne')).to.throw(
-          Error, "The permission level 'testOne' could not be found."
+          Error, "The permission level 'testOne' could not be found.",
         );
       });
     });

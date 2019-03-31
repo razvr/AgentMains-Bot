@@ -23,7 +23,7 @@ describe('CommandParser', function () {
 
       it('raises a InvalidPrefixError', function () {
         expect(() =>
-          CommandParser.parse(this.nix, this.message, this.validPrefixes)
+          CommandParser.parse(this.nix, this.message, this.validPrefixes),
         ).to.throw(InvalidPrefixError, 'Message does not start with a valid prefix');
       });
     });
@@ -36,7 +36,7 @@ describe('CommandParser', function () {
 
       it('raises a InvalidPrefixError', function () {
         expect(() =>
-          CommandParser.parse(this.nix, this.message, this.validPrefixes)
+          CommandParser.parse(this.nix, this.message, this.validPrefixes),
         ).to.throw(Error, 'Command \'command\' does not exist');
       });
     });
@@ -259,7 +259,7 @@ describe('CommandParser', function () {
       context('when the last param is greedy', function () {
         beforeEach(function () {
           this.command.args.push(
-            {name: "param3", greedy: true}
+            {name: "param3", greedy: true},
           );
         });
 
@@ -297,7 +297,7 @@ describe('CommandParser', function () {
       context('when the last param is not greedy', function () {
         beforeEach(function () {
           this.command.args.push(
-            {name: "param3", greedy: false}
+            {name: "param3", greedy: false},
           );
         });
 

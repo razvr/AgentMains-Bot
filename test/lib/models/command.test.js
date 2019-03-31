@@ -1,11 +1,9 @@
-const MockNix = require("../../support/mock-nix");
 const MockContext = require("../../support/mock-context");
-const MockResponse = require("../../support/mock-response");
 const Command = require("../../../lib/models/command");
 
 describe('Command', function () {
   beforeEach(function () {
-    this.nix = new MockNix();
+    this.nix = createNixStub();
     this.cmdConfig = {
       name: "testCommand",
       moduleName: "test",
@@ -78,7 +76,7 @@ describe('Command', function () {
 
       it('raises an error', function () {
         expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, "Name for command is missing."
+          Error, "Name for command is missing.",
         );
       });
     });
@@ -90,7 +88,7 @@ describe('Command', function () {
 
       it('raises an error', function () {
         expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, "Name for command is missing."
+          Error, "Name for command is missing.",
         );
       });
     });
@@ -102,7 +100,7 @@ describe('Command', function () {
 
       it('raises an error', function () {
         expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, `moduleName for command ${this.cmdConfig.name} is missing.`
+          Error, `moduleName for command ${this.cmdConfig.name} is missing.`,
         );
       });
     });
@@ -114,7 +112,7 @@ describe('Command', function () {
 
       it('raises an error', function () {
         expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, `moduleName for command ${this.cmdConfig.name} is missing.`
+          Error, `moduleName for command ${this.cmdConfig.name} is missing.`,
         );
       });
     });
@@ -126,7 +124,7 @@ describe('Command', function () {
 
       it('raises an error', function () {
         expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, `run function for command ${this.cmdConfig.name} is missing.`
+          Error, `run function for command ${this.cmdConfig.name} is missing.`,
         );
       });
     });
@@ -138,7 +136,7 @@ describe('Command', function () {
 
       it('raises an error', function () {
         expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, `run function for command ${this.cmdConfig.name} is missing.`
+          Error, `run function for command ${this.cmdConfig.name} is missing.`,
         );
       });
     });
@@ -193,8 +191,8 @@ describe('Command', function () {
 
   describe('#execCommand', function () {
     beforeEach(function () {
-      this.context = new MockContext();
-      this.response = new MockResponse();
+      this.context = Mockery.create("CommandContext");
+      this.response = Mockery.create("Response");
     });
 
     it('calls #checkMissingArgs', function () {
@@ -237,7 +235,7 @@ describe('Command', function () {
   describe('#help', function () {
     beforeEach(function () {
       this.context = new MockContext();
-      this.response = new MockResponse();
+      this.response = Mockery.create("Response");
 
       this.context.nix = this.nix;
     });
@@ -254,7 +252,7 @@ describe('Command', function () {
   describe('#argsMissing', function () {
     beforeEach(function () {
       this.context = new MockContext();
-      this.response = new MockResponse();
+      this.response = Mockery.create("Response");
 
       this.context.nix = this.nix;
     });

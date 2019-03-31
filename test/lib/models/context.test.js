@@ -1,12 +1,10 @@
-const MockNix = require("../../support/mock-nix");
-const MockMessage = require("../../support/mock-message");
 const MockCommand = require("../../support/mock-command");
 const Context = require('../../../lib/models/command-context');
 
 describe('Context', function () {
   beforeEach(function () {
-    this.nix = new MockNix();
-    this.message = new MockMessage();
+    this.nix = createNixStub();
+    this.message = Mockery.create("Message");
     this.command = new MockCommand();
     this.args = {};
     this.flags = {};
@@ -16,7 +14,7 @@ describe('Context', function () {
       this.message,
       this.command,
       this.args,
-      this.flags
+      this.flags,
     );
   });
 

@@ -2,7 +2,6 @@ const Rx = require('rx');
 
 const ServicesManager = require('../../../lib/managers/services-manager');
 const Service = require("../../../lib/models/service");
-const MockNix = require("../../support/mock-nix");
 
 const ModuleService = require('../../../lib/services/module-service');
 const CommandService = require('../../../lib/services/command-service');
@@ -11,7 +10,7 @@ const UserService = require('../../../lib/services/user-service');
 
 describe('ServicesManager', function () {
   beforeEach(function () {
-    this.nix = new MockNix();
+    this.nix = createNixStub();
 
     this.nix.services = {
       core: {
@@ -83,7 +82,7 @@ describe('ServicesManager', function () {
 
       it('raises an error', function () {
         expect(() => this.servicesManager.addService('test', TestService)).to.throw(
-          Error, "The service 'test.TestService' has already been added."
+          Error, "The service 'test.TestService' has already been added.",
         );
       });
     });
@@ -106,7 +105,7 @@ describe('ServicesManager', function () {
     context('when the service has not been added to the manager', function () {
       it('raises an error', function () {
         expect(() => this.servicesManager.getService('test', 'TestService')).to.throw(
-          Error, "The service 'test.TestService' could not be found"
+          Error, "The service 'test.TestService' could not be found",
         );
       });
     });
@@ -192,7 +191,7 @@ describe('ServicesManager', function () {
             },
             (error) => {
               done(error);
-            }
+            },
           );
       });
     });

@@ -1,10 +1,9 @@
 const Rx = require('rx');
-const MockMessage = require("../../support/mock-message");
 const Response = require('../../../lib/models/response');
 
 describe('Response', function () {
   beforeEach(function () {
-    this.message = new MockMessage();
+    this.message = Mockery.create("Message");
     this.response = new Response(this.message);
   });
 
@@ -57,7 +56,7 @@ describe('Response', function () {
           () => {
             expect(this.nextCallback).not.to.have.been.called;
             done();
-          }
+          },
         );
       });
     });
@@ -83,7 +82,7 @@ describe('Response', function () {
           () => {
             expect(this.nextCallback).to.have.been.calledOnceWith("discordResponse");
             done();
-          }
+          },
         );
       });
     });
@@ -111,7 +110,7 @@ describe('Response', function () {
           () => {
             expect(this.nextCallback).to.have.been.calledOnceWith("discordResponse");
             done();
-          }
+          },
         );
       });
     });
@@ -125,7 +124,7 @@ describe('Response', function () {
       it("sends an embed to the channel", function () {
         this.response.send();
         expect(this.message.channel.send).to.have.been.calledOnceWith(
-          this.response.content, {embed: this.response.embed}
+          this.response.content, {embed: this.response.embed},
         );
       });
 
@@ -139,7 +138,7 @@ describe('Response', function () {
           () => {
             expect(this.nextCallback).to.have.been.calledOnceWith("discordResponse");
             done();
-          }
+          },
         );
       });
     });
@@ -165,7 +164,7 @@ describe('Response', function () {
           () => {
             expect(this.nextCallback).to.have.been.calledOnceWith("discordResponse");
             done();
-          }
+          },
         );
       });
     });
@@ -187,7 +186,7 @@ describe('Response', function () {
           },
           () => {
             done("error callback was not called");
-          }
+          },
         );
       });
     });
@@ -247,7 +246,7 @@ describe('Response', function () {
         it('sends the correct response', function () {
           this.response.send(this.options);
           expect(this.message.channel.send).to.have.been.calledOnceWith(
-            '', {embed: this.response.embed}
+            '', {embed: this.response.embed},
           );
         });
       });
