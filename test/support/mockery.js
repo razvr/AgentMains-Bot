@@ -53,6 +53,7 @@ class Sequence {
   }
 
   next(props) {
+    this.index += 1;
     return this.sequenceFn(this.index, props);
   }
 }

@@ -12,15 +12,22 @@ describe('Feature: Commands', function () {
 
     this.message = {
       content: 'Hello World!',
-      member: Mockery.create('User'),
+      member: Mockery.create('GuildMember'),
       guild: this.guild,
       channel: this.channel,
     };
 
+    this.command = {
+      name: "test",
+      moduleName: 'core',
+      args: [],
+      run: sinon.fake(),
+    };
+
     this.nix.listen().subscribe(
       () => {
-        sinon.stub(this.nix.getService('core', 'CommandService'), 'canSendMessage')
-          .returns(Rx.Observable.of(true));
+        this.commandService = this.nix.getService('core', 'CommandService');
+        sinon.stub(this.commandService, 'canSendMessage').returns(Rx.Observable.of(true));
 
         done();
       },
@@ -41,12 +48,6 @@ describe('Feature: Commands', function () {
 
   it('runs basic commands', function (done) {
     this.message.content = '!test';
-
-    this.command = {
-      name: "test",
-      moduleName: 'core',
-      run: sinon.fake(),
-    };
     this.nix.addCommand(this.command);
 
     this.discord.emit('message', this.message);
@@ -60,18 +61,13 @@ describe('Feature: Commands', function () {
 
   it('runs commands with arguments', function (done) {
     this.message.content = '!test value1 value2';
+    this.command.args = [
+      { name: 'normal' },
+      { name: 'required', required: true },
+      { name: 'optional' },
+      { name: 'default', default: 'value4' },
+    ];
 
-    this.command = {
-      name: "test",
-      moduleName: 'core',
-      args: [
-        { name: 'normal' },
-        { name: 'required', required: true },
-        { name: 'optional' },
-        { name: 'default', default: 'value4' },
-      ],
-      run: sinon.fake(),
-    };
     this.nix.addCommand(this.command);
 
     this.discord.emit('message', this.message);
@@ -86,23 +82,16 @@ describe('Feature: Commands', function () {
           },
         }));
       })
-      .subscribe(
-        () => done(),
-        (error) => done(error),
-      );
+      .subscribe(() => done(), (error) => done(error));
   });
 
   it('returns a help message when a command is missing required arguments', function (done) {
     this.message.content = '!test value1';
-    this.command = {
-      name: "test",
-      moduleName: 'core',
-      args: [
-        { name: 'param1' },
-        { name: 'param2', required: true },
-      ],
-      run: sinon.fake(),
-    };
+    this.command.args = [
+      { name: 'param1' },
+      { name: 'param2', required: true },
+    ];
+
     this.nix.addCommand(this.command);
 
     this.discord.emit('message', this.message);
@@ -111,9 +100,22 @@ describe('Feature: Commands', function () {
         expect(this.command.run).not.to.have.been.called;
         expect(this.channel.send).to.have.been.calledWith("I'm sorry, but I'm missing some information for that command:");
       })
-      .subscribe(
-        () => done(),
-        (error) => done(error),
-      );
+      .subscribe(() => done(), (error) => done(error));
+  });
+
+  it('does not run commands that the user does not have permission to run', function (done) {
+    this.message.content = '!test';
+
+    this.command.permissions = ['test'];
+
+    this.nix.addPermissionLevel('test');
+    this.nix.addCommand(this.command);
+
+    this.discord.emit('message', this.message);
+    this.nix.shutdown()
+      .do(() => {
+        expect(this.command.run).not.to.have.been.called;
+      })
+      .subscribe(() => done(), (error) => done(error));
   });
 });

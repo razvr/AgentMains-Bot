@@ -19,7 +19,9 @@ define("Client", {
   destroy: fake.resolves(true),
 });
 
-define("Guild");
+define("Guild", {
+  ownerID: seq(() => create('User').id),
+});
 
 define("User", {
   id: seq((index) => `0000${index}`),
@@ -28,7 +30,10 @@ define("User", {
   send: fake((msg) => new Promise((resolve) => resolve(msg))),
 });
 
-define("GuildMember");
+define("GuildMember", {
+  user: seq(() => create('User')),
+  roles: [],
+});
 
 define("TextChannel", {
   permissions: new Collection(),

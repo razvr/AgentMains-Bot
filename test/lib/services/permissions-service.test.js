@@ -64,9 +64,19 @@ describe('PermissionsService', function () {
         });
 
         it('emits a default set of data', function (done) {
-          expect(this.permissionsService.getPermissionsData(this.guild.id, this.level))
-            .to.emit([{ users: [], roles: [] }])
-            .and.complete(done);
+          this.permissionsService
+            .getPermissionsData(this.guild.id, this.level)
+            .toArray()
+            .do((emitted) => {
+              expect(emitted).to.deep.equal([
+                {
+                  name: 'admin',
+                  users: [],
+                  roles: [],
+                },
+              ]);
+            })
+            .subscribe(() => done(), (error) => done(error));
         });
       });
 

@@ -1,7 +1,7 @@
 let Rx = require('rx');
 
 module.exports = function (chai) {
-  var Assertion = chai.Assertion;
+  let Assertion = chai.Assertion;
 
   Assertion.addProperty('observable', toBeObservable);
   Assertion.addMethod('emitLength', toEmitLength);
@@ -49,6 +49,8 @@ module.exports = function (chai) {
     new Assertion(this._obj).to.be.observable;
 
     this._obj = this._obj
+      .toArray()
+      .map(() => false)
       .catch((error) => {
         new Assertion(error).to.be.an.instanceOf(errorLike);
 
@@ -62,17 +64,13 @@ module.exports = function (chai) {
           }
         }
 
-        caught = true;
-        return Rx.Observable.empty();
+        return Rx.Observable.of(true);
       })
-      .toArray()
-      .do(() => {
+      .do((caught) => {
         if (!caught) {
           throw new Error('expected to throw an error, but none was thrown.');
         }
       });
-
-    let caught = false;
   }
 
   function toClose(done) {
