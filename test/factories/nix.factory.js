@@ -1,4 +1,5 @@
 const Rx = require('rx');
+seq = Mockery.seq;
 
 Mockery.define("Response", {
   embed: null,
@@ -10,5 +11,6 @@ Mockery.define("Response", {
 Mockery.define("Command");
 
 Mockery.define("CommandContext", {
-  command: Mockery.seq(() => Mockery.create('Command')),
+  command: seq(() => Mockery.create('Command')),
+  flags: seq(() => ({})),
 });
