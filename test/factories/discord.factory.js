@@ -25,7 +25,7 @@ define("Guild", {
 
 define("User", {
   id: seq((index) => `0000${index}`),
-  tag: seq((index) => `User${index}#0000`),
+  tag: seq((index) => `User${index}#000${index}`),
 
   send: fake((msg) => new Promise((resolve) => resolve(msg))),
 });
@@ -44,8 +44,10 @@ define("TextChannel", {
 });
 
 define("Message", {
+  content: 'This is a message.',
   author: seq(() => create('User')),
   channel: seq(() => create('TextChannel')),
+
   reply: fake((msg) => new Promise((resolve) => resolve(msg))),
 });
 
