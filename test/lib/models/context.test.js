@@ -46,24 +46,6 @@ describe('Context', function () {
     });
   });
 
-  describe(".user", function() {
-    context("when the member is unknown", function () {
-      beforeEach(function () { this.message.member = null; });
-
-      it('returns the author of the message', function () {
-        expect(this.context.author).to.eq(this.message.author);
-      });
-    });
-
-    context("when the member is known", function () {
-      beforeEach(function () { this.message.member = 'member'; });
-
-      it('returns the member of the message', function () {
-        expect(this.context.member).to.eq(this.message.member);
-      });
-    });
-  });
-
   describe(".channel", function () {
     it('returns the channel of the message', function () {
       expect(this.context.channel).to.eq(this.message.channel);
