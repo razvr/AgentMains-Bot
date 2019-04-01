@@ -10,12 +10,13 @@ describe('Feature: Commands', function () {
       guild: this.guild,
     });
 
-    this.message = {
-      content: 'Hello World!',
-      member: Mockery.create('GuildMember'),
+    this.message = Mockery.create("Message", {
+      member: Mockery.create('GuildMember', {
+        guild: this.guild,
+      }),
       guild: this.guild,
       channel: this.channel,
-    };
+    });
 
     this.command = {
       name: "test",
@@ -24,15 +25,10 @@ describe('Feature: Commands', function () {
       run: sinon.fake(),
     };
 
-    this.nix.listen().subscribe(
-      () => {
-        this.commandService = this.nix.getService('core', 'CommandService');
-        sinon.stub(this.commandService, 'canSendMessage').returns(Rx.Observable.of(true));
+    this.commandService = this.nix.getService('core', 'CommandService');
+    sinon.stub(this.commandService, 'canSendMessage').returns(Rx.Observable.of(true));
 
-        done();
-      },
-      (error) => done(error),
-    );
+    this.nix.listen().subscribe(() => done(), (error) => done(error));
   });
 
   afterEach(function (done) {
