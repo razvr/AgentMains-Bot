@@ -6,7 +6,7 @@ module.exports = (config = {}) => {
     ownerUserId: '100000000',
     loginToken: 'example-token',
 
-    logger: { silent: true },
+    logger: { level: 'warn' },
     dataSource: { type: 'memory' },
 
     ...config,

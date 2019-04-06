@@ -425,76 +425,6 @@ describe('Nix', function () {
     });
   });
 
-  describe('#handleHook', function () {
-    context('when the hook return value is undefined', function () {
-      beforeEach(function () {
-        this.returnValue = undefined;
-      });
-
-      it('turns the value into an Observable', function (done) {
-        let nextCallback = sinon.fake();
-        let result$ = this.nix.handleHook(this.returnValue);
-        expect(result$).to.be.an.instanceOf(Rx.Observable);
-
-        result$.subscribe(nextCallback, (error) => done(error), () => {
-          expect(nextCallback).to.have.been.calledOnceWith('');
-          done();
-        });
-      });
-    });
-
-    context('when the hook return value an observable', function () {
-      beforeEach(function () {
-        this.returnValue = Rx.Observable.of('response');
-      });
-
-      it('turns the value into an Observable', function (done) {
-        let nextCallback = sinon.fake();
-        let result$ = this.nix.handleHook(this.returnValue);
-        expect(result$).to.be.an.instanceOf(Rx.Observable);
-
-        result$.subscribe(nextCallback, (error) => done(error), () => {
-          expect(nextCallback).to.have.been.calledOnceWith('response');
-          done();
-        });
-      });
-    });
-
-    context('when the hook return value is a promise', function () {
-      beforeEach(function () {
-        this.returnValue = new Promise((resolve) => resolve('response'));
-      });
-
-      it('turns the value into an Observable', function (done) {
-        let nextCallback = sinon.fake();
-        let result$ = this.nix.handleHook(this.returnValue);
-        expect(result$).to.be.an.instanceOf(Rx.Observable);
-
-        result$.subscribe(nextCallback, (error) => done(error), () => {
-          expect(nextCallback).to.have.been.calledOnceWith('response');
-          done();
-        });
-      });
-    });
-
-    context('when the hook return value is an object', function () {
-      beforeEach(function () {
-        this.returnValue = { returned: true };
-      });
-
-      it('turns the value into an Observable', function (done) {
-        let nextCallback = sinon.fake();
-        let result$ = this.nix.handleHook(this.returnValue);
-        expect(result$).to.be.an.instanceOf(Rx.Observable);
-
-        result$.subscribe(nextCallback, (error) => done(error), () => {
-          expect(nextCallback).to.have.been.calledOnceWith(this.returnValue);
-          done();
-        });
-      });
-    });
-  });
-
   describe('#runHook', function () {
     beforeEach(function () {
       this.hookListener = {};
@@ -535,16 +465,6 @@ describe('Nix', function () {
         this.nix.runHook(this.hookListener, this.hookName)
           .subscribe(() => {}, (error) => done(error), () => {
             expect(this.hook).to.have.been.calledOnce;
-            done();
-          });
-      });
-
-      it('passes the return value through handleHook', function (done) {
-        sinon.spy(this.nix, 'handleHook');
-
-        this.nix.runHook(this.hookListener, this.hookName)
-          .subscribe(() => {}, (error) => done(error), () => {
-            expect(this.nix.handleHook).to.have.been.calledOnceWith(this.returnValue);
             done();
           });
       });
