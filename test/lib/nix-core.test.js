@@ -25,10 +25,9 @@ describe('Nix', function () {
 
   afterEach(function (done) {
     if (this.nix.listening) {
-      this.nix.shutdown();
-      done();
-    }
-    else {
+      this.nix.shutdown()
+        .subscribe(() => done(), (error) => done(error));
+    } else {
       done();
     }
   });
@@ -119,42 +118,14 @@ describe('Nix', function () {
   });
 
   describe('#listen', function () {
-    it('returns an observable that emits when the bot is ready', function (done) {
-      let callback = sinon.fake();
-      let result$ = this.nix.listen();
-      expect(result$).to.be.an.instanceOf(Rx.Observable);
-
-      result$.subscribe(
-        (next) => {
-          callback(next);
-          this.nix.shutdown();
-        },
-        (error) => done(error),
-        () => {
-          expect(callback).to.have.been.calledOnce;
-          expect(callback).to.have.been.calledWith('Ready');
-          done();
-        },
-      );
+    it('returns an observable', function () {
+      expect(this.nix.listen()).to.be.an.instanceOf(Rx.Observable);
     });
 
-    context('when passed observable handlers', function () {
-      beforeEach(function () {
-        sinon.spy(Rx.ReplaySubject.prototype, 'subscribe');
-      });
-
-      afterEach(function () {
-        Rx.ReplaySubject.prototype.subscribe.restore();
-      });
-
-      it('subscribes the handlers', function () {
-        let nextCallback = sinon.fake();
-        let errorCallback = sinon.fake();
-        let completeCallback = sinon.fake();
-
-        let stream$ = this.nix.listen(nextCallback, errorCallback, completeCallback);
-        expect(stream$.subscribe).to.have.been.calledWith(nextCallback, errorCallback, completeCallback);
-      });
+    it('emits when the bot is ready', function (done) {
+      this.nix.listen()
+        .do((item) => expect(item).to.eq('Ready'))
+        .subscribe(() => done(), (error) => done(error));
     });
 
     it('returns the same stream for multiple calls', function () {
@@ -165,30 +136,17 @@ describe('Nix', function () {
     });
 
     it('replays the ready signal', function (done) {
-      let secondListenCallback = sinon.fake();
       this.nix.listen()
-        .do(() => this.nix.listen(secondListenCallback))
-        .subscribe(
-          () => this.nix.shutdown(),
-          (error) => done(error),
-          () => {
-            expect(secondListenCallback).to.have.been.calledWith('Ready');
-            done();
-          },
-        );
+        .flatMap(() => this.nix.listen())
+        .subscribe(() => done(), (error) => done(error));
     });
 
     describe('bootstrap process', function () {
       it('configures services', function (done) {
         sinon.spy(this.nix.servicesManager, 'configureServices');
-
-        this.nix.listen(
-          () => {
-            expect(this.nix.servicesManager.configureServices).to.have.been.called;
-            done();
-          },
-          (error) => done(error),
-        );
+        this.nix.listen()
+          .do(() => expect(this.nix.servicesManager.configureServices).to.have.been.called)
+          .subscribe(() => done(), (error) => done(error));
       });
 
       context('when configuring services fails', function () {
@@ -198,26 +156,20 @@ describe('Nix', function () {
         });
 
         it('triggers the error callback', function (done) {
-          this.nix.listen(
-            () => done("Error callback was not called"),
-            (error) => {
-              expect(error).to.eq(this.error);
-              done();
-            },
-          );
+          this.nix.listen()
+            .subscribe(
+              () => done(new Error("Error callback was not called")),
+              () => done(),
+            );
         });
       });
 
       it('configures commands', function (done) {
         sinon.spy(this.nix.commandManager, 'configureCommands');
 
-        this.nix.listen(
-          () => {
-            expect(this.nix.commandManager.configureCommands).to.have.been.called;
-            done();
-          },
-          (error) => done(error),
-        );
+        this.nix.listen()
+          .do(() => expect(this.nix.commandManager.configureCommands).to.have.been.called)
+          .subscribe(() => done(), (error) => done(error));
       });
 
       context('when configuring commands fails', function () {
@@ -227,25 +179,18 @@ describe('Nix', function () {
         });
 
         it('triggers the error callback', function (done) {
-          this.nix.listen(
-            () => done("Error callback was not called"),
-            (error) => {
-              expect(error).to.eq(this.error);
-              done();
-            },
-          );
+          this.nix.listen()
+            .subscribe(
+              () => done(new Error("Error callback was not called")),
+              () => done(),
+            );
         });
       });
 
       it('logs into discord', function (done) {
-        this.nix
-          .listen(
-            () => {
-              expect(this.nix.discord.login).to.have.been.calledWith(this.config.loginToken);
-              done();
-            },
-            (error) => done(error),
-          );
+        this.nix.listen()
+          .do(() => expect(this.nix.discord.login).to.have.been.calledWith(this.config.loginToken))
+          .subscribe(() => done(), (error) => done(error));
       });
 
       context('when logging into discord fails', function () {
@@ -255,26 +200,20 @@ describe('Nix', function () {
         });
 
         it('triggers the error callback', function (done) {
-          this.nix.listen(
-            () => done("Error callback was not called"),
-            (error) => {
-              expect(error).to.eq(this.error);
-              done();
-            },
-          );
+          this.nix.listen()
+            .subscribe(
+              () => done(new Error("Error callback was not called")),
+              () => done(),
+            );
         });
       });
 
       it('tries to find the owner', function (done) {
         sinon.spy(this.nix, 'findOwner');
 
-        this.nix.listen(
-          () => {
-            expect(this.nix.findOwner).to.have.been.calledWith();
-            done();
-          },
-          (error) => done(error),
-        );
+        this.nix.listen()
+          .do(() => expect(this.nix.findOwner).to.have.been.calledWith())
+          .subscribe(() => done(), (error) => done(error));
       });
 
       context('when finding the owner into discord fails', function () {
@@ -284,26 +223,20 @@ describe('Nix', function () {
         });
 
         it('triggers the error callback', function (done) {
-          this.nix.listen(
-            () => done("Error callback was not called"),
-            (error) => {
-              expect(error).to.eq(this.error);
-              done();
-            },
-          );
+          this.nix.listen()
+            .subscribe(
+              () => done(new Error("Error callback was not called")),
+              () => done(),
+            );
         });
       });
 
       it('triggers the onNixListen hook', function (done) {
         sinon.spy(this.nix, 'onNixListen');
 
-        this.nix.listen(
-          () => {
-            expect(this.nix.onNixListen).to.have.been.calledWith();
-            done();
-          },
-          (error) => done(error),
-        );
+        this.nix.listen()
+          .do(() => expect(this.nix.onNixListen).to.have.been.calledWith())
+          .subscribe(() => done(), (error) => done(error));
       });
 
       context('when the onNixListen hook fails', function () {
@@ -313,36 +246,28 @@ describe('Nix', function () {
         });
 
         it('triggers the error callback', function (done) {
-          this.nix.listen(
-            () => done("Error callback was not called"),
-            (error) => {
-              expect(error).to.eq(this.error);
-              done();
-            },
-          );
+          this.nix.listen()
+            .subscribe(
+              () => done(new Error("Error callback was not called")),
+              () => done(),
+            );
         });
       });
 
       it('starts all Discord event streams', function (done) {
-        this.nix.listen(
-          () => {
+        this.nix.listen()
+          .do(() => {
             Object.values(Discord.Constants.Events).forEach((eventType) => {
               expect(this.nix.streams[eventType + '$']).to.be.an.instanceOf(Rx.Observable);
             });
-            done();
-          },
-          (error) => done(error),
-        );
+          })
+          .subscribe(() => done(), (error) => done(error));
       });
 
       it('starts nix related event streams', function (done) {
-        this.nix.listen(
-          () => {
-            expect(this.nix.streams.command$).to.be.an.instanceOf(Rx.Observable);
-            done();
-          },
-          (error) => done(error),
-        );
+        this.nix.listen()
+          .do(() => expect(this.nix.streams.command$).to.be.an.instanceOf(Rx.Observable))
+          .subscribe(() => done(), (error) => done(error));
       });
 
       context('when the bot has joined guilds', function () {
@@ -358,15 +283,13 @@ describe('Nix', function () {
         it('runs the onNixJoinGuild for each', function (done) {
           sinon.spy(this.nix, 'onNixJoinGuild');
 
-          this.nix.listen(
-            () => {
+          this.nix.listen()
+            .do(() => {
               expect(this.nix.onNixJoinGuild).to.have.been.calledWith(this.guild1);
               expect(this.nix.onNixJoinGuild).to.have.been.calledWith(this.guild2);
               expect(this.nix.onNixJoinGuild).to.have.been.calledWith(this.guild3);
-              done();
-            },
-            (error) => done(error),
-          );
+            })
+            .subscribe(() => done(), (error) => done(error));
         });
       });
     });
@@ -502,76 +425,6 @@ describe('Nix', function () {
     });
   });
 
-  describe('#handleHook', function () {
-    context('when the hook return value is undefined', function () {
-      beforeEach(function () {
-        this.returnValue = undefined;
-      });
-
-      it('turns the value into an Observable', function (done) {
-        let nextCallback = sinon.fake();
-        let result$ = this.nix.handleHook(this.returnValue);
-        expect(result$).to.be.an.instanceOf(Rx.Observable);
-
-        result$.subscribe(nextCallback, (error) => done(error), () => {
-          expect(nextCallback).to.have.been.calledOnceWith('');
-          done();
-        });
-      });
-    });
-
-    context('when the hook return value an observable', function () {
-      beforeEach(function () {
-        this.returnValue = Rx.Observable.of('response');
-      });
-
-      it('turns the value into an Observable', function (done) {
-        let nextCallback = sinon.fake();
-        let result$ = this.nix.handleHook(this.returnValue);
-        expect(result$).to.be.an.instanceOf(Rx.Observable);
-
-        result$.subscribe(nextCallback, (error) => done(error), () => {
-          expect(nextCallback).to.have.been.calledOnceWith('response');
-          done();
-        });
-      });
-    });
-
-    context('when the hook return value is a promise', function () {
-      beforeEach(function () {
-        this.returnValue = new Promise((resolve) => resolve('response'));
-      });
-
-      it('turns the value into an Observable', function (done) {
-        let nextCallback = sinon.fake();
-        let result$ = this.nix.handleHook(this.returnValue);
-        expect(result$).to.be.an.instanceOf(Rx.Observable);
-
-        result$.subscribe(nextCallback, (error) => done(error), () => {
-          expect(nextCallback).to.have.been.calledOnceWith('response');
-          done();
-        });
-      });
-    });
-
-    context('when the hook return value is an object', function () {
-      beforeEach(function () {
-        this.returnValue = { returned: true };
-      });
-
-      it('turns the value into an Observable', function (done) {
-        let nextCallback = sinon.fake();
-        let result$ = this.nix.handleHook(this.returnValue);
-        expect(result$).to.be.an.instanceOf(Rx.Observable);
-
-        result$.subscribe(nextCallback, (error) => done(error), () => {
-          expect(nextCallback).to.have.been.calledOnceWith(this.returnValue);
-          done();
-        });
-      });
-    });
-  });
-
   describe('#runHook', function () {
     beforeEach(function () {
       this.hookListener = {};
@@ -612,16 +465,6 @@ describe('Nix', function () {
         this.nix.runHook(this.hookListener, this.hookName)
           .subscribe(() => {}, (error) => done(error), () => {
             expect(this.hook).to.have.been.calledOnce;
-            done();
-          });
-      });
-
-      it('passes the return value through handleHook', function (done) {
-        sinon.spy(this.nix, 'handleHook');
-
-        this.nix.runHook(this.hookListener, this.hookName)
-          .subscribe(() => {}, (error) => done(error), () => {
-            expect(this.nix.handleHook).to.have.been.calledOnceWith(this.returnValue);
             done();
           });
       });
@@ -727,7 +570,7 @@ describe('Nix', function () {
       expect(Object.values(embed.fields).map((f) => f.name)).to.include('Stack:');
     });
 
-    context('when extra fields are passed', function() {
+    context('when extra fields are passed', function () {
       beforeEach(function () {
         this.extraFields = [
           { name: 'test1', value: 'value1' },

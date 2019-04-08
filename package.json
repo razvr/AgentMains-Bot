@@ -1,6 +1,6 @@
 {
   "name": "nix-core",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "A framework for discord bots",
   "homepage": "",
   "author": {
@@ -12,10 +12,12 @@
     "lib"
   ],
   "scripts": {
-    "lint": "./node_modules/.bin/eslint **/*.js",
-    "lint-watch": "./node_modules/.bin/esw **/*.js -w",
+    "start": "npm run bot",
     "bot": "node --preserve-symlinks ./test/test-bot/index.js",
-    "test": "./node_modules/.bin/mocha"
+    "test": "mocha",
+    "lint": "eslint .",
+    "lint-watch": "esw . -w",
+    "validate": "npm-run-all --parallel test lint"
   },
   "main": "index.js",
   "keywords": [
@@ -43,9 +45,11 @@
     "eslint": "^4.14.0",
     "eslint-watch": "^4.0.2",
     "glob": "^7.1.2",
+    "husky": "^1.3.1",
     "mocha": "^5.2.0",
     "nix-data-disk": "github:nix-core/nix-data-disk#v0.0.0",
     "nix-data-memory": "github:nix-core/nix-data-memory#v0.0.2",
+    "npm-run-all": "^4.1.5",
     "rx": "^4.1.0",
     "sinon": "^6.1.4",
     "sinon-chai": "^3.2.0"
