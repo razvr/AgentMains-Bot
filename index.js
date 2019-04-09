@@ -1,4 +1,5 @@
 module.exports = require('./lib/nix-core');
+module.exports.errror = require('./lib/errors');
 
 module.exports.NixConfig = require('./lib/models/nix-config');
 module.exports.Module = require('./lib/models/module');
