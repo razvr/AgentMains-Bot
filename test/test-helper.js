@@ -26,4 +26,3 @@ let factoriesDir = path.join(__dirname, 'factories');
 glob.sync('**/*.factory.js', { cwd: factoriesDir })
   .map((filename) => path.join(factoriesDir, filename))
   .forEach((filepath) => require(filepath));
-

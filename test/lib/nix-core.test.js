@@ -17,10 +17,14 @@ describe('Nix', function () {
       logger: { silent: true },
     };
 
-    this.nix = new Nix(this.config);
+    this.discord = Mockery.create("Client");
+    this.owner = Mockery.create('User', {
+      client: this.discord,
+      id: this.config.ownerUserId,
+    });
 
-    // Disable outbound connections
-    this.nix.discord = Mockery.create("Client");
+    this.nix = new Nix(this.config);
+    this.nix.discord = this.discord;
   });
 
   afterEach(function (done) {
