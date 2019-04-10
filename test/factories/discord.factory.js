@@ -28,7 +28,9 @@ define("Guild", {
   client: seq(() => create('Client')),
   id: seq((index) => `0000${index}`),
   ownerID: seq((_, { client }) => create('User', { client }).id),
+
   members: seq(() => new Collection()),
+  roles: seq(() => new Collection()),
 }, {
   builder: (guild) => {
     guild.client.guilds.set(guild.id, guild);
@@ -85,4 +87,17 @@ define("Message", {
 
 define("Permissions", {
   has: seq(() => fake.returns(false)),
+});
+
+define("Role", {
+  id: seq((index) => `0000${index}`),
+  name: seq((index) => `testRole${index}`),
+
+  client: seq(() => create('Client')),
+  guild: seq((_, { client }) => create('Guild', { client })),
+}, {
+  builder: (role) => {
+    role.guild.roles.set(role.id, role);
+    return role;
+  },
 });
