@@ -1,8 +1,6 @@
 const Rx = require('rx');
-const { onNext, onCompleted, onError } = Rx.ReactiveTest;
 
 const PermissionsService = require('../../../lib/services/permissions-service');
-const { DATAKEYS } = require('../../../lib/modules/permissions/utility');
 
 describe('PermissionsService', function () {
   beforeEach(function () {
