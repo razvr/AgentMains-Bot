@@ -20,7 +20,7 @@ describe('NixConfig', function () {
       "responseStrings",
       "defaultPrefix",
       "services",
-      "modules",
+      "plugins",
       "commands",
       "messageOwnerOnBoot",
     ].forEach((attribute) => {
@@ -40,7 +40,7 @@ describe('NixConfig', function () {
       ["responseStrings", "value"],
       ["defaultPrefix", "value"],
       ["services", "value"],
-      ["modules", "value"],
+      ["plugins", "value"],
       ["commands", "value"],
       ["messageOwnerOnBoot", "value"],
       ["customField", "value"],

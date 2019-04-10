@@ -19,14 +19,14 @@ describe('PermissionsManager', function () {
       });
     });
 
-    context('when modules have been added', function () {
+    context('when plugins have been added', function () {
       beforeEach(function () {
         this.permissionsManager.addPermissionLevel("testOne");
         this.permissionsManager.addPermissionLevel("testTwo");
         this.permissionsManager.addPermissionLevel("testThree");
       });
 
-      it('returns a list of all added modules', function () {
+      it('returns a list of all added plugins', function () {
         expect(this.permissionsManager.levels).to.deep.eq([
           "testOne",
           "testTwo",

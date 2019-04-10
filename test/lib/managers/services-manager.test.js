@@ -3,7 +3,7 @@ const Rx = require('rx');
 const ServicesManager = require('../../../lib/managers/services-manager');
 const Service = require("../../../lib/models/service");
 
-const ModuleService = require('../../../lib/services/module-service');
+const PluginService = require('../../../lib/services/plugin-service');
 const CommandService = require('../../../lib/services/command-service');
 const PermissionsService = require('../../../lib/services/permissions-service');
 const UserService = require('../../../lib/services/user-service');
@@ -119,7 +119,7 @@ describe('ServicesManager', function () {
     it('loads all core services', function () {
       this.servicesManager.loadServices();
 
-      expect(this.servicesManager.addService).to.have.been.calledWith('core', ModuleService);
+      expect(this.servicesManager.addService).to.have.been.calledWith('core', PluginService);
       expect(this.servicesManager.addService).to.have.been.calledWith('core', CommandService);
       expect(this.servicesManager.addService).to.have.been.calledWith('core', PermissionsService);
       expect(this.servicesManager.addService).to.have.been.calledWith('core', UserService);

@@ -5,7 +5,7 @@ const Nix = require('../../lib/nix-core');
 const DataManager = require('../../lib/managers/data-manager');
 const CommandManager = require('../../lib/managers/command-manager');
 const ServicesManager = require('../../lib/managers/services-manager');
-const ModuleManager = require('../../lib/managers/module-manager');
+const PluginManager = require('../../lib/managers/plugin-manager');
 const ConfigManager = require('../../lib/managers/config-manager');
 const PermissionsManager = require('../../lib/managers/permissions-manager');
 
@@ -40,7 +40,7 @@ describe('Nix', function () {
     beforeEach(function () {
       sinon.stub(CommandManager.prototype, 'loadCommands');
       sinon.stub(ServicesManager.prototype, 'loadServices');
-      sinon.stub(ModuleManager.prototype, 'loadModules');
+      sinon.stub(PluginManager.prototype, 'loadPlugins');
 
       this.nix = new Nix(this.config);
     });
@@ -48,7 +48,7 @@ describe('Nix', function () {
     afterEach(function () {
       CommandManager.prototype.loadCommands.restore();
       ServicesManager.prototype.loadServices.restore();
-      ModuleManager.prototype.loadModules.restore();
+      PluginManager.prototype.loadPlugins.restore();
     });
 
     it('verifies the config', function () {
@@ -80,10 +80,10 @@ describe('Nix', function () {
       expect(this.nix.getService).to.eq(this.nix.servicesManager.getService);
     });
 
-    it('creates and binds a ModuleManager', function () {
-      expect(this.nix.moduleManager).to.be.an.instanceOf(ModuleManager);
-      expect(this.nix.addModule).to.eq(this.nix.moduleManager.addModule);
-      expect(this.nix.getModule).to.eq(this.nix.moduleManager.getModule);
+    it('creates and binds a PluginManager', function () {
+      expect(this.nix.pluginManager).to.be.an.instanceOf(PluginManager);
+      expect(this.nix.addPlugin).to.eq(this.nix.pluginManager.addPlugin);
+      expect(this.nix.getPlugin).to.eq(this.nix.pluginManager.getPlugin);
     });
 
     it('creates and binds a ConfigManager', function () {
@@ -102,8 +102,8 @@ describe('Nix', function () {
       expect(this.nix.servicesManager.loadServices).to.have.been.called;
     });
 
-    it('triggers the loading of modules', function () {
-      expect(this.nix.moduleManager.loadModules).to.have.been.called;
+    it('triggers the loading of plugins', function () {
+      expect(this.nix.pluginManager.loadPlugins).to.have.been.called;
     });
 
     it('triggers the loading of commands', function () {
@@ -618,12 +618,12 @@ describe('Nix', function () {
         });
     });
 
-    it('runs moduleManager onNixListen', function (done) {
-      sinon.spy(this.nix.moduleManager, 'onNixListen');
+    it('runs pluginManager onNixListen', function (done) {
+      sinon.spy(this.nix.pluginManager, 'onNixListen');
 
       this.nix.onNixListen()
         .subscribe(() => {}, (error) => done(error), () => {
-          expect(this.nix.moduleManager.onNixListen).to.have.been.calledOnce;
+          expect(this.nix.pluginManager.onNixListen).to.have.been.calledOnce;
           done();
         });
     });
@@ -647,11 +647,11 @@ describe('Nix', function () {
       });
     });
 
-    context('when the moduleManager onNixListen hook throws an error', function () {
+    context('when the pluginManager onNixListen hook throws an error', function () {
       beforeEach(function () {
         this.error = new Error('mock error');
         this.hook = sinon.fake.throws(this.error);
-        this.nix.moduleManager.onNixListen = this.hook;
+        this.nix.pluginManager.onNixListen = this.hook;
 
         this.nix.handleError = sinon.fake.returns(Rx.Observable.of(''));
       });
@@ -701,13 +701,13 @@ describe('Nix', function () {
         });
     });
 
-    it('runs moduleService prepareDefaultData', function (done) {
-      let moduleService = this.nix.getService('core', 'moduleService');
-      sinon.spy(moduleService, 'prepareDefaultData');
+    it('runs pluginService prepareDefaultData', function (done) {
+      let pluginService = this.nix.getService('core', 'pluginService');
+      sinon.spy(pluginService, 'prepareDefaultData');
 
       this.nix.onNixJoinGuild(this.guild)
         .subscribe(() => {}, (error) => done(error), () => {
-          expect(moduleService.prepareDefaultData).to.have.been.calledOnceWith(this.nix, this.guild.id);
+          expect(pluginService.prepareDefaultData).to.have.been.calledOnceWith(this.nix, this.guild.id);
           done();
         });
     });
@@ -722,12 +722,12 @@ describe('Nix', function () {
         });
     });
 
-    it('runs moduleManager onNixJoinGuild', function (done) {
-      sinon.spy(this.nix.moduleManager, 'onNixJoinGuild');
+    it('runs pluginManager onNixJoinGuild', function (done) {
+      sinon.spy(this.nix.pluginManager, 'onNixJoinGuild');
 
       this.nix.onNixJoinGuild(this.guild)
         .subscribe(() => {}, (error) => done(error), () => {
-          expect(this.nix.moduleManager.onNixJoinGuild).to.have.been.calledOnceWith(this.guild);
+          expect(this.nix.pluginManager.onNixJoinGuild).to.have.been.calledOnceWith(this.guild);
           done();
         });
     });
@@ -751,11 +751,11 @@ describe('Nix', function () {
       });
     });
 
-    context('when the moduleManager onNixListen hook throws an error', function () {
+    context('when the pluginManager onNixListen hook throws an error', function () {
       beforeEach(function () {
         this.error = new Error('mock error');
         this.hook = sinon.fake.throws(this.error);
-        this.nix.moduleManager.onNixJoinGuild = this.hook;
+        this.nix.pluginManager.onNixJoinGuild = this.hook;
 
         this.nix.handleError = sinon.fake.returns(Rx.Observable.of(''));
       });

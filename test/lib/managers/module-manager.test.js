@@ -1,38 +1,38 @@
-const ModuleManager = require('../../../lib/managers/module-manager');
+const PluginManager = require('../../../lib/managers/plugin-manager');
 const Service = require("../../../lib/models/service");
 
-describe('ModuleManager', function () {
+describe('PluginManager', function () {
   beforeEach(function () {
     this.nix = createNixStub();
-    this.moduleManager = new ModuleManager(this.nix);
+    this.pluginManager = new PluginManager(this.nix);
   });
 
   describe(".nix", function () {
     it('returns the nix reference that the manager was constructed with', function () {
-      expect(this.moduleManager.nix).to.eq(this.nix);
+      expect(this.pluginManager.nix).to.eq(this.nix);
     });
   });
 
-  describe(".modules", function () {
-    context('when no modules have been added', function () {
-      it('returns an empty list of modules', function () {
-        expect(this.moduleManager.modules).to.deep.eq([]);
+  describe(".plugins", function () {
+    context('when no plugins have been added', function () {
+      it('returns an empty list of plugins', function () {
+        expect(this.pluginManager.plugins).to.deep.eq([]);
       });
     });
 
-    context('when modules have been added', function () {
+    context('when plugins have been added', function () {
       beforeEach(function () {
         this.moduleOne = { name: "moduleOne" };
         this.moduleTwo = { name: "moduleTwo" };
         this.moduleThree = { name: "moduleThree" };
 
-        this.moduleManager.addModule(this.moduleOne);
-        this.moduleManager.addModule(this.moduleTwo);
-        this.moduleManager.addModule(this.moduleThree);
+        this.pluginManager.addPlugin(this.moduleOne);
+        this.pluginManager.addPlugin(this.moduleTwo);
+        this.pluginManager.addPlugin(this.moduleThree);
       });
 
-      it('returns a list of all added modules', function () {
-        expect(this.moduleManager.modules.map((m) => m.name)).to.deep.eq([
+      it('returns a list of all added plugins', function () {
+        expect(this.pluginManager.plugins.map((m) => m.name)).to.deep.eq([
           "moduleOne",
           "moduleTwo",
           "moduleThree",
@@ -43,49 +43,49 @@ describe('ModuleManager', function () {
 
   describe("constructor", function () {
     it('initializes the manager with an empty module list', function () {
-      expect(this.moduleManager.modules).to.deep.eq([]);
+      expect(this.pluginManager.plugins).to.deep.eq([]);
     });
   });
 
-  describe("#getModule", function () {
+  describe("#getPlugin", function () {
     context('when the module has been added', function () {
       beforeEach(function () {
-        this.testModule = { name: "TestModule" };
-        this.moduleManager.addModule(this.testModule);
+        this.testPlugin = { name: "TestPlugin" };
+        this.pluginManager.addPlugin(this.testPlugin);
       });
 
       it('returns the module', function () {
-        expect(this.moduleManager.getModule('TestModule').name).to.eq("TestModule");
+        expect(this.pluginManager.getPlugin('TestPlugin').name).to.eq("TestPlugin");
       });
     });
 
     context('when the module has not been added', function () {
       it('raises an error', function () {
-        expect(() => this.moduleManager.getModule('TestModule')).to.throw(
-          Error, "Module 'TestModule' could not be found.",
+        expect(() => this.pluginManager.getPlugin('TestPlugin')).to.throw(
+          Error, "Plugin 'TestPlugin' could not be found.",
         );
       });
     });
   });
 
-  describe("#addModule", function () {
+  describe("#addPlugin", function () {
     beforeEach(function () {
-      this.testModule = { name: "TestModule" };
+      this.testPlugin = { name: "TestPlugin" };
     });
 
-    it('makes the module retrievable via #getModule', function () {
-      this.moduleManager.addModule(this.testModule);
-      expect(this.moduleManager.getModule('TestModule').name).to.eq("TestModule");
+    it('makes the module retrievable via #getPlugin', function () {
+      this.pluginManager.addPlugin(this.testPlugin);
+      expect(this.pluginManager.getPlugin('TestPlugin').name).to.eq("TestPlugin");
     });
 
     context('when the module has already been added', function () {
       beforeEach(function () {
-        this.moduleManager.addModule(this.testModule);
+        this.pluginManager.addPlugin(this.testPlugin);
       });
 
       it('raises an error', function () {
-        expect(() => this.moduleManager.addModule(this.testModule)).to.throw(
-          Error, "Module 'TestModule' has already been added.",
+        expect(() => this.pluginManager.addPlugin(this.testPlugin)).to.throw(
+          Error, "Plugin 'TestPlugin' has already been added.",
         );
       });
     });
@@ -98,7 +98,7 @@ describe('ModuleManager', function () {
       }
 
       beforeEach(function () {
-        this.testModule.services = [
+        this.testPlugin.services = [
           ServiceOne,
           ServiceTwo,
         ];
@@ -107,18 +107,18 @@ describe('ModuleManager', function () {
       it('adds all services to nix', function () {
         spy(this.nix, 'addService');
 
-        this.moduleManager.addModule(this.testModule);
+        this.pluginManager.addPlugin(this.testPlugin);
 
         expect(this.nix.addService).to.have.been
-          .calledWith("TestModule", this.testModule.services[0]);
+          .calledWith("TestPlugin", this.testPlugin.services[0]);
         expect(this.nix.addService).to.have.been
-          .calledWith("TestModule", this.testModule.services[1]);
+          .calledWith("TestPlugin", this.testPlugin.services[1]);
       });
     });
 
     context('when the module has config actions', function () {
       beforeEach(function () {
-        this.testModule.configActions = [
+        this.testPlugin.configActions = [
           { name: "testActionOne" },
           { name: "testActionTwo" },
         ];
@@ -127,18 +127,18 @@ describe('ModuleManager', function () {
       it('adds all config actions to nix', function () {
         spy(this.nix, 'addConfigAction');
 
-        this.moduleManager.addModule(this.testModule);
+        this.pluginManager.addPlugin(this.testPlugin);
 
         expect(this.nix.addConfigAction).to.have.been
-          .calledWith("TestModule", this.testModule.configActions[0]);
+          .calledWith("TestPlugin", this.testPlugin.configActions[0]);
         expect(this.nix.addConfigAction).to.have.been
-          .calledWith("TestModule", this.testModule.configActions[1]);
+          .calledWith("TestPlugin", this.testPlugin.configActions[1]);
       });
     });
 
     context('when the module has commands', function () {
       beforeEach(function () {
-        this.testModule.commands = [
+        this.testPlugin.commands = [
           { name: "testActionOne", run: fake() },
           { name: "testActionTwo", run: fake() },
         ];
@@ -147,18 +147,18 @@ describe('ModuleManager', function () {
       it('adds all commands to nix', function () {
         spy(this.nix, 'addCommand');
 
-        this.moduleManager.addModule(this.testModule);
+        this.pluginManager.addPlugin(this.testPlugin);
 
         expect(this.nix.addCommand).to.have.been
-          .calledWith(this.testModule.commands[0]);
+          .calledWith(this.testPlugin.commands[0]);
         expect(this.nix.addCommand).to.have.been
-          .calledWith(this.testModule.commands[1]);
+          .calledWith(this.testPlugin.commands[1]);
       });
     });
 
     context('when the module has new permission levels', function () {
       beforeEach(function () {
-        this.testModule.permissions = [
+        this.testPlugin.permissions = [
           "test1",
           "test2",
         ];
@@ -167,35 +167,35 @@ describe('ModuleManager', function () {
       it('adds all permission levels to nix', function () {
         spy(this.nix, 'addPermissionLevel');
 
-        this.moduleManager.addModule(this.testModule);
+        this.pluginManager.addPlugin(this.testPlugin);
 
         expect(this.nix.addPermissionLevel).to.have.been
-          .calledWith(this.testModule.permissions[0]);
+          .calledWith(this.testPlugin.permissions[0]);
         expect(this.nix.addPermissionLevel).to.have.been
-          .calledWith(this.testModule.permissions[1]);
+          .calledWith(this.testPlugin.permissions[1]);
       });
     });
   });
 
   describe('#onNixListen', function () {
-    context('when modules have a onNixListen hook', function () {
+    context('when plugins have a onNixListen hook', function () {
       beforeEach(function () {
-        this.testModule1 = { name: "TestModule1", onNixListen: sinon.fake() };
-        this.testModule2 = { name: "TestModule2", onNixListen: sinon.fake() };
-        this.testModule3 = { name: "TestModule3", onNixListen: sinon.fake() };
+        this.testPlugin1 = { name: "TestPlugin1", onNixListen: sinon.fake() };
+        this.testPlugin2 = { name: "TestPlugin2", onNixListen: sinon.fake() };
+        this.testPlugin3 = { name: "TestPlugin3", onNixListen: sinon.fake() };
 
-        this.moduleManager.addModule(this.testModule1);
-        this.moduleManager.addModule(this.testModule2);
-        this.moduleManager.addModule(this.testModule3);
+        this.pluginManager.addPlugin(this.testPlugin1);
+        this.pluginManager.addPlugin(this.testPlugin2);
+        this.pluginManager.addPlugin(this.testPlugin3);
       });
 
       it('triggers the hook for each', function (done) {
-        this.moduleManager
+        this.pluginManager
           .onNixListen()
           .subscribe(() => {}, (error) => done(error), () => {
-            expect(this.testModule1.onNixListen).to.have.been.calledOnce;
-            expect(this.testModule2.onNixListen).to.have.been.calledOnce;
-            expect(this.testModule3.onNixListen).to.have.been.calledOnce;
+            expect(this.testPlugin1.onNixListen).to.have.been.calledOnce;
+            expect(this.testPlugin2.onNixListen).to.have.been.calledOnce;
+            expect(this.testPlugin3.onNixListen).to.have.been.calledOnce;
             done();
           });
       });
@@ -203,24 +203,24 @@ describe('ModuleManager', function () {
   });
 
   describe('#onNixJoinGuild', function () {
-    context('when modules have a onNixJoinGuild hook', function () {
+    context('when plugins have a onNixJoinGuild hook', function () {
       beforeEach(function () {
-        this.testModule1 = { name: "TestModule1", onNixJoinGuild: sinon.fake() };
-        this.testModule2 = { name: "TestModule2", onNixJoinGuild: sinon.fake() };
-        this.testModule3 = { name: "TestModule3", onNixJoinGuild: sinon.fake() };
+        this.testPlugin1 = { name: "TestPlugin1", onNixJoinGuild: sinon.fake() };
+        this.testPlugin2 = { name: "TestPlugin2", onNixJoinGuild: sinon.fake() };
+        this.testPlugin3 = { name: "TestPlugin3", onNixJoinGuild: sinon.fake() };
 
-        this.moduleManager.addModule(this.testModule1);
-        this.moduleManager.addModule(this.testModule2);
-        this.moduleManager.addModule(this.testModule3);
+        this.pluginManager.addPlugin(this.testPlugin1);
+        this.pluginManager.addPlugin(this.testPlugin2);
+        this.pluginManager.addPlugin(this.testPlugin3);
       });
 
       it('triggers the hook for each', function (done) {
-        this.moduleManager
+        this.pluginManager
           .onNixJoinGuild()
           .subscribe(() => {}, (error) => done(error), () => {
-            expect(this.testModule1.onNixJoinGuild).to.have.been.calledOnce;
-            expect(this.testModule2.onNixJoinGuild).to.have.been.calledOnce;
-            expect(this.testModule3.onNixJoinGuild).to.have.been.calledOnce;
+            expect(this.testPlugin1.onNixJoinGuild).to.have.been.calledOnce;
+            expect(this.testPlugin2.onNixJoinGuild).to.have.been.calledOnce;
+            expect(this.testPlugin3.onNixJoinGuild).to.have.been.calledOnce;
             done();
           });
       });

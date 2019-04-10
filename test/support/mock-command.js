@@ -1,7 +1,7 @@
 class MockCommand {
   constructor() {
     this.nix = 'mock_nix';
-    this.moduleName = 'mock_module';
+    this.pluginName = 'mock_module';
     this.name = 'mockCommand';
     this.description = 'mock';
     this.run = sinon.fake();

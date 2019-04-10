@@ -20,7 +20,7 @@ describe('Feature: Commands', function () {
 
     this.command = {
       name: "test",
-      moduleName: 'core',
+      pluginName: 'core',
       args: [],
       run: sinon.fake(),
     };

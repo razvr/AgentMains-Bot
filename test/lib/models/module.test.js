@@ -1,10 +1,10 @@
-const Module = require('../../../lib/models/module');
+const Plugin = require('../../../lib/models/plugin');
 
-describe('Module', function () {
+describe('Plugin', function () {
   beforeEach(function () {
     this.options = {name: "test"};
 
-    this.module = new Module(this.options);
+    this.module = new Plugin(this.options);
   });
 
   describe('attributes', function () {
@@ -41,7 +41,7 @@ describe('Module', function () {
     ].forEach(([attribute, value]) => {
       it(`assigns ${attribute} from the options`, function () {
         this.options[attribute] = value;
-        this.module = new Module(this.options);
+        this.module = new Plugin(this.options);
         expect(this.module[attribute]).to.eq(value);
       });
     });

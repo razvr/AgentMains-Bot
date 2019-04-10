@@ -27,18 +27,18 @@ describe('CommandManager', function () {
       });
     });
 
-    context('when modules have been added', function () {
+    context('when plugins have been added', function () {
       beforeEach(function () {
-        this.commandOne = {moduleName: 'test', name: "commandOne", run: () => {}};
-        this.commandTwo = {moduleName: 'test', name: "commandTwo", run: () => {}};
-        this.commandThree = {moduleName: 'test', name: "commandThree", run: () => {}};
+        this.commandOne = {pluginName: 'test', name: "commandOne", run: () => {}};
+        this.commandTwo = {pluginName: 'test', name: "commandTwo", run: () => {}};
+        this.commandThree = {pluginName: 'test', name: "commandThree", run: () => {}};
 
         this.commandManager.addCommand(this.commandOne);
         this.commandManager.addCommand(this.commandTwo);
         this.commandManager.addCommand(this.commandThree);
       });
 
-      it('returns a list of all added modules', function () {
+      it('returns a list of all added plugins', function () {
         expect(this.commandManager.commands.map((m) => m.name)).to.deep.eq([
           "commandOne",
           "commandTwo",
@@ -57,9 +57,9 @@ describe('CommandManager', function () {
   describe("#loadCommands", function () {
     describe('when there are commands listed in the config', function () {
       beforeEach(function () {
-        this.commandOne = {moduleName: 'test', name: "commandOne", run: () => {}};
-        this.commandTwo = {moduleName: 'test', name: "commandTwo", run: () => {}};
-        this.commandThree = {moduleName: 'test', name: "commandThree", run: () => {}};
+        this.commandOne = {pluginName: 'test', name: "commandOne", run: () => {}};
+        this.commandTwo = {pluginName: 'test', name: "commandTwo", run: () => {}};
+        this.commandThree = {pluginName: 'test', name: "commandThree", run: () => {}};
 
         this.nix.config = {
           commands: [
@@ -84,7 +84,7 @@ describe('CommandManager', function () {
 
   describe("#addCommand", function () {
     beforeEach(function () {
-      this.command = {moduleName: 'test', name: "commandOne", run: () => {}};
+      this.command = {pluginName: 'test', name: "commandOne", run: () => {}};
     });
 
     it('makes the command retrievable via #getCommand', function () {
@@ -94,7 +94,7 @@ describe('CommandManager', function () {
 
     context('when a command with the same name has already been added', function () {
       beforeEach(function () {
-        this.otherCommand = {moduleName: 'test', name: "commandOne", run: () => {}};
+        this.otherCommand = {pluginName: 'test', name: "commandOne", run: () => {}};
         this.commandManager.addCommand(this.otherCommand);
       });
 
@@ -109,7 +109,7 @@ describe('CommandManager', function () {
   describe("#getCommand", function () {
     context('when the command has been added', function () {
       beforeEach(function () {
-        this.command = {moduleName: 'test', name: "commandOne", run: () => {}};
+        this.command = {pluginName: 'test', name: "commandOne", run: () => {}};
         this.commandManager.addCommand(this.command);
       });
 
@@ -131,21 +131,21 @@ describe('CommandManager', function () {
     context('when commands have been added to the manager', function () {
       beforeEach(function () {
         this.commandManager.addCommand({
-          moduleName: 'test',
+          pluginName: 'test',
           name: "commandOne",
           configureCommand() { this.configured = true; },
           run: () => {},
         });
 
         this.commandManager.addCommand({
-          moduleName: 'test',
+          pluginName: 'test',
           name: "commandTwo",
           configureCommand() { this.configured = true; },
           run: () => {},
         });
 
         this.commandManager.addCommand({
-          moduleName: 'test',
+          pluginName: 'test',
           name: "commandThree",
           configureCommand() { this.configured = true; },
           run: () => {},

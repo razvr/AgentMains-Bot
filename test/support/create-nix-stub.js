@@ -12,8 +12,8 @@ module.exports = (config = {}) => {
     ...config,
   });
 
-  nix.stubService = (moduleName, serviceName, service) => {
-    let serviceKey = `${moduleName}.${serviceName}`.toLowerCase();
+  nix.stubService = (pluginName, serviceName, service) => {
+    let serviceKey = `${pluginName}.${serviceName}`.toLowerCase();
     nix.servicesManager._services[serviceKey] = service;
   };
 

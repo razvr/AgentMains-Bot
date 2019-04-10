@@ -21,7 +21,7 @@ describe('CommandService', function () {
 
       this.command = new Command(this.nix, {
         name: "testCommand",
-        moduleName: "testModule",
+        pluginName: "testPlugin",
         run: () => {},
       });
       this.context = new CommandContext(this.nix, this.message, this.command, {}, {});

@@ -6,7 +6,7 @@ describe('Command', function () {
     this.nix = createNixStub();
     this.cmdConfig = {
       name: "testCommand",
-      moduleName: "test",
+      pluginName: "test",
       run: function () {},
     };
 
@@ -16,7 +16,7 @@ describe('Command', function () {
   describe('attributes', function () {
     [
       "nix",
-      "moduleName",
+      "pluginName",
       "name",
       "description",
       "run",
@@ -42,7 +42,7 @@ describe('Command', function () {
     });
 
     [
-      ["moduleName", "value"],
+      ["pluginName", "value"],
       ["name", "value"],
       ["description", "value"],
       ["run", sinon.fake()],
@@ -95,24 +95,24 @@ describe('Command', function () {
 
     context('when the module name is missing', function () {
       beforeEach(function () {
-        delete this.cmdConfig.moduleName;
+        delete this.cmdConfig.pluginName;
       });
 
       it('raises an error', function () {
         expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, `moduleName for command ${this.cmdConfig.name} is missing.`,
+          Error, `pluginName for command ${this.cmdConfig.name} is missing.`,
         );
       });
     });
 
     context('when the module name not a string', function () {
       beforeEach(function () {
-        this.cmdConfig.moduleName = {};
+        this.cmdConfig.pluginName = {};
       });
 
       it('raises an error', function () {
         expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, `moduleName for command ${this.cmdConfig.name} is missing.`,
+          Error, `pluginName for command ${this.cmdConfig.name} is missing.`,
         );
       });
     });

@@ -13,13 +13,13 @@ describe('ConfigManager', function () {
   });
 
   describe('.actions', function () {
-    context('when no modules have been added', function () {
-      it('returns an empty list of modules', function () {
+    context('when no plugins have been added', function () {
+      it('returns an empty list of plugins', function () {
         expect(this.configManager.actions).to.deep.eq([]);
       });
     });
 
-    context('when modules have been added', function () {
+    context('when plugins have been added', function () {
       beforeEach(function () {
         this.actionOne = {name: "actionOne"};
         this.actionTwo = {name: "actionTwo"};
@@ -73,7 +73,7 @@ describe('ConfigManager', function () {
       this.testAction = {name: "testAction"};
     });
 
-    it('makes the module retrievable via #getModule', function () {
+    it('makes the module retrievable via #getPlugin', function () {
       this.configManager.addConfigAction('test', this.testAction);
       expect(this.configManager.getConfigAction('test', 'testAction').name).to.eq("testAction");
     });
