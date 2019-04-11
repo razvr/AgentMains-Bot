@@ -218,7 +218,7 @@ describe('Nix', function () {
       context('when logging into discord fails', function () {
         beforeEach(function () {
           this.error = new Error("mock error");
-          this.nix.discord.login = fake.rejects(this.error);
+          this.nix.discord.login = sinon.fake.rejects(this.error);
         });
 
         it('triggers the error callback', function (done) {

@@ -9,7 +9,7 @@ class Mockery {
 
   define(name, defaultProps={}, options={}) {
     if (!name) {
-      throw new ArgumentError("Name is required");
+      throw new Error("Name is required");
     }
 
     options = {

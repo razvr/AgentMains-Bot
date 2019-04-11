@@ -1,7 +1,8 @@
 const { Collection, DiscordAPIError } = require('discord.js');
-create = Mockery.create;
-seq = Mockery.seq;
-define = Mockery.define;
+const create = Mockery.create;
+const seq = Mockery.seq;
+const define = Mockery.define;
+const fake = sinon.fake;
 
 define("Client", {
   guilds: seq(() => new Collection()),

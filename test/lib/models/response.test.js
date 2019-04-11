@@ -99,8 +99,6 @@ describe('Response', function () {
       });
 
       it("returns an observable of the response from discord", function (done) {
-        let items = 0;
-
         let result$ = this.response.send();
         expect(result$).to.be.an.instanceOf(Rx.Observable);
 

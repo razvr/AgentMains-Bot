@@ -1,0 +1,22 @@
+{
+  "extends": [
+    "../.eslintrc.json"
+  ],
+  "plugins": [
+    "chai-expect"
+  ],
+  "env": {
+    "mocha": true
+  },
+  "globals": {
+    "expect": "readonly",
+    "sinon": "readonly",
+    "createNixStub": "readonly",
+    "Mockery": "readonly"
+  },
+  "rules": {
+    "chai-expect/missing-assertion": "error",
+    "chai-expect/terminating-properties": "error",
+    "chai-expect/no-inner-compare": "error"
+  }
+}

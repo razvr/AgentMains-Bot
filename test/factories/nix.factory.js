@@ -1,7 +1,7 @@
 const Rx = require('rx');
-create = Mockery.create;
-seq = Mockery.seq;
-define = Mockery.define;
+const create = Mockery.create;
+const seq = Mockery.seq;
+const define = Mockery.define;
 
 define("Response", {
   embed: null,

@@ -13,12 +13,6 @@ chai.use(observableMatchers);
 
 global.sinon = sinon;
 global.expect = chai.expect;
-
-global.stub = sinon.stub;
-global.spy = sinon.spy;
-global.fake = sinon.fake;
-global.mock = sinon.mock;
-
 global.Mockery = Mockery;
 global.createNixStub = createNixStub;
 

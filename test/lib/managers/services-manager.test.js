@@ -3,11 +3,6 @@ const Rx = require('rx');
 const ServicesManager = require('../../../lib/managers/services-manager');
 const Service = require("../../../lib/models/service");
 
-const PluginService = require('../../../lib/core-plugin/services/plugin-service');
-const CommandService = require('../../../lib/core-plugin/services/command-service');
-const PermissionsService = require('../../../lib/core-plugin/services/permissions-service');
-const UserService = require('../../../lib/core-plugin/services/user-service');
-
 describe('ServicesManager', function () {
   beforeEach(function () {
     this.nix = createNixStub();

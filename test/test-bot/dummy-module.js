@@ -5,7 +5,7 @@ module.exports = {
     description: "Test command",
     permissions: [ "dummy" ],
 
-    run(context, response) {},
+    run() {},
   }],
   onNixListen() {
   },

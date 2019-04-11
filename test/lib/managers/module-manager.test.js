@@ -105,7 +105,7 @@ describe('PluginManager', function () {
       });
 
       it('adds all services to nix', function () {
-        spy(this.nix, 'addService');
+        sinon.spy(this.nix, 'addService');
 
         this.pluginManager.addPlugin(this.testPlugin);
 
@@ -125,7 +125,7 @@ describe('PluginManager', function () {
       });
 
       it('adds all config actions to nix', function () {
-        spy(this.nix, 'addConfigAction');
+        sinon.spy(this.nix, 'addConfigAction');
 
         this.pluginManager.addPlugin(this.testPlugin);
 
@@ -139,13 +139,13 @@ describe('PluginManager', function () {
     context('when the module has commands', function () {
       beforeEach(function () {
         this.testPlugin.commands = [
-          { name: "testActionOne", run: fake() },
-          { name: "testActionTwo", run: fake() },
+          { name: "testActionOne", run: sinon.fake() },
+          { name: "testActionTwo", run: sinon.fake() },
         ];
       });
 
       it('adds all commands to nix', function () {
-        spy(this.nix, 'addCommand');
+        sinon.spy(this.nix, 'addCommand');
 
         this.pluginManager.addPlugin(this.testPlugin);
 
@@ -165,7 +165,7 @@ describe('PluginManager', function () {
       });
 
       it('adds all permission levels to nix', function () {
-        spy(this.nix, 'addPermissionLevel');
+        sinon.spy(this.nix, 'addPermissionLevel');
 
         this.pluginManager.addPlugin(this.testPlugin);
 

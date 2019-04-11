@@ -10,7 +10,7 @@ module.exports = function (chai) {
   Assertion.addMethod('complete', toClose);
 
   Assertion.overwriteMethod('throw', function (_super) {
-    return function (errorLike, errMatcher) {
+    return function () {
       if (this._obj instanceof Rx.Observable) {
         return toThrow.apply(this, arguments);
       } else {

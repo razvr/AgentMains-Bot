@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 const CommandParser = require('../../../lib/command-parser');
 const { InvalidPrefixError } = require("../../../lib/errors/command-parse-errors");
 const CommandManager = require('../../../lib/managers/command-manager');
