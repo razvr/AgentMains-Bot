@@ -191,7 +191,7 @@ describe('ModuleManager', function () {
 
       it('triggers the hook for each', function (done) {
         this.moduleManager
-          .onNixListen()
+          .onListen()
           .subscribe(() => {}, (error) => done(error), () => {
             expect(this.testModule1.onNixListen).to.have.been.calledOnce;
             expect(this.testModule2.onNixListen).to.have.been.calledOnce;
@@ -216,7 +216,7 @@ describe('ModuleManager', function () {
 
       it('triggers the hook for each', function (done) {
         this.moduleManager
-          .onNixJoinGuild()
+          .onJoinGuild()
           .subscribe(() => {}, (error) => done(error), () => {
             expect(this.testModule1.onNixJoinGuild).to.have.been.calledOnce;
             expect(this.testModule2.onNixJoinGuild).to.have.been.calledOnce;

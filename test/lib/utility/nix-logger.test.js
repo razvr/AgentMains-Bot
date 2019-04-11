@@ -1,4 +1,4 @@
-const NixLogger = require("../../../lib/utility/nix-logger");
+const NixLogger = require("../../../lib/utility/chaos-logger");
 
 describe('NixLogger', function () {
   describe('::createLogger', function () {

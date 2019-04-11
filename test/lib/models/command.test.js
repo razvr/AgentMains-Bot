@@ -63,10 +63,10 @@ describe('Command', function () {
       });
     });
 
-    it("ignores the nix field from the cmdConfig", function () {
-      this.cmdConfig.nix = "notNix";
+    it("ignores the chaos field from the cmdConfig", function () {
+      this.cmdConfig.chaos = "notNix";
       this.command = new Command(this.nix, this.cmdConfig);
-      expect(this.command.nix).to.eq(this.nix);
+      expect(this.command.chaos).to.eq(this.nix);
     });
 
     context('when the name is missing', function () {
@@ -183,10 +183,6 @@ describe('Command', function () {
         ]);
       });
     });
-  });
-
-  describe('#checkMissingArgs', function () {
-
   });
 
   describe('#execCommand', function () {

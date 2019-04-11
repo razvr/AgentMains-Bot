@@ -1,4 +1,4 @@
-const NixConfig = require('../../../lib/models/nix-config');
+const NixConfig = require('../../../lib/models/chaos-config');
 
 describe('NixConfig', function () {
   beforeEach(function () {

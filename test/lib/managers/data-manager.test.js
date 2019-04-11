@@ -1,5 +1,5 @@
-const MemoryDataSource = require('nix-data-memory');
-const DiskDataSource = require('nix-data-disk');
+const MemoryDataSource = require('chaos-data-memory');
+const DiskDataSource = require('chaos-data-disk');
 const path = require('path');
 const fs = require('fs');
 const Rx = require('rx');
@@ -61,7 +61,7 @@ describe('DataManager', function () {
 
         it('raises an error', function () {
           expect(() => new DataManager(this.nix)).to.throw(
-            DataManager.DataSourceError, "Unable to load data source 'nix-data-test'. Is the npm module 'nix-data-test' installed?",
+            DataManager.DataSourceError, "Unable to load data source 'chaos-data-test'. Is the npm module 'chaos-data-test' installed?",
           );
         });
       });
@@ -75,14 +75,14 @@ describe('DataManager', function () {
     });
   });
 
-  describe('#onNixListen', function () {
+  describe('#onListen', function () {
     context('when the datasource does not have a onNixListen', function () {
       beforeEach(function () {
         delete this.dataSource.onNixListen;
       });
 
       it("returns an Observable of true", function (done) {
-        let hook$ = this.dataManager.onNixListen();
+        let hook$ = this.dataManager.onListen();
         expect(hook$).to.be.an.instanceOf(Rx.Observable);
 
         hook$.subscribe(
@@ -103,21 +103,21 @@ describe('DataManager', function () {
       });
 
       it("calls the datasource's onNixListen", function () {
-        let hook$ = this.dataManager.onNixListen();
+        let hook$ = this.dataManager.onListen();
         expect(hook$).to.be.an.instanceOf(Rx.Observable);
         expect(this.dataManager._dataSource.onNixListen).to.have.been.called;
       });
     });
   });
 
-  describe('#onNixJoinGuild', function () {
+  describe('#onJoinGuild', function () {
     context('when the datasource does not have a onNixJoinGuild', function() {
       beforeEach(function () {
         delete this.dataSource.onNixJoinGuild;
       });
 
       it("returns an Observable of true", function (done) {
-        let hook$ = this.dataManager.onNixJoinGuild();
+        let hook$ = this.dataManager.onJoinGuild();
         expect(hook$).to.be.an.instanceOf(Rx.Observable);
 
         hook$.subscribe(
@@ -138,7 +138,7 @@ describe('DataManager', function () {
       });
 
       it("calls the datasource's onNixListen", function () {
-        let hook$ = this.dataManager.onNixJoinGuild();
+        let hook$ = this.dataManager.onJoinGuild();
         expect(hook$).to.be.an.instanceOf(Rx.Observable);
         expect(this.dataManager._dataSource.onNixJoinGuild).to.have.been.called;
       });
