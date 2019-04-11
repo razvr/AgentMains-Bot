@@ -1,6 +1,6 @@
 const Rx = require('rx');
 
-const RoleService = require('../../../lib/services/role-service');
+const RoleService = require('../../../lib/core-plugin/services/role-service');
 const { RoleNotFoundError } = require("../../../lib/errors");
 
 describe('Service: RoleService', function () {

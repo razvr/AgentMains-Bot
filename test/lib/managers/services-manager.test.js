@@ -3,10 +3,10 @@ const Rx = require('rx');
 const ServicesManager = require('../../../lib/managers/services-manager');
 const Service = require("../../../lib/models/service");
 
-const PluginService = require('../../../lib/services/plugin-service');
-const CommandService = require('../../../lib/services/command-service');
-const PermissionsService = require('../../../lib/services/permissions-service');
-const UserService = require('../../../lib/services/user-service');
+const PluginService = require('../../../lib/core-plugin/services/plugin-service');
+const CommandService = require('../../../lib/core-plugin/services/command-service');
+const PermissionsService = require('../../../lib/core-plugin/services/permissions-service');
+const UserService = require('../../../lib/core-plugin/services/user-service');
 
 describe('ServicesManager', function () {
   beforeEach(function () {
@@ -107,47 +107,6 @@ describe('ServicesManager', function () {
         expect(() => this.servicesManager.getService('test', 'TestService')).to.throw(
           Error, "The service 'test.TestService' could not be found",
         );
-      });
-    });
-  });
-
-  describe('#loadServices', function () {
-    beforeEach(function () {
-      sinon.spy(this.servicesManager, 'addService');
-    });
-
-    it('loads all core services', function () {
-      this.servicesManager.loadServices();
-
-      expect(this.servicesManager.addService).to.have.been.calledWith('core', PluginService);
-      expect(this.servicesManager.addService).to.have.been.calledWith('core', CommandService);
-      expect(this.servicesManager.addService).to.have.been.calledWith('core', PermissionsService);
-      expect(this.servicesManager.addService).to.have.been.calledWith('core', UserService);
-    });
-
-    context('when there are services in the nix config', function () {
-      class ConfigService1 extends Service {}
-
-      class ConfigService2 extends Service {}
-
-      class ConfigService3 extends Service {}
-
-      beforeEach(function () {
-        this.nix.config.services = {
-          test: [
-            ConfigService1,
-            ConfigService2,
-            ConfigService3,
-          ],
-        };
-      });
-
-      it('loads services from the config', function () {
-        this.servicesManager.loadServices();
-
-        expect(this.servicesManager.addService).to.have.been.calledWith('test', ConfigService1);
-        expect(this.servicesManager.addService).to.have.been.calledWith('test', ConfigService2);
-        expect(this.servicesManager.addService).to.have.been.calledWith('test', ConfigService3);
       });
     });
   });

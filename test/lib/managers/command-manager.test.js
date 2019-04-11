@@ -54,34 +54,6 @@ describe('CommandManager', function () {
     });
   });
 
-  describe("#loadCommands", function () {
-    describe('when there are commands listed in the config', function () {
-      beforeEach(function () {
-        this.commandOne = {pluginName: 'test', name: "commandOne", run: () => {}};
-        this.commandTwo = {pluginName: 'test', name: "commandTwo", run: () => {}};
-        this.commandThree = {pluginName: 'test', name: "commandThree", run: () => {}};
-
-        this.nix.config = {
-          commands: [
-            this.commandOne,
-            this.commandTwo,
-            this.commandThree,
-          ],
-        };
-      });
-
-      it('loads all commands from the nix config', function () {
-        this.commandManager.loadCommands();
-        expect(this.commandManager.commands.map((c) => c.name)).to.deep.eq([
-          "commandOne",
-          "commandTwo",
-          "commandThree",
-        ]);
-      });
-    });
-
-  });
-
   describe("#addCommand", function () {
     beforeEach(function () {
       this.command = {pluginName: 'test', name: "commandOne", run: () => {}};

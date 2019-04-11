@@ -1,6 +1,6 @@
 const Rx = require('rx');
 
-const PermissionsService = require('../../../lib/services/permissions-service');
+const PermissionsService = require('../../../lib/core-plugin/services/permissions-service');
 
 describe('PermissionsService', function () {
   beforeEach(function () {

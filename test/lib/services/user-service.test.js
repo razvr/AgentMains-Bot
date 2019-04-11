@@ -1,6 +1,6 @@
 const Rx = require('rx');
 
-const UserService = require('../../../lib/services/user-service');
+const UserService = require('../../../lib/core-plugin/services/user-service');
 const { UserNotFoundError } = require("../../../lib/errors");
 
 describe('Service: UserService', function () {

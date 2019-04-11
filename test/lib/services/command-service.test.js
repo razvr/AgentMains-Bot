@@ -1,13 +1,6 @@
-const {
-  Collection,
-  Guild,
-  TextChannel,
-  Message,
-} = require('discord.js');
-
 const Command = require('../../../lib/models/command');
 const CommandContext = require('../../../lib/models/command-context');
-const CommandService = require('../../../lib/services/command-service');
+const CommandService = require('../../../lib/core-plugin/services/command-service');
 
 describe('CommandService', function () {
   beforeEach(function () {

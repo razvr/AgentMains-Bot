@@ -93,30 +93,6 @@ describe('Command', function () {
       });
     });
 
-    context('when the module name is missing', function () {
-      beforeEach(function () {
-        delete this.cmdConfig.pluginName;
-      });
-
-      it('raises an error', function () {
-        expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, `pluginName for command ${this.cmdConfig.name} is missing.`,
-        );
-      });
-    });
-
-    context('when the module name not a string', function () {
-      beforeEach(function () {
-        this.cmdConfig.pluginName = {};
-      });
-
-      it('raises an error', function () {
-        expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
-          Error, `pluginName for command ${this.cmdConfig.name} is missing.`,
-        );
-      });
-    });
-
     context('when the run method is missing', function () {
       beforeEach(function () {
         delete this.cmdConfig.run;

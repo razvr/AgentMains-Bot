@@ -1,13 +1,15 @@
 const Rx = require('rx');
 const Discord = require('discord.js');
 
-const Nix = require('../../lib/nix-core');
-const DataManager = require('../../lib/managers/data-manager');
 const CommandManager = require('../../lib/managers/command-manager');
-const ServicesManager = require('../../lib/managers/services-manager');
-const PluginManager = require('../../lib/managers/plugin-manager');
 const ConfigManager = require('../../lib/managers/config-manager');
+const corePlugin = require('../../lib/core-plugin');
+const DataManager = require('../../lib/managers/data-manager');
+const Nix = require('../../lib/nix-core');
 const PermissionsManager = require('../../lib/managers/permissions-manager');
+const PluginManager = require('../../lib/managers/plugin-manager');
+const Service = require("../../lib/models/service");
+const ServicesManager = require('../../lib/managers/services-manager');
 
 describe('Nix', function () {
   beforeEach(function () {
@@ -37,24 +39,10 @@ describe('Nix', function () {
   });
 
   describe('constructor', function () {
-    beforeEach(function () {
-      sinon.stub(CommandManager.prototype, 'loadCommands');
-      sinon.stub(ServicesManager.prototype, 'loadServices');
-      sinon.stub(PluginManager.prototype, 'loadPlugins');
-
-      this.nix = new Nix(this.config);
-    });
-
-    afterEach(function () {
-      CommandManager.prototype.loadCommands.restore();
-      ServicesManager.prototype.loadServices.restore();
-      PluginManager.prototype.loadPlugins.restore();
-    });
-
     it('verifies the config', function () {
       this.config = { verifyConfig: sinon.fake() };
-      this.nix = new Nix(this.config);
 
+      this.nix = new Nix(this.config);
       expect(this.config.verifyConfig).to.have.been.called;
     });
 
@@ -62,52 +50,46 @@ describe('Nix', function () {
       expect(this.nix.discord).to.be.an.instanceOf(Discord.Client);
     });
 
-    it('creates and binds a DataManager', function () {
-      expect(this.nix.dataManager).to.be.an.instanceOf(DataManager);
-      expect(this.nix.setGuildData).to.eq(this.nix.dataManager.setGuildData);
-      expect(this.nix.getGuildData).to.eq(this.nix.dataManager.getGuildData);
-    });
+    describe('creates and binds managers', function () {
+      beforeEach(function () {
+        this.nix = new Nix(this.config);
+      });
 
-    it('creates and binds a CommandManager', function () {
-      expect(this.nix.commandManager).to.be.an.instanceOf(CommandManager);
-      expect(this.nix.addCommand).to.eq(this.nix.commandManager.addCommand);
-      expect(this.nix.getCommand).to.eq(this.nix.commandManager.getCommand);
-    });
+      it('creates and binds a DataManager', function () {
+        expect(this.nix.dataManager).to.be.an.instanceOf(DataManager);
+        expect(this.nix.setGuildData).to.eq(this.nix.dataManager.setGuildData);
+        expect(this.nix.getGuildData).to.eq(this.nix.dataManager.getGuildData);
+      });
 
-    it('creates and binds a ServicesManager', function () {
-      expect(this.nix.servicesManager).to.be.an.instanceOf(ServicesManager);
-      expect(this.nix.addService).to.eq(this.nix.servicesManager.addService);
-      expect(this.nix.getService).to.eq(this.nix.servicesManager.getService);
-    });
+      it('creates and binds a CommandManager', function () {
+        expect(this.nix.commandManager).to.be.an.instanceOf(CommandManager);
+        expect(this.nix.addCommand).to.eq(this.nix.commandManager.addCommand);
+        expect(this.nix.getCommand).to.eq(this.nix.commandManager.getCommand);
+      });
 
-    it('creates and binds a PluginManager', function () {
-      expect(this.nix.pluginManager).to.be.an.instanceOf(PluginManager);
-      expect(this.nix.addPlugin).to.eq(this.nix.pluginManager.addPlugin);
-      expect(this.nix.getPlugin).to.eq(this.nix.pluginManager.getPlugin);
-    });
+      it('creates and binds a ServicesManager', function () {
+        expect(this.nix.servicesManager).to.be.an.instanceOf(ServicesManager);
+        expect(this.nix.addService).to.eq(this.nix.servicesManager.addService);
+        expect(this.nix.getService).to.eq(this.nix.servicesManager.getService);
+      });
 
-    it('creates and binds a ConfigManager', function () {
-      expect(this.nix.configManager).to.be.an.instanceOf(ConfigManager);
-      expect(this.nix.addConfigAction).to.eq(this.nix.configManager.addConfigAction);
-      expect(this.nix.getConfigAction).to.eq(this.nix.configManager.getConfigAction);
-    });
+      it('creates and binds a PluginManager', function () {
+        expect(this.nix.pluginManager).to.be.an.instanceOf(PluginManager);
+        expect(this.nix.addPlugin).to.eq(this.nix.pluginManager.addPlugin);
+        expect(this.nix.getPlugin).to.eq(this.nix.pluginManager.getPlugin);
+      });
 
-    it('creates and binds a PermissionsManager', function () {
-      expect(this.nix.permissionsManager).to.be.an.instanceOf(PermissionsManager);
-      expect(this.nix.addPermissionLevel).to.eq(this.nix.permissionsManager.addPermissionLevel);
-      expect(this.nix.getPermissionLevel).to.eq(this.nix.permissionsManager.getPermissionLevel);
-    });
+      it('creates and binds a ConfigManager', function () {
+        expect(this.nix.configManager).to.be.an.instanceOf(ConfigManager);
+        expect(this.nix.addConfigAction).to.eq(this.nix.configManager.addConfigAction);
+        expect(this.nix.getConfigAction).to.eq(this.nix.configManager.getConfigAction);
+      });
 
-    it('triggers the loading of services', function () {
-      expect(this.nix.servicesManager.loadServices).to.have.been.called;
-    });
-
-    it('triggers the loading of plugins', function () {
-      expect(this.nix.pluginManager.loadPlugins).to.have.been.called;
-    });
-
-    it('triggers the loading of commands', function () {
-      expect(this.nix.commandManager.loadCommands).to.have.been.called;
+      it('creates and binds a PermissionsManager', function () {
+        expect(this.nix.permissionsManager).to.be.an.instanceOf(PermissionsManager);
+        expect(this.nix.addPermissionLevel).to.eq(this.nix.permissionsManager.addPermissionLevel);
+        expect(this.nix.getPermissionLevel).to.eq(this.nix.permissionsManager.getPermissionLevel);
+      });
     });
 
     it('loads response strings from the config', function () {
@@ -116,8 +98,44 @@ describe('Nix', function () {
       };
 
       this.nix = new Nix(this.config);
-
       expect(this.nix.responseStrings.test).to.eq(this.config.responseStrings.test);
+    });
+
+    it('loads the core plugin', function () {
+      this.nix = new Nix(this.config);
+      const loadedPlugins = this.nix.pluginManager.plugins;
+      expect(loadedPlugins.map((p) => p.name)).to.include(corePlugin.name);
+    });
+
+    it('loads plugins from the config', function () {
+      this.config.plugins = [{ name: 'testPlugin' }];
+
+      this.nix = new Nix(this.config);
+
+      const loadedPlugins = this.nix.pluginManager.plugins;
+      expect(loadedPlugins.map((p) => p.name)).to.include('testPlugin');
+    });
+
+    it('loads services from the config', function () {
+      class TestService extends Service {}
+
+      this.config.services = { 'testPlugin': [TestService] };
+
+      this.nix = new Nix(this.config);
+
+      let testService = this.nix.getService('testPlugin', 'TestService');
+      expect(testService).to.be.an.instanceOf(TestService);
+    });
+
+    it('loads commands from the config', function () {
+      this.config.commands = [{
+        name: 'testCommand',
+        run: () => {},
+      }];
+
+      this.nix = new Nix(this.config);
+
+      expect(this.nix.getCommand('testCommand')).not.to.be.undefined;
     });
   });
 

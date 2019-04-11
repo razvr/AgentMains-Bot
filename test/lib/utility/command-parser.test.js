@@ -1,4 +1,4 @@
-const CommandParser = require('../../../lib/utility/command-parser');
+const CommandParser = require('../../../lib/command-parser');
 const { InvalidPrefixError } = require("../../../lib/errors/command-parse-errors");
 const CommandManager = require('../../../lib/managers/command-manager');
 
