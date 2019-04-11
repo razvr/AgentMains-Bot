@@ -377,6 +377,14 @@ chalk@^2.4.1:
     escape-string-regexp "^1.0.5"
     supports-color "^5.3.0"
 
+"chaos-data-disk@github:nix-core/nix-data-disk#v0.0.0":
+  version "0.0.0"
+  resolved "https://codeload.github.com/nix-core/nix-data-disk/tar.gz/b44ab7815e65e4d2a65816c0c6f029e599880a71"
+
+"chaos-data-memory@github:nix-core/nix-data-memory#v0.0.2":
+  version "0.0.2"
+  resolved "https://codeload.github.com/nix-core/nix-data-memory/tar.gz/d1cb161b7ca4be4bc85ca2c73ed60a4f81824745"
+
 chardet@^0.4.0:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/chardet/-/chardet-0.4.2.tgz#b5473b33dc97c424e5d98dc87d55d4d8a29c8bf2"
@@ -1840,14 +1848,6 @@ nise@^1.4.5:
     lolex "^2.3.2"
     path-to-regexp "^1.7.0"
     text-encoding "^0.6.4"
-
-"nix-data-disk@github:nix-core/nix-data-disk#v0.0.0":
-  version "0.0.0"
-  resolved "https://codeload.github.com/nix-core/nix-data-disk/tar.gz/b44ab7815e65e4d2a65816c0c6f029e599880a71"
-
-"nix-data-memory@github:nix-core/nix-data-memory#v0.0.2":
-  version "0.0.2"
-  resolved "https://codeload.github.com/nix-core/nix-data-memory/tar.gz/d1cb161b7ca4be4bc85ca2c73ed60a4f81824745"
 
 node-pre-gyp@^0.10.0:
   version "0.10.3"

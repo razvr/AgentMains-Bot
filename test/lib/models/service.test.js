@@ -1,4 +1,3 @@
-const Rx = require('rx');
 const Service = require("../../../lib/models/service");
 
 describe('Service', function () {
@@ -24,60 +23,9 @@ describe('Service', function () {
     });
   });
 
-  describe(".nix", function () {
-    it('returns the instance of nix the service was constructed with', function () {
-      expect(this.service.nix).to.eq(this.nix);
-    });
-  });
-
-  describe("#configureService", function () {
-    it("returns an Observable of true", function (done) {
-      let hook$ = this.service.configureService();
-      expect(hook$).to.be.an.instanceOf(Rx.Observable);
-
-      hook$.subscribe(
-        (value) => {
-          expect(value).to.eq(true);
-          done();
-        },
-        (error) => {
-          done(error);
-        },
-      );
-    });
-  });
-
-  describe("#onNixListen", function () {
-    it("returns an Observable of true", function (done) {
-      let hook$ = this.service.onNixListen();
-      expect(hook$).to.be.an.instanceOf(Rx.Observable);
-
-      hook$.subscribe(
-        (value) => {
-          expect(value).to.eq(true);
-          done();
-        },
-        (error) => {
-          done(error);
-        },
-      );
-    });
-  });
-
-  describe("#onNixJoinGuild", function () {
-    it("returns an Observable of true", function (done) {
-      let hook$ = this.service.onNixJoinGuild();
-      expect(hook$).to.be.an.instanceOf(Rx.Observable);
-
-      hook$.subscribe(
-        (value) => {
-          expect(value).to.eq(true);
-          done();
-        },
-        (error) => {
-          done(error);
-        },
-      );
+  describe(".chaos", function () {
+    it('returns the instance of ChaosCore the service was constructed with', function () {
+      expect(this.service.chaos).to.eq(this.nix);
     });
   });
 });

@@ -191,7 +191,7 @@ describe('PluginManager', function () {
 
       it('triggers the hook for each', function (done) {
         this.pluginManager
-          .onNixListen()
+          .onListen()
           .subscribe(() => {}, (error) => done(error), () => {
             expect(this.testPlugin1.onNixListen).to.have.been.calledOnce;
             expect(this.testPlugin2.onNixListen).to.have.been.calledOnce;
@@ -216,7 +216,7 @@ describe('PluginManager', function () {
 
       it('triggers the hook for each', function (done) {
         this.pluginManager
-          .onNixJoinGuild()
+          .onJoinGuild()
           .subscribe(() => {}, (error) => done(error), () => {
             expect(this.testPlugin1.onNixJoinGuild).to.have.been.calledOnce;
             expect(this.testPlugin2.onNixJoinGuild).to.have.been.calledOnce;
