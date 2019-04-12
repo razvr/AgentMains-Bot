@@ -7,7 +7,7 @@ describe('NixConfig', function () {
       loginToken: "mock_loginToken",
     };
 
-    this.nixConfig = new NixConfig(this.options);
+    this.chaosConfig = new NixConfig(this.options);
   });
 
   describe('attributes', function () {
@@ -25,7 +25,7 @@ describe('NixConfig', function () {
       "messageOwnerOnBoot",
     ].forEach((attribute) => {
       it(attribute, function () {
-        expect(this.nixConfig[attribute]).not.to.be.undefined;
+        expect(this.chaosConfig[attribute]).not.to.be.undefined;
       });
     });
   });
@@ -47,28 +47,28 @@ describe('NixConfig', function () {
     ].forEach(([attribute, value]) => {
       it(`assigns ${attribute} from the options`, function () {
         this.options[attribute] = value;
-        this.nixConfig = new NixConfig(this.options);
-        expect(this.nixConfig[attribute]).to.eq(value);
+        this.chaosConfig = new NixConfig(this.options);
+        expect(this.chaosConfig[attribute]).to.eq(value);
       });
     });
 
     it('defaults the dataSource to "memory"', function () {
-      expect(this.nixConfig.dataSource.type).to.eq('memory');
+      expect(this.chaosConfig.dataSource.type).to.eq('memory');
     });
 
     it('defaults the defaultPrefix to "!"', function () {
-      expect(this.nixConfig.defaultPrefix).to.eq('!');
+      expect(this.chaosConfig.defaultPrefix).to.eq('!');
     });
   });
 
   describe('#verifyConfig', function () {
     context('when the ownerUserId is missing', function() {
       beforeEach(function () {
-        this.nixConfig.ownerUserId = null;
+        this.chaosConfig.ownerUserId = null;
       });
 
       it('throws an error', function () {
-        expect(() => this.nixConfig.verifyConfig()).to.throw(
+        expect(() => this.chaosConfig.verifyConfig()).to.throw(
           NixConfig.InvalidConfigError, "ownerUserId is required",
         );
       });
@@ -76,11 +76,11 @@ describe('NixConfig', function () {
 
     context('when the loginToken is missing', function () {
       beforeEach(function () {
-        this.nixConfig.loginToken = null;
+        this.chaosConfig.loginToken = null;
       });
 
       it('throws an error', function () {
-        expect(() => this.nixConfig.verifyConfig()).to.throw(
+        expect(() => this.chaosConfig.verifyConfig()).to.throw(
           NixConfig.InvalidConfigError, "loginToken is required",
         );
       });

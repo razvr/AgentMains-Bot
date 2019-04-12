@@ -9,8 +9,4 @@ module.exports = {
       return response.send({ content: "Hello World!" });
     },
   }],
-  onNixListen() {
-  },
-  onNixJoinGuild() {
-  },
 };

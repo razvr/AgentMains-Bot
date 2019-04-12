@@ -5,9 +5,9 @@ const { RoleNotFoundError } = require("../../../lib/errors");
 
 describe('Service: RoleService', function () {
   beforeEach(function () {
-    this.nix = createNixStub();
-    this.nix.discord = Mockery.create('Client');
-    this.roleService = new RoleService(this.nix);
+    this.chaos = createNixStub();
+    this.chaos.discord = Mockery.create('Client');
+    this.roleService = new RoleService(this.chaos);
   });
 
   describe('#findMember', function () {
@@ -16,7 +16,7 @@ describe('Service: RoleService', function () {
 
     beforeEach(function () {
       this.guild = Mockery.create('Guild', {
-        client: this.nix.discord,
+        client: this.chaos.discord,
       });
     });
 
@@ -41,7 +41,7 @@ describe('Service: RoleService', function () {
         context('when the role exists in the guild', function () {
           beforeEach(function () {
             this.role = Mockery.create('Role', {
-              client: this.nix.discord,
+              client: this.chaos.discord,
               guild: this.guild,
               id: roleId,
               name: roleName,

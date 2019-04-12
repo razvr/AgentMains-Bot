@@ -8,29 +8,29 @@ const DataManager = require('../../../lib/managers/data-manager');
 
 describe('DataManager', function () {
   beforeEach(function () {
-    this.nix = createNixStub();
-    this.nix.config = { dataSource: {} };
+    this.chaos = createNixStub();
+    this.chaos.config = { dataSource: {} };
 
     this.dataSource = new MemoryDataSource();
-    this.dataManager = new DataManager(this.nix);
+    this.dataManager = new DataManager(this.chaos);
 
     this.dataManager._dataSource = this.dataSource;
   });
 
-  describe(".nix", function () {
+  describe(".chaos", function () {
     it('returns a reference to nix', function () {
-      expect(this.dataManager.nix).to.eq(this.nix);
+      expect(this.dataManager.chaos).to.eq(this.chaos);
     });
   });
 
   describe('constructor', function () {
     context('when no datasource is in the nix config', function() {
       beforeEach(function () {
-        delete this.nix.config.dataSource;
+        delete this.chaos.config.dataSource;
       });
 
       it('defaults to a memory datasource', function () {
-        this.dataManager = new DataManager(this.nix);
+        this.dataManager = new DataManager(this.chaos);
         expect(this.dataManager._dataSource).to.be.a.instanceOf(MemoryDataSource);
       });
     });
@@ -40,8 +40,8 @@ describe('DataManager', function () {
         beforeEach(function () {
           this.tmpDir = path.resolve(__dirname, "../../tmp");
 
-          this.nix.config.dataSource.type = "disk";
-          this.nix.config.dataSource.dataDir = this.tmpDir;
+          this.chaos.config.dataSource.type = "disk";
+          this.chaos.config.dataSource.dataDir = this.tmpDir;
         });
 
         afterEach(function () {
@@ -49,18 +49,18 @@ describe('DataManager', function () {
         });
 
         it('correctly loads the datasource', function () {
-          this.dataManager = new DataManager(this.nix);
+          this.dataManager = new DataManager(this.chaos);
           expect(this.dataManager._dataSource).to.be.a.instanceOf(DiskDataSource);
         });
       });
 
       context('when the npm module is not installed', function() {
         beforeEach(function () {
-          this.nix.config.dataSource.type = "test";
+          this.chaos.config.dataSource.type = "test";
         });
 
         it('raises an error', function () {
-          expect(() => new DataManager(this.nix)).to.throw(
+          expect(() => new DataManager(this.chaos)).to.throw(
             DataManager.DataSourceError, "Unable to load data source 'chaos-data-test'. Is the npm module 'chaos-data-test' installed?",
           );
         });
@@ -76,9 +76,9 @@ describe('DataManager', function () {
   });
 
   describe('#onListen', function () {
-    context('when the datasource does not have a onNixListen', function () {
+    context('when the datasource does not have a onListen', function () {
       beforeEach(function () {
-        delete this.dataSource.onNixListen;
+        delete this.dataSource.onListen;
       });
 
       it("returns an Observable of true", function (done) {
@@ -97,23 +97,23 @@ describe('DataManager', function () {
       });
     });
 
-    context('when the datasource has a onNixListen', function () {
+    context('when the datasource has a onListen', function () {
       beforeEach(function () {
-        this.dataSource.onNixListen = sinon.fake.returns(Rx.Observable.of(true));
+        this.dataSource.onListen = sinon.fake.returns(Rx.Observable.of(true));
       });
 
-      it("calls the datasource's onNixListen", function () {
+      it("calls the datasource's onListen", function () {
         let hook$ = this.dataManager.onListen();
         expect(hook$).to.be.an.instanceOf(Rx.Observable);
-        expect(this.dataManager._dataSource.onNixListen).to.have.been.called;
+        expect(this.dataManager._dataSource.onListen).to.have.been.called;
       });
     });
   });
 
   describe('#onJoinGuild', function () {
-    context('when the datasource does not have a onNixJoinGuild', function() {
+    context('when the datasource does not have a onJoinGuild', function() {
       beforeEach(function () {
-        delete this.dataSource.onNixJoinGuild;
+        delete this.dataSource.onJoinGuild;
       });
 
       it("returns an Observable of true", function (done) {
@@ -132,15 +132,15 @@ describe('DataManager', function () {
       });
     });
 
-    context('when the datasource has a onNixJoinGuild', function () {
+    context('when the datasource has a onJoinGuild', function () {
       beforeEach(function () {
-        this.dataSource.onNixJoinGuild = sinon.fake.returns(Rx.Observable.of(true));
+        this.dataSource.onJoinGuild = sinon.fake.returns(Rx.Observable.of(true));
       });
 
-      it("calls the datasource's onNixListen", function () {
+      it("calls the datasource's onJoinGuild", function () {
         let hook$ = this.dataManager.onJoinGuild();
         expect(hook$).to.be.an.instanceOf(Rx.Observable);
-        expect(this.dataManager._dataSource.onNixJoinGuild).to.have.been.called;
+        expect(this.dataManager._dataSource.onJoinGuild).to.have.been.called;
       });
     });
   });

@@ -25,13 +25,13 @@ describe('Nix', function () {
       id: this.config.ownerUserId,
     });
 
-    this.nix = new Nix(this.config);
-    this.nix.discord = this.discord;
+    this.chaos = new Nix(this.config);
+    this.chaos.discord = this.discord;
   });
 
   afterEach(function (done) {
-    if (this.nix.listening) {
-      this.nix.shutdown()
+    if (this.chaos.listening) {
+      this.chaos.shutdown()
         .subscribe(() => done(), (error) => done(error));
     } else {
       done();
@@ -42,53 +42,53 @@ describe('Nix', function () {
     it('verifies the config', function () {
       this.config = { verifyConfig: sinon.fake() };
 
-      this.nix = new Nix(this.config);
+      this.chaos = new Nix(this.config);
       expect(this.config.verifyConfig).to.have.been.called;
     });
 
     it('creates a new Discord client', function () {
-      expect(this.nix.discord).to.be.an.instanceOf(Discord.Client);
+      expect(this.chaos.discord).to.be.an.instanceOf(Discord.Client);
     });
 
     describe('creates and binds managers', function () {
       beforeEach(function () {
-        this.nix = new Nix(this.config);
+        this.chaos = new Nix(this.config);
       });
 
       it('creates and binds a DataManager', function () {
-        expect(this.nix.dataManager).to.be.an.instanceOf(DataManager);
-        expect(this.nix.setGuildData).to.eq(this.nix.dataManager.setGuildData);
-        expect(this.nix.getGuildData).to.eq(this.nix.dataManager.getGuildData);
+        expect(this.chaos.dataManager).to.be.an.instanceOf(DataManager);
+        expect(this.chaos.setGuildData).to.eq(this.chaos.dataManager.setGuildData);
+        expect(this.chaos.getGuildData).to.eq(this.chaos.dataManager.getGuildData);
       });
 
       it('creates and binds a CommandManager', function () {
-        expect(this.nix.commandManager).to.be.an.instanceOf(CommandManager);
-        expect(this.nix.addCommand).to.eq(this.nix.commandManager.addCommand);
-        expect(this.nix.getCommand).to.eq(this.nix.commandManager.getCommand);
+        expect(this.chaos.commandManager).to.be.an.instanceOf(CommandManager);
+        expect(this.chaos.addCommand).to.eq(this.chaos.commandManager.addCommand);
+        expect(this.chaos.getCommand).to.eq(this.chaos.commandManager.getCommand);
       });
 
       it('creates and binds a ServicesManager', function () {
-        expect(this.nix.servicesManager).to.be.an.instanceOf(ServicesManager);
-        expect(this.nix.addService).to.eq(this.nix.servicesManager.addService);
-        expect(this.nix.getService).to.eq(this.nix.servicesManager.getService);
+        expect(this.chaos.servicesManager).to.be.an.instanceOf(ServicesManager);
+        expect(this.chaos.addService).to.eq(this.chaos.servicesManager.addService);
+        expect(this.chaos.getService).to.eq(this.chaos.servicesManager.getService);
       });
 
       it('creates and binds a PluginManager', function () {
-        expect(this.nix.pluginManager).to.be.an.instanceOf(PluginManager);
-        expect(this.nix.addPlugin).to.eq(this.nix.pluginManager.addPlugin);
-        expect(this.nix.getPlugin).to.eq(this.nix.pluginManager.getPlugin);
+        expect(this.chaos.pluginManager).to.be.an.instanceOf(PluginManager);
+        expect(this.chaos.addPlugin).to.eq(this.chaos.pluginManager.addPlugin);
+        expect(this.chaos.getPlugin).to.eq(this.chaos.pluginManager.getPlugin);
       });
 
       it('creates and binds a ConfigManager', function () {
-        expect(this.nix.configManager).to.be.an.instanceOf(ConfigManager);
-        expect(this.nix.addConfigAction).to.eq(this.nix.configManager.addConfigAction);
-        expect(this.nix.getConfigAction).to.eq(this.nix.configManager.getConfigAction);
+        expect(this.chaos.configManager).to.be.an.instanceOf(ConfigManager);
+        expect(this.chaos.addConfigAction).to.eq(this.chaos.configManager.addConfigAction);
+        expect(this.chaos.getConfigAction).to.eq(this.chaos.configManager.getConfigAction);
       });
 
       it('creates and binds a PermissionsManager', function () {
-        expect(this.nix.permissionsManager).to.be.an.instanceOf(PermissionsManager);
-        expect(this.nix.addPermissionLevel).to.eq(this.nix.permissionsManager.addPermissionLevel);
-        expect(this.nix.getPermissionLevel).to.eq(this.nix.permissionsManager.getPermissionLevel);
+        expect(this.chaos.permissionsManager).to.be.an.instanceOf(PermissionsManager);
+        expect(this.chaos.addPermissionLevel).to.eq(this.chaos.permissionsManager.addPermissionLevel);
+        expect(this.chaos.getPermissionLevel).to.eq(this.chaos.permissionsManager.getPermissionLevel);
       });
     });
 
@@ -97,22 +97,22 @@ describe('Nix', function () {
         test: () => 'test_string',
       };
 
-      this.nix = new Nix(this.config);
-      expect(this.nix.responseStrings.test).to.eq(this.config.responseStrings.test);
+      this.chaos = new Nix(this.config);
+      expect(this.chaos.responseStrings.test).to.eq(this.config.responseStrings.test);
     });
 
     it('loads the core plugin', function () {
-      this.nix = new Nix(this.config);
-      const loadedPlugins = this.nix.pluginManager.plugins;
+      this.chaos = new Nix(this.config);
+      const loadedPlugins = this.chaos.pluginManager.plugins;
       expect(loadedPlugins.map((p) => p.name)).to.include(corePlugin.name);
     });
 
     it('loads plugins from the config', function () {
       this.config.plugins = [{ name: 'testPlugin' }];
 
-      this.nix = new Nix(this.config);
+      this.chaos = new Nix(this.config);
 
-      const loadedPlugins = this.nix.pluginManager.plugins;
+      const loadedPlugins = this.chaos.pluginManager.plugins;
       expect(loadedPlugins.map((p) => p.name)).to.include('testPlugin');
     });
 
@@ -121,9 +121,9 @@ describe('Nix', function () {
 
       this.config.services = { 'testPlugin': [TestService] };
 
-      this.nix = new Nix(this.config);
+      this.chaos = new Nix(this.config);
 
-      let testService = this.nix.getService('testPlugin', 'TestService');
+      let testService = this.chaos.getService('testPlugin', 'TestService');
       expect(testService).to.be.an.instanceOf(TestService);
     });
 
@@ -133,52 +133,52 @@ describe('Nix', function () {
         run: () => {},
       }];
 
-      this.nix = new Nix(this.config);
+      this.chaos = new Nix(this.config);
 
-      expect(this.nix.getCommand('testCommand')).not.to.be.undefined;
+      expect(this.chaos.getCommand('testCommand')).not.to.be.undefined;
     });
   });
 
   describe('#listen', function () {
     it('returns an observable', function () {
-      expect(this.nix.listen()).to.be.an.instanceOf(Rx.Observable);
+      expect(this.chaos.listen()).to.be.an.instanceOf(Rx.Observable);
     });
 
     it('emits when the bot is ready', function (done) {
-      this.nix.listen()
+      this.chaos.listen()
         .do((item) => expect(item).to.eq('Ready'))
         .subscribe(() => done(), (error) => done(error));
     });
 
     it('returns the same stream for multiple calls', function () {
-      let result1$ = this.nix.listen();
-      let result2$ = this.nix.listen();
+      let result1$ = this.chaos.listen();
+      let result2$ = this.chaos.listen();
 
       expect(result1$).to.eq(result2$);
     });
 
     it('replays the ready signal', function (done) {
-      this.nix.listen()
-        .flatMap(() => this.nix.listen())
+      this.chaos.listen()
+        .flatMap(() => this.chaos.listen())
         .subscribe(() => done(), (error) => done(error));
     });
 
     describe('bootstrap process', function () {
       it('configures services', function (done) {
-        sinon.spy(this.nix.servicesManager, 'configureServices');
-        this.nix.listen()
-          .do(() => expect(this.nix.servicesManager.configureServices).to.have.been.called)
+        sinon.spy(this.chaos.servicesManager, 'configureServices');
+        this.chaos.listen()
+          .do(() => expect(this.chaos.servicesManager.configureServices).to.have.been.called)
           .subscribe(() => done(), (error) => done(error));
       });
 
       context('when configuring services fails', function () {
         beforeEach(function () {
           this.error = new Error("mock error");
-          sinon.stub(this.nix.servicesManager, 'configureServices').throws(this.error);
+          sinon.stub(this.chaos.servicesManager, 'configureServices').throws(this.error);
         });
 
         it('triggers the error callback', function (done) {
-          this.nix.listen()
+          this.chaos.listen()
             .subscribe(
               () => done(new Error("Error callback was not called")),
               () => done(),
@@ -187,21 +187,21 @@ describe('Nix', function () {
       });
 
       it('configures commands', function (done) {
-        sinon.spy(this.nix.commandManager, 'configureCommands');
+        sinon.spy(this.chaos.commandManager, 'configureCommands');
 
-        this.nix.listen()
-          .do(() => expect(this.nix.commandManager.configureCommands).to.have.been.called)
+        this.chaos.listen()
+          .do(() => expect(this.chaos.commandManager.configureCommands).to.have.been.called)
           .subscribe(() => done(), (error) => done(error));
       });
 
       context('when configuring commands fails', function () {
         beforeEach(function () {
           this.error = new Error("mock error");
-          sinon.stub(this.nix.commandManager, 'configureCommands').throws(this.error);
+          sinon.stub(this.chaos.commandManager, 'configureCommands').throws(this.error);
         });
 
         it('triggers the error callback', function (done) {
-          this.nix.listen()
+          this.chaos.listen()
             .subscribe(
               () => done(new Error("Error callback was not called")),
               () => done(),
@@ -210,19 +210,19 @@ describe('Nix', function () {
       });
 
       it('logs into discord', function (done) {
-        this.nix.listen()
-          .do(() => expect(this.nix.discord.login).to.have.been.calledWith(this.config.loginToken))
+        this.chaos.listen()
+          .do(() => expect(this.chaos.discord.login).to.have.been.calledWith(this.config.loginToken))
           .subscribe(() => done(), (error) => done(error));
       });
 
       context('when logging into discord fails', function () {
         beforeEach(function () {
           this.error = new Error("mock error");
-          this.nix.discord.login = sinon.fake.rejects(this.error);
+          this.chaos.discord.login = sinon.fake.rejects(this.error);
         });
 
         it('triggers the error callback', function (done) {
-          this.nix.listen()
+          this.chaos.listen()
             .subscribe(
               () => done(new Error("Error callback was not called")),
               () => done(),
@@ -231,21 +231,21 @@ describe('Nix', function () {
       });
 
       it('tries to find the owner', function (done) {
-        sinon.spy(this.nix, 'findOwner');
+        sinon.spy(this.chaos, 'findOwner');
 
-        this.nix.listen()
-          .do(() => expect(this.nix.findOwner).to.have.been.calledWith())
+        this.chaos.listen()
+          .do(() => expect(this.chaos.findOwner).to.have.been.calledWith())
           .subscribe(() => done(), (error) => done(error));
       });
 
       context('when finding the owner into discord fails', function () {
         beforeEach(function () {
           this.error = new Error("mock error");
-          sinon.stub(this.nix, 'findOwner').returns(Rx.Observable.throw(this.error));
+          sinon.stub(this.chaos, 'findOwner').returns(Rx.Observable.throw(this.error));
         });
 
         it('triggers the error callback', function (done) {
-          this.nix.listen()
+          this.chaos.listen()
             .subscribe(
               () => done(new Error("Error callback was not called")),
               () => done(),
@@ -254,21 +254,21 @@ describe('Nix', function () {
       });
 
       it('triggers the onListen hook', function (done) {
-        sinon.spy(this.nix, 'onListen');
+        sinon.spy(this.chaos, 'onListen');
 
-        this.nix.listen()
-          .do(() => expect(this.nix.onListen).to.have.been.calledWith())
+        this.chaos.listen()
+          .do(() => expect(this.chaos.onListen).to.have.been.calledWith())
           .subscribe(() => done(), (error) => done(error));
       });
 
       context('when the onListen hook fails', function () {
         beforeEach(function () {
           this.error = new Error("mock error");
-          sinon.stub(this.nix, 'onListen').returns(Rx.Observable.throw(this.error));
+          sinon.stub(this.chaos, 'onListen').returns(Rx.Observable.throw(this.error));
         });
 
         it('triggers the error callback', function (done) {
-          this.nix.listen()
+          this.chaos.listen()
             .subscribe(
               () => done(new Error("Error callback was not called")),
               () => done(),
@@ -277,18 +277,18 @@ describe('Nix', function () {
       });
 
       it('starts all Discord event streams', function (done) {
-        this.nix.listen()
+        this.chaos.listen()
           .do(() => {
             Object.values(Discord.Constants.Events).forEach((eventType) => {
-              expect(this.nix.streams[eventType + '$']).to.be.an.instanceOf(Rx.Observable);
+              expect(this.chaos.streams[eventType + '$']).to.be.an.instanceOf(Rx.Observable);
             });
           })
           .subscribe(() => done(), (error) => done(error));
       });
 
       it('starts nix related event streams', function (done) {
-        this.nix.listen()
-          .do(() => expect(this.nix.streams.command$).to.be.an.instanceOf(Rx.Observable))
+        this.chaos.listen()
+          .do(() => expect(this.chaos.streams.command$).to.be.an.instanceOf(Rx.Observable))
           .subscribe(() => done(), (error) => done(error));
       });
 
@@ -297,19 +297,19 @@ describe('Nix', function () {
           this.guild1 = { id: 'mock_id_1' };
           this.guild2 = { id: 'mock_id_2' };
           this.guild3 = { id: 'mock_id_3' };
-          this.nix.discord.guilds.set(this.guild1.id, this.guild1);
-          this.nix.discord.guilds.set(this.guild2.id, this.guild2);
-          this.nix.discord.guilds.set(this.guild3.id, this.guild3);
+          this.chaos.discord.guilds.set(this.guild1.id, this.guild1);
+          this.chaos.discord.guilds.set(this.guild2.id, this.guild2);
+          this.chaos.discord.guilds.set(this.guild3.id, this.guild3);
         });
 
-        it('runs the onNixJoinGuild for each', function (done) {
-          sinon.spy(this.nix, 'onJoinGuild');
+        it('runs the onJoinGuild for each', function (done) {
+          sinon.spy(this.chaos, 'onJoinGuild');
 
-          this.nix.listen()
+          this.chaos.listen()
             .do(() => {
-              expect(this.nix.onJoinGuild).to.have.been.calledWith(this.guild1);
-              expect(this.nix.onJoinGuild).to.have.been.calledWith(this.guild2);
-              expect(this.nix.onJoinGuild).to.have.been.calledWith(this.guild3);
+              expect(this.chaos.onJoinGuild).to.have.been.calledWith(this.guild1);
+              expect(this.chaos.onJoinGuild).to.have.been.calledWith(this.guild2);
+              expect(this.chaos.onJoinGuild).to.have.been.calledWith(this.guild3);
             })
             .subscribe(() => done(), (error) => done(error));
         });
@@ -320,12 +320,12 @@ describe('Nix', function () {
   describe('#shutdown', function () {
     context('when nix is listening', function () {
       beforeEach(function () {
-        this.ready$ = this.nix.listen();
+        this.ready$ = this.chaos.listen();
       });
 
       it('stops the main listening stream', function (done) {
         this.ready$.subscribe(
-          () => this.nix.shutdown(),
+          () => this.chaos.shutdown(),
           (error) => done(error),
           () => done(),
         );
@@ -334,7 +334,7 @@ describe('Nix', function () {
 
     context('when nix is not listening', function () {
       it('throws an error', function () {
-        expect(() => this.nix.shutdown()).to.throw(
+        expect(() => this.chaos.shutdown()).to.throw(
           Error, "Bot is not listening",
         );
       });
@@ -347,20 +347,20 @@ describe('Nix', function () {
     });
 
     it('returns an Observable', function () {
-      expect(this.nix.messageOwner(this.message)).to.be.an.instanceOf(Rx.Observable);
+      expect(this.chaos.messageOwner(this.message)).to.be.an.instanceOf(Rx.Observable);
     });
 
     context('when the owner has been found', function () {
       beforeEach(function () {
-        this.nix._owner = {
+        this.chaos._owner = {
           send: sinon.fake.resolves(''),
         };
       });
 
       it('sends the message to the owner', function (done) {
-        this.nix.messageOwner(this.message)
+        this.chaos.messageOwner(this.message)
           .subscribe(() => {}, (error) => done(error), () => {
-            expect(this.nix.owner.send).to.have.been.calledWith(this.message);
+            expect(this.chaos.owner.send).to.have.been.calledWith(this.message);
             done();
           });
       });
@@ -371,10 +371,10 @@ describe('Nix', function () {
         });
 
         it('sends the message and options to the owner', function (done) {
-          this.nix.messageOwner(this.message, this.options)
+          this.chaos.messageOwner(this.message, this.options)
             .subscribe(() => {
             }, (error) => done(error), () => {
-              expect(this.nix.owner.send).to.have.been.calledWith(this.message, this.options);
+              expect(this.chaos.owner.send).to.have.been.calledWith(this.message, this.options);
               done();
             });
         });
@@ -383,11 +383,11 @@ describe('Nix', function () {
 
     context('when the owner has not been found', function () {
       beforeEach(function () {
-        this.nix._owner = null;
+        this.chaos._owner = null;
       });
 
       it('throws an error', function (done) {
-        this.nix.messageOwner('test_message')
+        this.chaos.messageOwner('test_message')
           .subscribe(() => done('next was called'), (error) => {
             expect(error).to.be.an.instanceOf(Error).with.property('message', 'Owner was not found.');
             done();
@@ -402,11 +402,11 @@ describe('Nix', function () {
         this.error = new Error('Unknown User');
         this.error.name = 'DiscordAPIError';
 
-        this.nix.discord.fetchUser = sinon.fake.rejects(this.error);
+        this.chaos.discord.fetchUser = sinon.fake.rejects(this.error);
       });
 
       it('raises an error', function (done) {
-        this.nix.findOwner()
+        this.chaos.findOwner()
           .subscribe(() => done('next was called'), (error) => {
             expect(error).to.eq(this.error);
             done();
@@ -417,11 +417,11 @@ describe('Nix', function () {
     context('when discord raises an error', function () {
       beforeEach(function () {
         this.error = new Error('mock error');
-        this.nix.discord.fetchUser = sinon.fake.rejects(this.error);
+        this.chaos.discord.fetchUser = sinon.fake.rejects(this.error);
       });
 
       it('raises an error', function (done) {
-        this.nix.findOwner()
+        this.chaos.findOwner()
           .subscribe(() => done('next was called'), (error) => {
             expect(error).to.eq(this.error);
             done();
@@ -432,13 +432,13 @@ describe('Nix', function () {
     context('when the owner can be found', function () {
       beforeEach(function () {
         this.user = { tag: 'mock_user' };
-        this.nix.discord.fetchUser = sinon.fake.resolves(this.user);
+        this.chaos.discord.fetchUser = sinon.fake.resolves(this.user);
       });
 
       it('saves the user', function (done) {
-        this.nix.findOwner().subscribe(
+        this.chaos.findOwner().subscribe(
           () => {
-            expect(this.nix.owner).to.eq(this.user);
+            expect(this.chaos.owner).to.eq(this.user);
             done();
           },
           (error) => done(error),
@@ -459,12 +459,12 @@ describe('Nix', function () {
       });
 
       it('returns an Observable', function () {
-        expect(this.nix.runHook(this.hookListener, this.hookName)).to.be.an.instanceOf(Rx.Observable);
+        expect(this.chaos.runHook(this.hookListener, this.hookName)).to.be.an.instanceOf(Rx.Observable);
       });
 
       it('returns emits true', function (done) {
         let nextCallback = sinon.fake();
-        this.nix.runHook(this.hookListener, this.hookName)
+        this.chaos.runHook(this.hookListener, this.hookName)
           .subscribe(nextCallback, (error) => done(error), () => {
             expect(nextCallback).to.have.been.calledOnceWith(true);
             done();
@@ -480,11 +480,11 @@ describe('Nix', function () {
       });
 
       it('returns an Observable', function () {
-        expect(this.nix.runHook(this.hookListener, this.hookName)).to.be.an.instanceOf(Rx.Observable);
+        expect(this.chaos.runHook(this.hookListener, this.hookName)).to.be.an.instanceOf(Rx.Observable);
       });
 
       it('runs the hook', function (done) {
-        this.nix.runHook(this.hookListener, this.hookName)
+        this.chaos.runHook(this.hookListener, this.hookName)
           .subscribe(() => {}, (error) => done(error), () => {
             expect(this.hook).to.have.been.calledOnce;
             done();
@@ -493,7 +493,7 @@ describe('Nix', function () {
 
       it('emits true', function (done) {
         let nextCallback = sinon.fake();
-        this.nix.runHook(this.hookListener, this.hookName)
+        this.chaos.runHook(this.hookListener, this.hookName)
           .subscribe(nextCallback, (error) => done(error), () => {
             expect(nextCallback).to.have.been.calledOnceWith(true);
             done();
@@ -506,7 +506,7 @@ describe('Nix', function () {
         });
 
         it('runs the hook with the passed args', function (done) {
-          this.nix.runHook(this.hookListener, this.hookName, this.args)
+          this.chaos.runHook(this.hookListener, this.hookName, this.args)
             .subscribe(() => {}, (error) => done(error), () => {
               expect(this.hook).to.have.been.calledOnceWith('arg1', 'arg2', 'arg3');
               done();
@@ -520,13 +520,13 @@ describe('Nix', function () {
           this.hook = sinon.fake.throws(this.error);
           this.hookListener[this.hookName] = this.hook;
 
-          this.nix.handleError = sinon.fake.returns(Rx.Observable.of(''));
+          this.chaos.handleError = sinon.fake.returns(Rx.Observable.of(''));
         });
 
         it('runs handleError', function (done) {
-          this.nix.runHook(this.hookListener, this.hookName)
+          this.chaos.runHook(this.hookListener, this.hookName)
             .subscribe(() => {}, (error) => done(error), () => {
-              expect(this.nix.handleError).to.have.been.calledOnceWith(this.error);
+              expect(this.chaos.handleError).to.have.been.calledOnceWith(this.error);
               done();
             });
         });
@@ -538,7 +538,7 @@ describe('Nix', function () {
           });
 
           it('re-throws the error', function (done) {
-            this.nix.runHook(this.hookListener, this.hookName, this.args, this.raiseError)
+            this.chaos.runHook(this.hookListener, this.hookName, this.args, this.raiseError)
               .subscribe(() => done('next was called'), (error) => {
                   expect(error).to.eq(this.error);
                   done();
@@ -556,16 +556,16 @@ describe('Nix', function () {
     });
 
     it('returns an Observable', function () {
-      expect(this.nix.handleError(this.error)).to.be.an.instanceOf(Rx.Observable);
+      expect(this.chaos.handleError(this.error)).to.be.an.instanceOf(Rx.Observable);
     });
 
     it('messages the owner', function (done) {
-      sinon.stub(this.nix, 'messageOwner').returns(Rx.Observable.of('value'));
-      let embed = this.nix.createEmbedForError(this.error);
+      sinon.stub(this.chaos, 'messageOwner').returns(Rx.Observable.of('value'));
+      let embed = this.chaos.createEmbedForError(this.error);
 
-      this.nix.handleError(this.error)
+      this.chaos.handleError(this.error)
         .subscribe(() => {}, (error) => done(error), () => {
-          expect(this.nix.messageOwner).to.have.been.calledOnceWith(
+          expect(this.chaos.messageOwner).to.have.been.calledOnceWith(
             "I ran into an unhandled exception:", { embed },
           );
           done();
@@ -579,16 +579,16 @@ describe('Nix', function () {
     });
 
     it('returns an RichEmbed', function () {
-      expect(this.nix.createEmbedForError(this.error)).to.be.an.instanceOf(Discord.RichEmbed);
+      expect(this.chaos.createEmbedForError(this.error)).to.be.an.instanceOf(Discord.RichEmbed);
     });
 
     it('adds an Error field', function () {
-      let embed = this.nix.createEmbedForError(this.error);
+      let embed = this.chaos.createEmbedForError(this.error);
       expect(Object.values(embed.fields).map((f) => f.name)).to.include('Error:');
     });
 
     it('adds an Stack field', function () {
-      let embed = this.nix.createEmbedForError(this.error);
+      let embed = this.chaos.createEmbedForError(this.error);
       expect(Object.values(embed.fields).map((f) => f.name)).to.include('Stack:');
     });
 
@@ -602,7 +602,7 @@ describe('Nix', function () {
       });
 
       it('adds the extra fields', function () {
-        let embed = this.nix.createEmbedForError(this.error, this.extraFields);
+        let embed = this.chaos.createEmbedForError(this.error, this.extraFields);
         let fields = Object.values(embed.fields);
 
         this.extraFields.forEach((extraField) => {
@@ -614,12 +614,12 @@ describe('Nix', function () {
 
   describe('#onListen', function () {
     it('returns an Observable', function () {
-      expect(this.nix.onListen()).to.be.an.instanceOf(Rx.Observable);
+      expect(this.chaos.onListen()).to.be.an.instanceOf(Rx.Observable);
     });
 
     it('emits true', function (done) {
       let nextCallback = sinon.fake();
-      this.nix.onListen()
+      this.chaos.onListen()
         .subscribe(nextCallback, (error) => done(error), () => {
           expect(nextCallback).to.have.been.calledOnceWith(true);
           done();
@@ -627,21 +627,21 @@ describe('Nix', function () {
     });
 
     it('runs servicesManager onListen', function (done) {
-      sinon.spy(this.nix.servicesManager, 'onListen');
+      sinon.spy(this.chaos.servicesManager, 'onListen');
 
-      this.nix.onListen()
+      this.chaos.onListen()
         .subscribe(() => {}, (error) => done(error), () => {
-          expect(this.nix.servicesManager.onListen).to.have.been.calledOnce;
+          expect(this.chaos.servicesManager.onListen).to.have.been.calledOnce;
           done();
         });
     });
 
     it('runs pluginManager onListen', function (done) {
-      sinon.spy(this.nix.pluginManager, 'onListen');
+      sinon.spy(this.chaos.pluginManager, 'onListen');
 
-      this.nix.onListen()
+      this.chaos.onListen()
         .subscribe(() => {}, (error) => done(error), () => {
-          expect(this.nix.pluginManager.onListen).to.have.been.calledOnce;
+          expect(this.chaos.pluginManager.onListen).to.have.been.calledOnce;
           done();
         });
     });
@@ -650,117 +650,13 @@ describe('Nix', function () {
       beforeEach(function () {
         this.error = new Error('mock error');
         this.hook = sinon.fake.throws(this.error);
-        this.nix.servicesManager.onListen = this.hook;
+        this.chaos.servicesManager.onListen = this.hook;
 
-        this.nix.handleError = sinon.fake.returns(Rx.Observable.of(''));
+        this.chaos.handleError = sinon.fake.returns(Rx.Observable.of(''));
       });
 
       it('throws the error', function (done) {
-        this.nix.onListen()
-          .subscribe(() => done('next was called'), (error) => {
-              expect(error).to.eq(this.error);
-              done();
-            },
-          );
-      });
-    });
-
-    context('when the pluginManager onNixListen hook throws an error', function () {
-      beforeEach(function () {
-        this.error = new Error('mock error');
-        this.hook = sinon.fake.throws(this.error);
-        this.nix.pluginManager.onListen = this.hook;
-
-        this.nix.handleError = sinon.fake.returns(Rx.Observable.of(''));
-      });
-
-      it('throws the error', function (done) {
-        this.nix.onListen()
-          .subscribe(() => done('next was called'), (error) => {
-              expect(error).to.eq(this.error);
-              done();
-            },
-          );
-      });
-    });
-  });
-
-  describe('#onJoinGuild', function () {
-    beforeEach(function (done) {
-      this.guild = { id: 'mock_id' };
-      this.nix.handleError = sinon.fake((error) => {
-        throw error;
-      });
-
-      this.nix.servicesManager.configureServices()
-        .subscribe(() => {}, (error) => done(error), () => done());
-    });
-
-    it('returns an Observable', function () {
-      expect(this.nix.onJoinGuild(this.guild)).to.be.an.instanceOf(Rx.Observable);
-    });
-
-    it('emits true', function (done) {
-      let nextCallback = sinon.fake();
-      this.nix.onJoinGuild(this.guild)
-        .subscribe(nextCallback, (error) => done(error), () => {
-          expect(nextCallback).to.have.been.calledOnceWith(true);
-          done();
-        });
-    });
-
-    it('runs dataManager onJoinGuild', function (done) {
-      sinon.spy(this.nix.dataManager, 'onJoinGuild');
-
-      this.nix.onJoinGuild(this.guild)
-        .subscribe(() => {}, (error) => done(error), () => {
-          expect(this.nix.dataManager.onJoinGuild).to.have.been.calledOnceWith(this.guild);
-          done();
-        });
-    });
-
-    it('runs pluginService prepareDefaultData', function (done) {
-      let pluginService = this.nix.getService('core', 'pluginService');
-      sinon.spy(pluginService, 'prepareDefaultData');
-
-      this.nix.onJoinGuild(this.guild)
-        .subscribe(() => {}, (error) => done(error), () => {
-          expect(pluginService.prepareDefaultData).to.have.been.calledOnceWith(this.nix, this.guild.id);
-          done();
-        });
-    });
-
-    it('runs servicesManager onJoinGuild', function (done) {
-      sinon.spy(this.nix.servicesManager, 'onJoinGuild');
-
-      this.nix.onJoinGuild(this.guild)
-        .subscribe(() => {}, (error) => done(error), () => {
-          expect(this.nix.servicesManager.onJoinGuild).to.have.been.calledOnceWith(this.guild);
-          done();
-        });
-    });
-
-    it('runs pluginManager onJoinGuild', function (done) {
-      sinon.spy(this.nix.pluginManager, 'onJoinGuild');
-
-      this.nix.onJoinGuild(this.guild)
-        .subscribe(() => {}, (error) => done(error), () => {
-          expect(this.nix.pluginManager.onJoinGuild).to.have.been.calledOnceWith(this.guild);
-          done();
-        });
-    });
-
-    context('when the servicesManager onJoinGuild hook throws an error', function () {
-      beforeEach(function () {
-        this.error = new Error('mock error');
-        this.hook = sinon.fake.throws(this.error);
-        this.nix.servicesManager.onJoinGuild = this.hook;
-
-        this.nix.handleError = sinon.fake.returns(Rx.Observable.of(''));
-      });
-
-      it('throws the error', function (done) {
-        this.nix.onJoinGuild(this.guild)
+        this.chaos.onListen()
           .subscribe(() => done('next was called'), (error) => {
               expect(error).to.eq(this.error);
               done();
@@ -773,13 +669,117 @@ describe('Nix', function () {
       beforeEach(function () {
         this.error = new Error('mock error');
         this.hook = sinon.fake.throws(this.error);
-        this.nix.pluginManager.onJoinGuild = this.hook;
+        this.chaos.pluginManager.onListen = this.hook;
 
-        this.nix.handleError = sinon.fake.returns(Rx.Observable.of(''));
+        this.chaos.handleError = sinon.fake.returns(Rx.Observable.of(''));
       });
 
       it('throws the error', function (done) {
-        this.nix.onJoinGuild(this.guild)
+        this.chaos.onListen()
+          .subscribe(() => done('next was called'), (error) => {
+              expect(error).to.eq(this.error);
+              done();
+            },
+          );
+      });
+    });
+  });
+
+  describe('#onJoinGuild', function () {
+    beforeEach(function (done) {
+      this.guild = { id: 'mock_id' };
+      this.chaos.handleError = sinon.fake((error) => {
+        throw error;
+      });
+
+      this.chaos.servicesManager.configureServices()
+        .subscribe(() => {}, (error) => done(error), () => done());
+    });
+
+    it('returns an Observable', function () {
+      expect(this.chaos.onJoinGuild(this.guild)).to.be.an.instanceOf(Rx.Observable);
+    });
+
+    it('emits true', function (done) {
+      let nextCallback = sinon.fake();
+      this.chaos.onJoinGuild(this.guild)
+        .subscribe(nextCallback, (error) => done(error), () => {
+          expect(nextCallback).to.have.been.calledOnceWith(true);
+          done();
+        });
+    });
+
+    it('runs dataManager onJoinGuild', function (done) {
+      sinon.spy(this.chaos.dataManager, 'onJoinGuild');
+
+      this.chaos.onJoinGuild(this.guild)
+        .subscribe(() => {}, (error) => done(error), () => {
+          expect(this.chaos.dataManager.onJoinGuild).to.have.been.calledOnceWith(this.guild);
+          done();
+        });
+    });
+
+    it('runs pluginService prepareDefaultData', function (done) {
+      let pluginService = this.chaos.getService('core', 'pluginService');
+      sinon.spy(pluginService, 'prepareDefaultData');
+
+      this.chaos.onJoinGuild(this.guild)
+        .subscribe(() => {}, (error) => done(error), () => {
+          expect(pluginService.prepareDefaultData).to.have.been.calledOnceWith(this.chaos, this.guild.id);
+          done();
+        });
+    });
+
+    it('runs servicesManager onJoinGuild', function (done) {
+      sinon.spy(this.chaos.servicesManager, 'onJoinGuild');
+
+      this.chaos.onJoinGuild(this.guild)
+        .subscribe(() => {}, (error) => done(error), () => {
+          expect(this.chaos.servicesManager.onJoinGuild).to.have.been.calledOnceWith(this.guild);
+          done();
+        });
+    });
+
+    it('runs pluginManager onJoinGuild', function (done) {
+      sinon.spy(this.chaos.pluginManager, 'onJoinGuild');
+
+      this.chaos.onJoinGuild(this.guild)
+        .subscribe(() => {}, (error) => done(error), () => {
+          expect(this.chaos.pluginManager.onJoinGuild).to.have.been.calledOnceWith(this.guild);
+          done();
+        });
+    });
+
+    context('when the servicesManager onJoinGuild hook throws an error', function () {
+      beforeEach(function () {
+        this.error = new Error('mock error');
+        this.hook = sinon.fake.throws(this.error);
+        this.chaos.servicesManager.onJoinGuild = this.hook;
+
+        this.chaos.handleError = sinon.fake.returns(Rx.Observable.of(''));
+      });
+
+      it('throws the error', function (done) {
+        this.chaos.onJoinGuild(this.guild)
+          .subscribe(() => done('next was called'), (error) => {
+              expect(error).to.eq(this.error);
+              done();
+            },
+          );
+      });
+    });
+
+    context('when the pluginManager onListen hook throws an error', function () {
+      beforeEach(function () {
+        this.error = new Error('mock error');
+        this.hook = sinon.fake.throws(this.error);
+        this.chaos.pluginManager.onJoinGuild = this.hook;
+
+        this.chaos.handleError = sinon.fake.returns(Rx.Observable.of(''));
+      });
+
+      it('throws the error', function (done) {
+        this.chaos.onJoinGuild(this.guild)
           .subscribe(() => done('next was called'), (error) => {
               expect(error).to.eq(this.error);
               done();

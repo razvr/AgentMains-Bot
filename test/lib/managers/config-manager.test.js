@@ -2,13 +2,13 @@ const ConfigManager = require('../../../lib/managers/config-manager');
 
 describe('ConfigManager', function () {
   beforeEach(function () {
-    this.nix = createNixStub();
-    this.configManager = new ConfigManager(this.nix);
+    this.chaos = createNixStub();
+    this.configManager = new ConfigManager(this.chaos);
   });
 
-  describe(".nix", function () {
+  describe(".chaos", function () {
     it('returns a reference to nix', function () {
-      expect(this.configManager.nix).to.eq(this.nix);
+      expect(this.configManager.chaos).to.eq(this.chaos);
     });
   });
 

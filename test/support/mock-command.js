@@ -1,6 +1,6 @@
 class MockCommand {
   constructor() {
-    this.nix = 'mock_nix';
+    this.chaos = 'mock_nix';
     this.pluginName = 'mock_module';
     this.name = 'mockCommand';
     this.description = 'mock';

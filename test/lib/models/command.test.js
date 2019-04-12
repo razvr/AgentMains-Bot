@@ -3,14 +3,14 @@ const Command = require("../../../lib/models/command");
 
 describe('Command', function () {
   beforeEach(function () {
-    this.nix = createNixStub();
+    this.chaos = createNixStub();
     this.cmdConfig = {
       name: "testCommand",
       pluginName: "test",
       run: function () {},
     };
 
-    this.command = new Command(this.nix, this.cmdConfig);
+    this.command = new Command(this.chaos, this.cmdConfig);
   });
 
   describe('attributes', function () {
@@ -37,8 +37,8 @@ describe('Command', function () {
 
   describe('constructor', function () {
     it("assigns nix from the passed in reference", function () {
-      this.command = new Command(this.nix, this.cmdConfig);
-      expect(this.command.nix).to.eq(this.nix);
+      this.command = new Command(this.chaos, this.cmdConfig);
+      expect(this.command.chaos).to.eq(this.chaos);
     });
 
     [
@@ -58,15 +58,15 @@ describe('Command', function () {
     ].forEach(([attribute, value]) => {
       it(`assigns ${attribute} from the cmdConfig`, function () {
         this.cmdConfig[attribute] = value;
-        this.command = new Command(this.nix, this.cmdConfig);
+        this.command = new Command(this.chaos, this.cmdConfig);
         expect(this.command[attribute]).to.eq(value);
       });
     });
 
     it("ignores the chaos field from the cmdConfig", function () {
       this.cmdConfig.chaos = "notNix";
-      this.command = new Command(this.nix, this.cmdConfig);
-      expect(this.command.chaos).to.eq(this.nix);
+      this.command = new Command(this.chaos, this.cmdConfig);
+      expect(this.command.chaos).to.eq(this.chaos);
     });
 
     context('when the name is missing', function () {
@@ -75,7 +75,7 @@ describe('Command', function () {
       });
 
       it('raises an error', function () {
-        expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
+        expect(() => new Command(this.chaos, this.cmdConfig)).to.throw(
           Error, "Name for command is missing.",
         );
       });
@@ -87,7 +87,7 @@ describe('Command', function () {
       });
 
       it('raises an error', function () {
-        expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
+        expect(() => new Command(this.chaos, this.cmdConfig)).to.throw(
           Error, "Name for command is missing.",
         );
       });
@@ -99,7 +99,7 @@ describe('Command', function () {
       });
 
       it('raises an error', function () {
-        expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
+        expect(() => new Command(this.chaos, this.cmdConfig)).to.throw(
           Error, `run function for command ${this.cmdConfig.name} is missing.`,
         );
       });
@@ -111,7 +111,7 @@ describe('Command', function () {
       });
 
       it('raises an error', function () {
-        expect(() => new Command(this.nix, this.cmdConfig)).to.throw(
+        expect(() => new Command(this.chaos, this.cmdConfig)).to.throw(
           Error, `run function for command ${this.cmdConfig.name} is missing.`,
         );
       });
@@ -209,7 +209,7 @@ describe('Command', function () {
       this.context = new MockContext();
       this.response = Mockery.create("Response");
 
-      this.context.nix = this.nix;
+      this.context.chaos = this.chaos;
     });
 
     it("sends an embed type response", function () {
@@ -226,7 +226,7 @@ describe('Command', function () {
       this.context = new MockContext();
       this.response = Mockery.create("Response");
 
-      this.context.nix = this.nix;
+      this.context.chaos = this.chaos;
     });
 
     it("sends an embed type response", function () {

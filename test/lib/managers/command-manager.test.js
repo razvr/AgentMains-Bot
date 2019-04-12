@@ -2,21 +2,21 @@ const CommandManager = require("../../../lib/managers/command-manager");
 
 describe('CommandManager', function () {
   beforeEach(function () {
-    this.nix = createNixStub();
+    this.chaos = createNixStub();
 
-    this.nix.services = {
+    this.chaos.services = {
       core: {
         serviceOne: {name: "serviceOne"},
         serviceTwo: {name: "serviceTwo"},
       },
     };
 
-    this.commandManager = new CommandManager(this.nix);
+    this.commandManager = new CommandManager(this.chaos);
   });
 
-  describe(".nix", function () {
+  describe(".chaos", function () {
     it('returns the nix that the manager was created with', function () {
-      expect(this.commandManager.nix).to.eq(this.nix);
+      expect(this.commandManager.chaos).to.eq(this.chaos);
     });
   });
 

@@ -5,9 +5,9 @@ const { UserNotFoundError } = require("../../../lib/errors");
 
 describe('Service: UserService', function () {
   beforeEach(function () {
-    this.nix = createNixStub();
-    this.nix.discord = Mockery.create('Client');
-    this.userService = new UserService(this.nix);
+    this.chaos = createNixStub();
+    this.chaos.discord = Mockery.create('Client');
+    this.userService = new UserService(this.chaos);
   });
 
   describe('#findMember', function () {
@@ -16,7 +16,7 @@ describe('Service: UserService', function () {
 
     beforeEach(function () {
       this.guild = Mockery.create('Guild', {
-        client: this.nix.discord,
+        client: this.chaos.discord,
       });
     });
 
@@ -42,11 +42,11 @@ describe('Service: UserService', function () {
         context('when the member exists in the guild', function () {
           beforeEach(function () {
             this.member = Mockery.create('GuildMember', {
-              client: this.nix.discord,
+              client: this.chaos.discord,
               id: memberId,
               guild: this.guild,
               user: Mockery.create('User', {
-                client: this.nix.discord,
+                client: this.chaos.discord,
                 id: memberId,
                 tag: memberTag,
               }),
@@ -89,7 +89,7 @@ describe('Service: UserService', function () {
         context('when the user exists', function () {
           beforeEach(function () {
             this.user = Mockery.create('User', {
-              client: this.nix.discord,
+              client: this.chaos.discord,
               id: userId,
               tag: userTag,
             });

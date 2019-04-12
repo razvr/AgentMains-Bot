@@ -2,13 +2,13 @@ const PermissionsManager = require("../../../lib/managers/permissions-manager");
 
 describe('PermissionsManager', function () {
   beforeEach(function () {
-    this.nix = createNixStub();
-    this.permissionsManager = new PermissionsManager(this.nix);
+    this.chaos = createNixStub();
+    this.permissionsManager = new PermissionsManager(this.chaos);
   });
 
-  describe(".nix", function () {
+  describe(".chaos", function () {
     it('returns the nix that the manager was created with', function () {
-      expect(this.permissionsManager.nix).to.eq(this.nix);
+      expect(this.permissionsManager.chaos).to.eq(this.chaos);
     });
   });
 

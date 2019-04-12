@@ -5,16 +5,16 @@ const Service = require("../../../lib/models/service");
 
 describe('ServicesManager', function () {
   beforeEach(function () {
-    this.nix = createNixStub();
+    this.chaos = createNixStub();
 
-    this.nix.services = {
+    this.chaos.services = {
       core: {
         serviceOne: { name: "serviceOne" },
         serviceTwo: { name: "serviceTwo" },
       },
     };
 
-    this.servicesManager = new ServicesManager(this.nix);
+    this.servicesManager = new ServicesManager(this.chaos);
   });
 
   describe('constructor', function () {
@@ -67,7 +67,7 @@ describe('ServicesManager', function () {
     it('initializes the service with a reference to nix', function () {
       this.servicesManager.addService('test', TestService);
       let testService = this.servicesManager.getService('test', 'TestService');
-      expect(testService.nix).to.eq(this.nix);
+      expect(testService.chaos).to.eq(this.chaos);
     });
 
     context('when the service has already been added', function () {

@@ -3,13 +3,13 @@ const Service = require("../../../lib/models/service");
 
 describe('PluginManager', function () {
   beforeEach(function () {
-    this.nix = createNixStub();
-    this.pluginManager = new PluginManager(this.nix);
+    this.chaos = createNixStub();
+    this.pluginManager = new PluginManager(this.chaos);
   });
 
-  describe(".nix", function () {
+  describe(".chaos", function () {
     it('returns the nix reference that the manager was constructed with', function () {
-      expect(this.pluginManager.nix).to.eq(this.nix);
+      expect(this.pluginManager.chaos).to.eq(this.chaos);
     });
   });
 
@@ -105,13 +105,13 @@ describe('PluginManager', function () {
       });
 
       it('adds all services to nix', function () {
-        sinon.spy(this.nix, 'addService');
+        sinon.spy(this.chaos, 'addService');
 
         this.pluginManager.addPlugin(this.testPlugin);
 
-        expect(this.nix.addService).to.have.been
+        expect(this.chaos.addService).to.have.been
           .calledWith("TestPlugin", this.testPlugin.services[0]);
-        expect(this.nix.addService).to.have.been
+        expect(this.chaos.addService).to.have.been
           .calledWith("TestPlugin", this.testPlugin.services[1]);
       });
     });
@@ -125,13 +125,13 @@ describe('PluginManager', function () {
       });
 
       it('adds all config actions to nix', function () {
-        sinon.spy(this.nix, 'addConfigAction');
+        sinon.spy(this.chaos, 'addConfigAction');
 
         this.pluginManager.addPlugin(this.testPlugin);
 
-        expect(this.nix.addConfigAction).to.have.been
+        expect(this.chaos.addConfigAction).to.have.been
           .calledWith("TestPlugin", this.testPlugin.configActions[0]);
-        expect(this.nix.addConfigAction).to.have.been
+        expect(this.chaos.addConfigAction).to.have.been
           .calledWith("TestPlugin", this.testPlugin.configActions[1]);
       });
     });
@@ -145,13 +145,13 @@ describe('PluginManager', function () {
       });
 
       it('adds all commands to nix', function () {
-        sinon.spy(this.nix, 'addCommand');
+        sinon.spy(this.chaos, 'addCommand');
 
         this.pluginManager.addPlugin(this.testPlugin);
 
-        expect(this.nix.addCommand).to.have.been
+        expect(this.chaos.addCommand).to.have.been
           .calledWith(this.testPlugin.commands[0]);
-        expect(this.nix.addCommand).to.have.been
+        expect(this.chaos.addCommand).to.have.been
           .calledWith(this.testPlugin.commands[1]);
       });
     });
@@ -165,24 +165,24 @@ describe('PluginManager', function () {
       });
 
       it('adds all permission levels to nix', function () {
-        sinon.spy(this.nix, 'addPermissionLevel');
+        sinon.spy(this.chaos, 'addPermissionLevel');
 
         this.pluginManager.addPlugin(this.testPlugin);
 
-        expect(this.nix.addPermissionLevel).to.have.been
+        expect(this.chaos.addPermissionLevel).to.have.been
           .calledWith(this.testPlugin.permissions[0]);
-        expect(this.nix.addPermissionLevel).to.have.been
+        expect(this.chaos.addPermissionLevel).to.have.been
           .calledWith(this.testPlugin.permissions[1]);
       });
     });
   });
 
-  describe('#onNixListen', function () {
-    context('when plugins have a onNixListen hook', function () {
+  describe('#onListen', function () {
+    context('when plugins have a onListen hook', function () {
       beforeEach(function () {
-        this.testPlugin1 = { name: "TestPlugin1", onNixListen: sinon.fake() };
-        this.testPlugin2 = { name: "TestPlugin2", onNixListen: sinon.fake() };
-        this.testPlugin3 = { name: "TestPlugin3", onNixListen: sinon.fake() };
+        this.testPlugin1 = { name: "TestPlugin1", onListen: sinon.fake() };
+        this.testPlugin2 = { name: "TestPlugin2", onListen: sinon.fake() };
+        this.testPlugin3 = { name: "TestPlugin3", onListen: sinon.fake() };
 
         this.pluginManager.addPlugin(this.testPlugin1);
         this.pluginManager.addPlugin(this.testPlugin2);
@@ -193,21 +193,21 @@ describe('PluginManager', function () {
         this.pluginManager
           .onListen()
           .subscribe(() => {}, (error) => done(error), () => {
-            expect(this.testPlugin1.onNixListen).to.have.been.calledOnce;
-            expect(this.testPlugin2.onNixListen).to.have.been.calledOnce;
-            expect(this.testPlugin3.onNixListen).to.have.been.calledOnce;
+            expect(this.testPlugin1.onListen).to.have.been.calledOnce;
+            expect(this.testPlugin2.onListen).to.have.been.calledOnce;
+            expect(this.testPlugin3.onListen).to.have.been.calledOnce;
             done();
           });
       });
     });
   });
 
-  describe('#onNixJoinGuild', function () {
-    context('when plugins have a onNixJoinGuild hook', function () {
+  describe('#onJoinGuild', function () {
+    context('when plugins have a onJoinGuild hook', function () {
       beforeEach(function () {
-        this.testPlugin1 = { name: "TestPlugin1", onNixJoinGuild: sinon.fake() };
-        this.testPlugin2 = { name: "TestPlugin2", onNixJoinGuild: sinon.fake() };
-        this.testPlugin3 = { name: "TestPlugin3", onNixJoinGuild: sinon.fake() };
+        this.testPlugin1 = { name: "TestPlugin1", onJoinGuild: sinon.fake() };
+        this.testPlugin2 = { name: "TestPlugin2", onJoinGuild: sinon.fake() };
+        this.testPlugin3 = { name: "TestPlugin3", onJoinGuild: sinon.fake() };
 
         this.pluginManager.addPlugin(this.testPlugin1);
         this.pluginManager.addPlugin(this.testPlugin2);
@@ -218,9 +218,9 @@ describe('PluginManager', function () {
         this.pluginManager
           .onJoinGuild()
           .subscribe(() => {}, (error) => done(error), () => {
-            expect(this.testPlugin1.onNixJoinGuild).to.have.been.calledOnce;
-            expect(this.testPlugin2.onNixJoinGuild).to.have.been.calledOnce;
-            expect(this.testPlugin3.onNixJoinGuild).to.have.been.calledOnce;
+            expect(this.testPlugin1.onJoinGuild).to.have.been.calledOnce;
+            expect(this.testPlugin2.onJoinGuild).to.have.been.calledOnce;
+            expect(this.testPlugin3.onJoinGuild).to.have.been.calledOnce;
             done();
           });
       });

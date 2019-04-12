@@ -34,7 +34,7 @@ describe('Plugin', function () {
       ["services", {}],
       ["configActions", "value"],
       ["commands", "value"],
-      ["onNixListen", sinon.fake()],
+      ["onListen", sinon.fake()],
       ["onEnabled", sinon.fake()],
       ["onDisabled", sinon.fake()],
       ["customField", "value"],
