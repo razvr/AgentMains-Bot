@@ -6,7 +6,7 @@ const path = require('path');
 
 const observableMatchers = require('./support/observable-matchers');
 const Mockery = require('./support/mockery');
-const createNixStub = require('./support/create-nix-stub');
+const createChaosStub = require('./support/create-chaos-stub');
 
 chai.use(sinonChai);
 chai.use(observableMatchers);
@@ -20,7 +20,7 @@ global.fake = sinon.fake;
 global.mock = sinon.mock;
 
 global.Mockery = Mockery;
-global.createNixStub = createNixStub;
+global.createChaosStub = createChaosStub;
 
 let factoriesDir = path.join(__dirname, 'factories');
 glob.sync('**/*.factory.js', { cwd: factoriesDir })

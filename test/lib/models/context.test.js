@@ -3,14 +3,14 @@ const Context = require('../../../lib/models/command-context');
 
 describe('Context', function () {
   beforeEach(function () {
-    this.nix = createNixStub();
+    this.chaos = createChaosStub();
     this.message = Mockery.create("Message");
     this.command = new MockCommand();
     this.args = {};
     this.flags = {};
 
     this.context = new Context(
-      this.nix,
+      this.chaos,
       this.message,
       this.command,
       this.args,
@@ -21,7 +21,7 @@ describe('Context', function () {
   describe('constructor', function () {
     it('assigns attributes', function () {
       expect(this.context.message).to.eq(this.message);
-      expect(this.context.nix).to.eq(this.nix);
+      expect(this.context.chaos).to.eq(this.chaos);
       expect(this.context.command).to.eq(this.command);
       expect(this.context.args).to.eq(this.args);
       expect(this.context.flags).to.eq(this.flags);

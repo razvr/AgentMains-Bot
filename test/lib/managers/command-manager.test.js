@@ -2,21 +2,21 @@ const CommandManager = require("../../../lib/managers/command-manager");
 
 describe('CommandManager', function () {
   beforeEach(function () {
-    this.nix = createNixStub();
+    this.chaos = createChaosStub();
 
-    this.nix.services = {
+    this.chaos.services = {
       core: {
         serviceOne: {name: "serviceOne"},
         serviceTwo: {name: "serviceTwo"},
       },
     };
 
-    this.commandManager = new CommandManager(this.nix);
+    this.commandManager = new CommandManager(this.chaos);
   });
 
-  describe(".nix", function () {
-    it('returns the nix that the manager was created with', function () {
-      expect(this.commandManager.nix).to.eq(this.nix);
+  describe(".chaos", function () {
+    it('returns the chaos that the manager was created with', function () {
+      expect(this.commandManager.chaos).to.eq(this.chaos);
     });
   });
 
@@ -61,7 +61,7 @@ describe('CommandManager', function () {
         this.commandTwo = {moduleName: 'test', name: "commandTwo", run: () => {}};
         this.commandThree = {moduleName: 'test', name: "commandThree", run: () => {}};
 
-        this.nix.config = {
+        this.chaos.config = {
           commands: [
             this.commandOne,
             this.commandTwo,
@@ -70,7 +70,7 @@ describe('CommandManager', function () {
         };
       });
 
-      it('loads all commands from the nix config', function () {
+      it('loads all commands from the chaos config', function () {
         this.commandManager.loadCommands();
         expect(this.commandManager.commands.map((c) => c.name)).to.deep.eq([
           "commandOne",

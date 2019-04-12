@@ -10,16 +10,16 @@ const UserService = require('../../../lib/services/user-service');
 
 describe('ServicesManager', function () {
   beforeEach(function () {
-    this.nix = createNixStub();
+    this.chaos = createChaosStub();
 
-    this.nix.services = {
+    this.chaos.services = {
       core: {
         serviceOne: { name: "serviceOne" },
         serviceTwo: { name: "serviceTwo" },
       },
     };
 
-    this.servicesManager = new ServicesManager(this.nix);
+    this.servicesManager = new ServicesManager(this.chaos);
   });
 
   describe('constructor', function () {
@@ -69,10 +69,10 @@ describe('ServicesManager', function () {
       expect(this.servicesManager.getService('test', 'TestService')).to.be.an.instanceof(TestService);
     });
 
-    it('initializes the service with a reference to nix', function () {
+    it('initializes the service with a reference to chaos', function () {
       this.servicesManager.addService('test', TestService);
       let testService = this.servicesManager.getService('test', 'TestService');
-      expect(testService.nix).to.eq(this.nix);
+      expect(testService.chaos).to.eq(this.chaos);
     });
 
     context('when the service has already been added', function () {
@@ -125,7 +125,7 @@ describe('ServicesManager', function () {
       expect(this.servicesManager.addService).to.have.been.calledWith('core', UserService);
     });
 
-    context('when there are services in the nix config', function () {
+    context('when there are services in the chaos config', function () {
       class ConfigService1 extends Service {}
 
       class ConfigService2 extends Service {}
@@ -133,7 +133,7 @@ describe('ServicesManager', function () {
       class ConfigService3 extends Service {}
 
       beforeEach(function () {
-        this.nix.config.services = {
+        this.chaos.config.services = {
           test: [
             ConfigService1,
             ConfigService2,

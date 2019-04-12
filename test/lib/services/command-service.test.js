@@ -11,20 +11,20 @@ const CommandService = require('../../../lib/services/command-service');
 
 describe('CommandService', function () {
   beforeEach(function () {
-    this.nix = createNixStub();
-    this.commandService = new CommandService(this.nix);
+    this.chaos = createChaosStub();
+    this.commandService = new CommandService(this.chaos);
   });
 
   describe('#filterCanRunCommand', function () {
     beforeEach(function () {
       this.message = Mockery.create("Message");
 
-      this.command = new Command(this.nix, {
+      this.command = new Command(this.chaos, {
         name: "testCommand",
         moduleName: "testModule",
         run: () => {},
       });
-      this.context = new CommandContext(this.nix, this.message, this.command, {}, {});
+      this.context = new CommandContext(this.chaos, this.message, this.command, {}, {});
     });
 
     context('when the bot can not send a message to the channel', function() {

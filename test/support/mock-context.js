@@ -27,7 +27,7 @@ class MockContext {
       channel: "mock_channel",
     };
 
-    this.nix = "mock_nix";
+    this.chaos = "mock_chaos";
     this.command = "mock_command";
     this.args = {};
     this.flags = {};

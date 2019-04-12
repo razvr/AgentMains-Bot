@@ -6,8 +6,8 @@ const { DATAKEYS } = require('../../../lib/modules/permissions/utility');
 
 describe('PermissionsService', function () {
   beforeEach(function () {
-    this.nix = createNixStub();
-    this.permissionsService = new PermissionsService(this.nix);
+    this.chaos = createChaosStub();
+    this.permissionsService = new PermissionsService(this.chaos);
   });
 
   describe('#getDatakey', function () {
@@ -48,14 +48,14 @@ describe('PermissionsService', function () {
 
       context('when there is no data for the level', function () {
         beforeEach(function () {
-          sinon.stub(this.nix, 'getGuildData').returns(Rx.Observable.of(null));
+          sinon.stub(this.chaos, 'getGuildData').returns(Rx.Observable.of(null));
         });
 
         it('saves a default set of data', function (done) {
-          sinon.spy(this.nix, 'setGuildData');
+          sinon.spy(this.chaos, 'setGuildData');
           expect(this.permissionsService.getPermissionsData(this.guild.id, this.level))
             .to.complete(done, () => {
-              expect(this.nix.setGuildData).to.have.been.calledWith(
+              expect(this.chaos.setGuildData).to.have.been.calledWith(
                 this.guild.id,
                 `core.permissions.${this.level}`,
                 { users: [], roles: [] },
@@ -86,7 +86,7 @@ describe('PermissionsService', function () {
             users: ["user1"],
             roles: ["role1"],
           };
-          sinon.stub(this.nix, 'getGuildData').returns(Rx.Observable.of(this.data));
+          sinon.stub(this.chaos, 'getGuildData').returns(Rx.Observable.of(this.data));
         });
 
         it('emits the saved data', function (done) {
@@ -126,14 +126,14 @@ describe('PermissionsService', function () {
     context('when the permission level is known', function () {
       beforeEach(function () {
         this.level = "admin";
-        this.nix.addPermissionLevel(this.level);
+        this.chaos.addPermissionLevel(this.level);
       });
 
       it('saves the passed data to the guild data', function (done) {
-        sinon.spy(this.nix, 'setGuildData');
+        sinon.spy(this.chaos, 'setGuildData');
         expect(this.permissionsService.setPermissionsData(this.guild.id, this.level, this.data))
           .to.complete(done, () => {
-          expect(this.nix.setGuildData).to.have.been.calledWith(
+          expect(this.chaos.setGuildData).to.have.been.calledWith(
             this.guild.id,
             `core.permissions.${this.level}`,
             this.data,

@@ -3,8 +3,8 @@ const Service = require("../../../lib/models/service");
 
 describe('Service', function () {
   beforeEach(function () {
-    this.nix = {};
-    this.service = new Service(this.nix);
+    this.chaos = {};
+    this.service = new Service(this.chaos);
   });
 
   describe(".name", function () {
@@ -15,7 +15,7 @@ describe('Service', function () {
     context('when the model was extended', function() {
       beforeEach(function () {
         class TestService extends Service {}
-        this.service = new TestService(this.nix);
+        this.service = new TestService(this.chaos);
       });
 
       it('returns the service name', function () {
@@ -26,7 +26,7 @@ describe('Service', function () {
 
   describe(".chaos", function () {
     it('returns the instance of ChaosCore the service was constructed with', function () {
-      expect(this.service.chaos).to.eq(this.nix);
+      expect(this.service.chaos).to.eq(this.chaos);
     });
   });
 });

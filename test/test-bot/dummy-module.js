@@ -7,8 +7,8 @@ module.exports = {
 
     run(context, response) {},
   }],
-  onNixListen() {
+  onListen() {
   },
-  onNixJoinGuild() {
+  onJoinGuild() {
   },
 };

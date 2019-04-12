@@ -2,8 +2,8 @@ const Rx = require('rx');
 
 describe('Feature: Commands', function () {
   beforeEach(function (done) {
-    this.nix = createNixStub();
-    this.discord = this.nix.discord;
+    this.chaos = createChaosStub();
+    this.discord = this.chaos.discord;
     this.guild = Mockery.create('Guild');
 
     this.channel = Mockery.create('TextChannel', {
@@ -25,15 +25,15 @@ describe('Feature: Commands', function () {
       run: sinon.fake(),
     };
 
-    this.commandService = this.nix.getService('core', 'CommandService');
+    this.commandService = this.chaos.getService('core', 'CommandService');
     sinon.stub(this.commandService, 'canSendMessage').returns(Rx.Observable.of(true));
 
-    this.nix.listen().subscribe(() => done(), (error) => done(error));
+    this.chaos.listen().subscribe(() => done(), (error) => done(error));
   });
 
   afterEach(function (done) {
-    if (this.nix.listening) {
-      this.nix.shutdown(
+    if (this.chaos.listening) {
+      this.chaos.shutdown(
         () => done(),
         (error) => done(error),
       );
@@ -44,10 +44,10 @@ describe('Feature: Commands', function () {
 
   it('runs basic commands', function (done) {
     this.message.content = '!test';
-    this.nix.addCommand(this.command);
+    this.chaos.addCommand(this.command);
 
     this.discord.emit('message', this.message);
-    this.nix.shutdown()
+    this.chaos.shutdown()
       .do(() => expect(this.command.run).to.have.been.called)
       .subscribe(
         () => done(),
@@ -64,10 +64,10 @@ describe('Feature: Commands', function () {
       { name: 'default', default: 'value4' },
     ];
 
-    this.nix.addCommand(this.command);
+    this.chaos.addCommand(this.command);
 
     this.discord.emit('message', this.message);
-    this.nix.shutdown()
+    this.chaos.shutdown()
       .do(() => {
         expect(this.command.run).to.have.been.calledWith(sinon.match({
           args: {
@@ -88,10 +88,10 @@ describe('Feature: Commands', function () {
       { name: 'param2', required: true },
     ];
 
-    this.nix.addCommand(this.command);
+    this.chaos.addCommand(this.command);
 
     this.discord.emit('message', this.message);
-    this.nix.shutdown()
+    this.chaos.shutdown()
       .do(() => {
         expect(this.command.run).not.to.have.been.called;
         expect(this.channel.send).to.have.been.calledWith("I'm sorry, but I'm missing some information for that command:");
@@ -104,11 +104,11 @@ describe('Feature: Commands', function () {
 
     this.command.permissions = ['test'];
 
-    this.nix.addPermissionLevel('test');
-    this.nix.addCommand(this.command);
+    this.chaos.addPermissionLevel('test');
+    this.chaos.addCommand(this.command);
 
     this.discord.emit('message', this.message);
-    this.nix.shutdown()
+    this.chaos.shutdown()
       .do(() => {
         expect(this.command.run).not.to.have.been.called;
       })

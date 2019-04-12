@@ -2,7 +2,7 @@ const NixCore = require('../../index');
 const Mockery = require('./mockery');
 
 module.exports = (config = {}) => {
-  let nix = new NixCore({
+  let chaos = new NixCore({
     ownerUserId: '100000000',
     loginToken: 'example-token',
 
@@ -12,32 +12,32 @@ module.exports = (config = {}) => {
     ...config,
   });
 
-  nix.stubService = (moduleName, serviceName, service) => {
+  chaos.stubService = (moduleName, serviceName, service) => {
     let serviceKey = `${moduleName}.${serviceName}`.toLowerCase();
-    nix.servicesManager._services[serviceKey] = service;
+    chaos.servicesManager._services[serviceKey] = service;
   };
 
-  nix.handleError = (error) => {
+  chaos.handleError = (error) => {
     return new Promise((resolve, reject) => reject(error));
   };
 
-  nix.discord.user = Mockery.create('User', {
-    id: nix.config.ownerUserId,
+  chaos.discord.user = Mockery.create('User', {
+    id: chaos.config.ownerUserId,
   });
 
-  nix.discord.login = () => {
+  chaos.discord.login = () => {
     return new Promise((resolve) =>
-      resolve(nix.discord.user),
+      resolve(chaos.discord.user),
     );
   };
-  nix.discord.fetchUser = (id) => {
+  chaos.discord.fetchUser = (id) => {
     return new Promise((resolve) =>
       resolve(Mockery.create('User', { id })),
     );
   };
-  nix.discord.destroy = () => {
+  chaos.discord.destroy = () => {
     return new Promise((resolve) => resolve());
   };
 
-  return nix;
+  return chaos;
 };
