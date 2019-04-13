@@ -24,9 +24,10 @@ describe('CommandService', function () {
 
     context('when the bot can not send a message to the channel', function() {
       it('emits no elements', function (done) {
-        expect(this.commandService.filterCanRunCommand(this.context))
-          .to.emit([])
-          .and.complete(done);
+        this.commandService.filterCanRunCommand(this.context)
+          .toArray()
+          .map((emitted) => expect(emitted.length).to.eq(0))
+          .subscribe(() => done(), (error) => done(error));
       });
     });
   });
