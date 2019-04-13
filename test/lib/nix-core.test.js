@@ -211,6 +211,7 @@ describe('Nix', function () {
       });
 
       it('logs into discord', function (done) {
+        this.chaos.discord.login = sinon.fake.resolves(true);
         this.chaos.listen()
           .do(() => expect(this.chaos.discord.login).to.have.been.calledWith(this.config.loginToken))
           .subscribe(() => done(), (error) => done(error));

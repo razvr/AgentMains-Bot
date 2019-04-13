@@ -85,6 +85,7 @@ describe('Feature: Commands', function () {
 
   it('returns a help message when a command is missing required arguments', function (done) {
     this.message.content = '!test value1';
+    this.channel.send = sinon.fake.resolves(true);
     this.command.args = [
       { name: 'param1' },
       { name: 'param2', required: true },

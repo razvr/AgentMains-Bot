@@ -9,7 +9,7 @@ chaosMocks.define("Response", {
   embed: null,
   type: "mock_type",
   content: "mock_content",
-  send: sinon.fake.returns(Rx.Observable.of('')),
+  send: seq(() => () => Rx.Observable.of('')),
 });
 
 chaosMocks.define("Command");

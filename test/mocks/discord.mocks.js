@@ -8,7 +8,9 @@ discordMocks.define("Client", {
   guilds: seq(() => new Collection()),
   users: seq(() => new Collection()),
 
-  login: seq(() => sinon.fake.resolves(true)),
+  login: () => {
+    return new Promise((resolve) => resolve(true));
+  },
   fetchUser: seq(() => function (userId) {
     return new Promise((resolve, reject) => {
       if (this.users.has(userId)) {
@@ -20,9 +22,11 @@ discordMocks.define("Client", {
       }
     });
   }),
-  addEventListener: seq(() => sinon.fake()),
-  removeEventListener: seq(() => sinon.fake()),
-  destroy: seq(() => sinon.fake.resolves(true)),
+  addEventListener: () => {},
+  removeEventListener: () => {},
+  destroy: () => {
+    return new Promise((resolve) => resolve(true));
+  },
 });
 
 discordMocks.define("Guild", {
@@ -44,7 +48,7 @@ discordMocks.define("User", {
   id: seq((index) => `0000${index}`),
   tag: seq((index) => `User${index}#000${index}`),
 
-  send: sinon.fake((msg) => new Promise((resolve) => resolve(msg))),
+  send: seq(() => (msg) => new Promise((resolve) => resolve(msg))),
 }, {
   builder: (user) => {
     user.client.users.set(user.id, user);
@@ -74,8 +78,8 @@ discordMocks.define("TextChannel", {
   permissions: seq(() => new Collection()),
   type: 'text',
 
-  send: seq(() => sinon.fake((msg) => new Promise((resolve) => resolve(msg)))),
-  permissionsFor: seq(() => sinon.fake.returns(discordMocks.create("Permissions"))),
+  send: seq(() => (msg) => new Promise((resolve) => resolve(msg))),
+  permissionsFor: seq(() => () => discordMocks.create("Permissions")),
 });
 
 discordMocks.define("Message", {
@@ -83,11 +87,11 @@ discordMocks.define("Message", {
   author: seq(() => discordMocks.create('User')),
   channel: seq(() => discordMocks.create('TextChannel')),
 
-  reply: sinon.fake((msg) => new Promise((resolve) => resolve(msg))),
+  reply: (msg) => new Promise((resolve) => resolve(msg)),
 });
 
 discordMocks.define("Permissions", {
-  has: seq(() => sinon.fake.returns(false)),
+  has: () => false,
 });
 
 discordMocks.define("Role", {

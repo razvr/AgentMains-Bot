@@ -210,6 +210,7 @@ describe('Command', function () {
     beforeEach(function () {
       this.context = new MockContext();
       this.response = mocks.chaos.create("Response");
+      this.response.send = sinon.fake();
 
       this.context.chaos = this.chaos;
     });
@@ -227,6 +228,7 @@ describe('Command', function () {
     beforeEach(function () {
       this.context = new MockContext();
       this.response = mocks.chaos.create("Response");
+      this.response.send = sinon.fake();
 
       this.context.chaos = this.chaos;
     });
