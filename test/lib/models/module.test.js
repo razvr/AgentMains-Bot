@@ -11,7 +11,6 @@ describe('Plugin', function () {
     [
       "name",
       "enabledByDefault",
-      "canBeDisabled",
       "defaultData",
       "permissions",
       "services",
@@ -28,7 +27,6 @@ describe('Plugin', function () {
     [
       ["name", "value"],
       ["enabledByDefault", "value"],
-      ["canBeDisabled", "value"],
       ["defaultData", "value"],
       ["permissions", []],
       ["services", {}],
