@@ -106,7 +106,7 @@ describe('ServicesManager', function () {
     });
   });
 
-  describe('#configureServices', function () {
+  describe('#onListen', function () {
     context('when services have been added to the manager', function () {
       class ConfigurableService extends Service {
         configureService() {
@@ -129,8 +129,7 @@ describe('ServicesManager', function () {
       });
 
       it('configures all services', function (done) {
-        this.servicesManager
-          .configureServices()
+        this.servicesManager.onListen()
           .subscribe(
             () => {
               let services = [

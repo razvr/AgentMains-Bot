@@ -99,7 +99,7 @@ describe('CommandManager', function () {
     });
   });
 
-  describe('#configureCommands', function () {
+  describe('#onListen', function () {
     context('when commands have been added to the manager', function () {
       beforeEach(function () {
         this.commandManager.addCommand({
@@ -125,8 +125,7 @@ describe('CommandManager', function () {
       });
 
       it('configures all commands', function (done) {
-        this.commandManager
-          .configureCommands()
+        this.commandManager.onListen()
           .subscribe(
             () => {
               let commands = [

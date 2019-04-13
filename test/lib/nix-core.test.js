@@ -165,16 +165,16 @@ describe('Nix', function () {
 
     describe('bootstrap process', function () {
       it('configures services', function (done) {
-        sinon.spy(this.chaos.servicesManager, 'configureServices');
+        sinon.spy(this.chaos.servicesManager, 'onListen');
         this.chaos.listen()
-          .do(() => expect(this.chaos.servicesManager.configureServices).to.have.been.called)
+          .do(() => expect(this.chaos.servicesManager.onListen).to.have.been.called)
           .subscribe(() => done(), (error) => done(error));
       });
 
       context('when configuring services fails', function () {
         beforeEach(function () {
           this.error = new Error("mock error");
-          sinon.stub(this.chaos.servicesManager, 'configureServices').throws(this.error);
+          sinon.stub(this.chaos.servicesManager, 'onListen').throws(this.error);
         });
 
         it('triggers the error callback', function (done) {
@@ -187,17 +187,17 @@ describe('Nix', function () {
       });
 
       it('configures commands', function (done) {
-        sinon.spy(this.chaos.commandManager, 'configureCommands');
+        sinon.spy(this.chaos.commandManager, 'onListen');
 
         this.chaos.listen()
-          .do(() => expect(this.chaos.commandManager.configureCommands).to.have.been.called)
+          .do(() => expect(this.chaos.commandManager.onListen).to.have.been.called)
           .subscribe(() => done(), (error) => done(error));
       });
 
       context('when configuring commands fails', function () {
         beforeEach(function () {
           this.error = new Error("mock error");
-          sinon.stub(this.chaos.commandManager, 'configureCommands').throws(this.error);
+          sinon.stub(this.chaos.commandManager, 'onListen').throws(this.error);
         });
 
         it('triggers the error callback', function (done) {
@@ -686,14 +686,11 @@ describe('Nix', function () {
   });
 
   describe('#onJoinGuild', function () {
-    beforeEach(function (done) {
+    beforeEach(function () {
       this.guild = { id: 'mock_id' };
       this.chaos.handleError = sinon.fake((error) => {
         throw error;
       });
-
-      this.chaos.servicesManager.configureServices()
-        .subscribe(() => {}, (error) => done(error), () => done());
     });
 
     it('returns an Observable', function () {
