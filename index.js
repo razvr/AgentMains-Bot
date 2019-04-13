@@ -7,3 +7,8 @@ module.exports.Command = require('./lib/models/command');
 module.exports.ConfigAction = require('./lib/models/config-action');
 
 module.exports.utility = require('./lib/utility');
+
+module.exports.test = {
+  mocks: require('./test/mocks'),
+  createChaosStub: require('./test/support/create-chaos-stub'),
+};
