@@ -1,9 +1,11 @@
 const MockContext = require("../../support/mock-context");
 const Command = require("../../../lib/models/command");
+const createChaosStub = require('../../support/create-chaos-stub');
+const mocks = require("../../mocks");
 
 describe('Command', function () {
   beforeEach(function () {
-    this.chaos = createNixStub();
+    this.chaos = createChaosStub();
     this.cmdConfig = {
       name: "testCommand",
       pluginName: "test",
@@ -163,8 +165,8 @@ describe('Command', function () {
 
   describe('#execCommand', function () {
     beforeEach(function () {
-      this.context = Mockery.create("CommandContext");
-      this.response = Mockery.create("Response");
+      this.context = mocks.chaos.build("CommandContext");
+      this.response = mocks.chaos.build("Response");
     });
 
     it('calls #checkMissingArgs', function () {
@@ -207,7 +209,7 @@ describe('Command', function () {
   describe('#help', function () {
     beforeEach(function () {
       this.context = new MockContext();
-      this.response = Mockery.create("Response");
+      this.response = mocks.chaos.create("Response");
 
       this.context.chaos = this.chaos;
     });
@@ -224,7 +226,7 @@ describe('Command', function () {
   describe('#argsMissing', function () {
     beforeEach(function () {
       this.context = new MockContext();
-      this.response = Mockery.create("Response");
+      this.response = mocks.chaos.create("Response");
 
       this.context.chaos = this.chaos;
     });

@@ -1,10 +1,12 @@
 const MockCommand = require("../../support/mock-command");
 const Context = require('../../../lib/models/command-context');
+const createChaosStub = require('../../support/create-chaos-stub');
+const mocks = require('../../mocks');
 
 describe('Context', function () {
   beforeEach(function () {
-    this.chaos = createNixStub();
-    this.message = Mockery.create("Message");
+    this.chaos = createChaosStub();
+    this.message = mocks.discord.build("Message");
     this.command = new MockCommand();
     this.args = {};
     this.flags = {};

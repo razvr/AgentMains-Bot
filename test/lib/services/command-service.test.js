@@ -1,16 +1,18 @@
 const Command = require('../../../lib/models/command');
 const CommandContext = require('../../../lib/models/command-context');
 const CommandService = require('../../../lib/core-plugin/services/command-service');
+const createChaosStub = require('../../support/create-chaos-stub');
+const mocks = require('../../mocks');
 
 describe('CommandService', function () {
   beforeEach(function () {
-    this.chaos = createNixStub();
+    this.chaos = createChaosStub();
     this.commandService = new CommandService(this.chaos);
   });
 
   describe('#filterCanRunCommand', function () {
     beforeEach(function () {
-      this.message = Mockery.create("Message");
+      this.message = mocks.discord.build("Message");
 
       this.command = new Command(this.chaos, {
         name: "testCommand",

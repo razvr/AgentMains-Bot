@@ -1,8 +1,9 @@
 const PermissionsManager = require("../../../lib/managers/permissions-manager");
+const createChaosStub = require('../../support/create-chaos-stub');
 
 describe('PermissionsManager', function () {
   beforeEach(function () {
-    this.chaos = createNixStub();
+    this.chaos = createChaosStub();
     this.permissionsManager = new PermissionsManager(this.chaos);
   });
 

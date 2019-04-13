@@ -1,9 +1,10 @@
 const PluginManager = require('../../../lib/managers/plugin-manager');
 const Service = require("../../../lib/models/service");
+const createChaosStub = require('../../support/create-chaos-stub');
 
 describe('PluginManager', function () {
   beforeEach(function () {
-    this.chaos = createNixStub();
+    this.chaos = createChaosStub();
     this.pluginManager = new PluginManager(this.chaos);
   });
 
@@ -104,7 +105,7 @@ describe('PluginManager', function () {
         ];
       });
 
-      it('adds all services to nix', function () {
+      it('adds all services to chaos', function () {
         sinon.spy(this.chaos, 'addService');
 
         this.pluginManager.addPlugin(this.testPlugin);

@@ -10,9 +10,7 @@
   },
   "globals": {
     "expect": "readonly",
-    "sinon": "readonly",
-    "createNixStub": "readonly",
-    "Mockery": "readonly"
+    "sinon": "readonly"
   },
   "rules": {
     "chai-expect/missing-assertion": "error",

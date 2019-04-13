@@ -10,6 +10,7 @@ const PermissionsManager = require('../../lib/managers/permissions-manager');
 const PluginManager = require('../../lib/managers/plugin-manager');
 const Service = require("../../lib/models/service");
 const ServicesManager = require('../../lib/managers/services-manager');
+const mocks = require('../mocks');
 
 describe('Nix', function () {
   beforeEach(function () {
@@ -19,8 +20,8 @@ describe('Nix', function () {
       logger: { silent: true },
     };
 
-    this.discord = Mockery.create("Client");
-    this.owner = Mockery.create('User', {
+    this.discord = mocks.discord.build("Client");
+    this.owner = mocks.discord.build('User', {
       client: this.discord,
       id: this.config.ownerUserId,
     });

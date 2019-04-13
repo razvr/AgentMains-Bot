@@ -3,12 +3,13 @@ const DiskDataSource = require('chaos-data-disk');
 const path = require('path');
 const fs = require('fs');
 const Rx = require('rx');
+const createChaosStub = require('../../support/create-chaos-stub');
 
 const DataManager = require('../../../lib/managers/data-manager');
 
 describe('DataManager', function () {
   beforeEach(function () {
-    this.chaos = createNixStub();
+    this.chaos = createChaosStub();
     this.chaos.config = { dataSource: {} };
 
     this.dataSource = new MemoryDataSource();

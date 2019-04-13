@@ -1,17 +1,19 @@
 const Rx = require('rx');
+const createChaosStub = require('../support/create-chaos-stub');
+const mocks = require('../mocks');
 
 describe('Feature: Commands', function () {
   beforeEach(function (done) {
-    this.chaos = createNixStub();
+    this.chaos = createChaosStub();
     this.discord = this.chaos.discord;
-    this.guild = Mockery.create('Guild');
+    this.guild = mocks.discord.build('Guild');
 
-    this.channel = Mockery.create('TextChannel', {
+    this.channel = mocks.discord.build('TextChannel', {
       guild: this.guild,
     });
 
-    this.message = Mockery.create("Message", {
-      member: Mockery.create('GuildMember', {
+    this.message = mocks.discord.build("Message", {
+      member: mocks.discord.build('GuildMember', {
         guild: this.guild,
       }),
       guild: this.guild,

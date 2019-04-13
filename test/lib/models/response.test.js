@@ -1,9 +1,10 @@
 const Rx = require('rx');
 const Response = require('../../../lib/models/response');
+const mocks = require('../../mocks');
 
 describe('Response', function () {
   beforeEach(function () {
-    this.message = Mockery.create("Message");
+    this.message = mocks.discord.build("Message");
     this.response = new Response(this.message);
   });
 

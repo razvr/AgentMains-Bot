@@ -1,10 +1,11 @@
 const Rx = require('rx');
 
 const PermissionsService = require('../../../lib/core-plugin/services/permissions-service');
+const createChaosStub = require('../../support/create-chaos-stub');
 
 describe('PermissionsService', function () {
   beforeEach(function () {
-    this.chaos = createNixStub();
+    this.chaos = createChaosStub();
     this.permissionsService = new PermissionsService(this.chaos);
   });
 

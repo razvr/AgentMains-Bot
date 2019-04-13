@@ -2,11 +2,13 @@ const Rx = require('rx');
 
 const RoleService = require('../../../lib/core-plugin/services/role-service');
 const { RoleNotFoundError } = require("../../../lib/errors");
+const createChaosStub = require('../../support/create-chaos-stub');
+const mocks = require('../../mocks');
 
 describe('Service: RoleService', function () {
   beforeEach(function () {
-    this.chaos = createNixStub();
-    this.chaos.discord = Mockery.create('Client');
+    this.chaos = createChaosStub();
+    this.chaos.discord = mocks.discord.build('Client');
     this.roleService = new RoleService(this.chaos);
   });
 
@@ -15,7 +17,7 @@ describe('Service: RoleService', function () {
     const roleName = 'testRole';
 
     beforeEach(function () {
-      this.guild = Mockery.create('Guild', {
+      this.guild = mocks.discord.build('Guild', {
         client: this.chaos.discord,
       });
     });
@@ -40,7 +42,7 @@ describe('Service: RoleService', function () {
 
         context('when the role exists in the guild', function () {
           beforeEach(function () {
-            this.role = Mockery.create('Role', {
+            this.role = mocks.discord.build('Role', {
               client: this.chaos.discord,
               guild: this.guild,
               id: roleId,
