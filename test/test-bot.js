@@ -1,4 +1,9 @@
-module.exports = {
+const ChaosCore = require('../lib/chaos-core');
+const config = require('../config.js');
+
+const chaos = new ChaosCore(config);
+
+chaos.addPlugin({
   name: "dummy",
   commands: [{
     name: "dummy",
@@ -9,4 +14,6 @@ module.exports = {
       return response.send({ content: "Hello World!" });
     },
   }],
-};
+});
+
+chaos.listen();
