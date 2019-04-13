@@ -1,0 +1,66 @@
+ChaosCore Plugin API
+====================
+
+## Plugin
+
+```JS
+module.exports = {
+  // === Plugin Configuration === //
+  
+  // The name of the plugin. Used to identify where a command comes from and 
+  // namespaces services and config actions. Using a `camelCase` plugin name
+  // is highly recommended 
+  name: 'AwesomePlugin',
+  
+  // Mark this plugin as something that should be enabled by default when the 
+  // bot is added to a new guild. 
+  enabledByDefault: false,
+  
+  // Define data that should be loaded automatically when the bot joins a new
+  // guild. Useful for setting up expected data structures, or preloading some
+  // default settings. You can only store strings, arrays, or basic objects
+  // inside a dataSource.
+  //
+  // defaultData: [
+  //  { keyword: "some.key.to.the.data", data: "Any primitive value" }
+  // ]
+  defaultData: [],
+  
+  // === Plugin Features === //
+  
+  // List of new permission roles that this plugin uses. Eg. 'mod', `chaosLord`
+  // See the section on permissions to learn more.
+  permissions: [],
+  
+  // List of Services that this plugin provides. For example `ChaosService`.
+  // See the section on Services to learn more.
+  services: [],
+  
+  // List of actions that the bot admins can use use configure settings for this
+  // plugin. Such as `enableChaos`, or `setChaosColour`. See the section on 
+  // Config Actions below to learn more.
+  configActions: [],
+  
+  // List of commands that the plugin allows. See the section on Commands to
+  // learn more.
+  commands: [],
+  
+  // === Plugin Hooks === //
+  
+  // A hook for when the bot has started to listen. All other plugins, service,
+  // commands, configActions, etc... are loaded by this point.
+  onListen: () => {},
+  
+  // A hook for when the bot has joined a guild, either at startup, or when the
+  // bot has joined a new guild. 
+  onJoinGuild: (guild) => {},
+  
+  // A hook for when the plugin is enabled in a guild, either at startup, or 
+  // when the plugin is manually enabled.
+  onEnabled: (guild) => {},
+  
+  // A hook for when the plugin is disabled in a guild.
+  onDisabled: (guild) => {},
+}
+
+```
