@@ -1,5 +1,3 @@
-const Rx = require('rx');
-
 const ServicesManager = require('../../../lib/managers/services-manager');
 const Service = require("../../../lib/models/service");
 
@@ -109,11 +107,7 @@ describe('ServicesManager', function () {
   describe('#onListen', function () {
     context('when services have been added to the manager', function () {
       class ConfigurableService extends Service {
-        configureService() {
-          this.configured = true;
-
-          return Rx.Observable.of(true);
-        }
+        onListen() { this.configured = true; }
       }
 
       class ServiceOne extends ConfigurableService {}
@@ -130,22 +124,14 @@ describe('ServicesManager', function () {
 
       it('configures all services', function (done) {
         this.servicesManager.onListen()
-          .subscribe(
-            () => {
-              let services = [
-                this.servicesManager.getService('test', 'ServiceOne'),
-                this.servicesManager.getService('test', 'ServiceTwo'),
-                this.servicesManager.getService('test', 'ServiceThree'),
-              ];
-
-              expect(services.every((service) => service.configured)).to.eq(true);
-
-              done();
-            },
-            (error) => {
-              done(error);
-            },
-          );
+          .do(() => {
+            [
+              this.servicesManager.getService('test', 'ServiceOne'),
+              this.servicesManager.getService('test', 'ServiceTwo'),
+              this.servicesManager.getService('test', 'ServiceThree'),
+            ].forEach((service) => expect(service.configured).to.eq(true));
+          })
+          .subscribe(() => done(), (error) => done(error));
       });
     });
   });

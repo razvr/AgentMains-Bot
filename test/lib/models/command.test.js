@@ -15,7 +15,7 @@ describe('Command', function () {
 
   describe('attributes', function () {
     [
-      "nix",
+      "chaos",
       "pluginName",
       "name",
       "description",

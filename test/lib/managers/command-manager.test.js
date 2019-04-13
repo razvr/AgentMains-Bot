@@ -105,21 +105,21 @@ describe('CommandManager', function () {
         this.commandManager.addCommand({
           pluginName: 'test',
           name: "commandOne",
-          configureCommand() { this.configured = true; },
+          onListen() { this.configured = true; },
           run: () => {},
         });
 
         this.commandManager.addCommand({
           pluginName: 'test',
           name: "commandTwo",
-          configureCommand() { this.configured = true; },
+          onListen() { this.configured = true; },
           run: () => {},
         });
 
         this.commandManager.addCommand({
           pluginName: 'test',
           name: "commandThree",
-          configureCommand() { this.configured = true; },
+          onListen() { this.configured = true; },
           run: () => {},
         });
       });
