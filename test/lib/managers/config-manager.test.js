@@ -1,5 +1,5 @@
 const ConfigManager = require('../../../lib/managers/config-manager');
-const createChaosStub = require('../../support/create-chaos-stub');
+const createChaosStub = require('../../create-chaos-stub');
 
 describe('ConfigManager', function () {
   beforeEach(function () {

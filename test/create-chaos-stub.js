@@ -1,5 +1,5 @@
-const ChaosCore = require('../../lib/chaos-core');
-const mocks = require('../mocks');
+const ChaosCore = require('../lib/chaos-core');
+const mocks = require('./mocks');
 
 module.exports = (config = {}) => {
   let chaos = new ChaosCore({

@@ -1,5 +1,5 @@
 const Rx = require('rx');
-const createChaosStub = require('../support/create-chaos-stub');
+const createChaosStub = require('../create-chaos-stub');
 const mocks = require('../mocks');
 
 describe('Feature: Commands', function () {

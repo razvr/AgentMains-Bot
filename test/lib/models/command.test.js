@@ -1,5 +1,5 @@
 const Command = require("../../../lib/models/command");
-const createChaosStub = require('../../support/create-chaos-stub');
+const createChaosStub = require('../../create-chaos-stub');
 const mocks = require("../../mocks");
 
 describe('Command', function () {

@@ -1,6 +1,6 @@
 const ServicesManager = require('../../../lib/managers/services-manager');
 const Service = require("../../../lib/models/service");
-const createChaosStub = require('../../support/create-chaos-stub');
+const createChaosStub = require('../../create-chaos-stub');
 
 describe('ServicesManager', function () {
   beforeEach(function () {

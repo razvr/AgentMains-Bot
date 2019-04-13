@@ -1,5 +1,5 @@
 const Context = require('../../../lib/models/command-context');
-const createChaosStub = require('../../support/create-chaos-stub');
+const createChaosStub = require('../../create-chaos-stub');
 const mocks = require('../../mocks');
 
 describe('Context', function () {

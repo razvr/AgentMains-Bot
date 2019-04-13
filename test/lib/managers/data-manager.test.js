@@ -3,7 +3,7 @@ const DiskDataSource = require('chaos-data-disk');
 const path = require('path');
 const fs = require('fs');
 const Rx = require('rx');
-const createChaosStub = require('../../support/create-chaos-stub');
+const createChaosStub = require('../../create-chaos-stub');
 
 const DataManager = require('../../../lib/managers/data-manager');
 

@@ -1,7 +1,7 @@
 const Command = require('../../../lib/models/command');
 const CommandContext = require('../../../lib/models/command-context');
 const CommandService = require('../../../lib/core-plugin/services/command-service');
-const createChaosStub = require('../../support/create-chaos-stub');
+const createChaosStub = require('../../create-chaos-stub');
 const mocks = require('../../mocks');
 
 describe('CommandService', function () {

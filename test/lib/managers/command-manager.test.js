@@ -1,5 +1,5 @@
 const CommandManager = require("../../../lib/managers/command-manager");
-const createChaosStub = require('../../support/create-chaos-stub');
+const createChaosStub = require('../../create-chaos-stub');
 
 describe('CommandManager', function () {
   beforeEach(function () {

@@ -2,7 +2,7 @@ const Rx = require('rx');
 
 const UserService = require('../../../lib/core-plugin/services/user-service');
 const { UserNotFoundError } = require("../../../lib/errors");
-const createChaosStub = require('../../support/create-chaos-stub');
+const createChaosStub = require('../../create-chaos-stub');
 const mocks = require('../../mocks');
 
 describe('Service: UserService', function () {

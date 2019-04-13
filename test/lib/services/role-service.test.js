@@ -2,7 +2,7 @@ const Rx = require('rx');
 
 const RoleService = require('../../../lib/core-plugin/services/role-service');
 const { RoleNotFoundError } = require("../../../lib/errors");
-const createChaosStub = require('../../support/create-chaos-stub');
+const createChaosStub = require('../../create-chaos-stub');
 const mocks = require('../../mocks');
 
 describe('Service: RoleService', function () {
