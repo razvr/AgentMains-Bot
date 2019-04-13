@@ -1,9 +1,14 @@
 const Rx = require('rx');
 
 const Mockery = require('./mockery');
-const seq = Mockery.seq;
 const discordMocks = require('./discord.mocks');
+const seq = Mockery.seq;
+
 const chaosMocks = new Mockery();
+
+chaosMocks.define("Plugin", {
+  name: "testPlugin",
+});
 
 chaosMocks.define("Response", {
   embed: null,
@@ -12,7 +17,11 @@ chaosMocks.define("Response", {
   send: seq(() => () => Rx.Observable.of('')),
 });
 
-chaosMocks.define("Command");
+chaosMocks.define("Command", {
+  name: 'testCommand',
+  description: 'This is a test command',
+  run: () => {},
+});
 
 chaosMocks.define("CommandContext", {
   command: seq(() => chaosMocks.create('Command')),

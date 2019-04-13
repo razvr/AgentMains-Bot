@@ -125,7 +125,7 @@ describe('PluginManager', function () {
         ];
       });
 
-      it('adds all config actions to nix', function () {
+      it('adds all config actions to chaos', function () {
         sinon.spy(this.chaos, 'addConfigAction');
 
         this.pluginManager.addPlugin(this.testPlugin);
@@ -145,7 +145,7 @@ describe('PluginManager', function () {
         ];
       });
 
-      it('adds all commands to nix', function () {
+      it('adds all commands to chaos', function () {
         sinon.spy(this.chaos, 'addCommand');
 
         this.pluginManager.addPlugin(this.testPlugin);
@@ -165,7 +165,7 @@ describe('PluginManager', function () {
         ];
       });
 
-      it('adds all permission levels to nix', function () {
+      it('adds all permission levels to chaos', function () {
         sinon.spy(this.chaos, 'addPermissionLevel');
 
         this.pluginManager.addPlugin(this.testPlugin);
