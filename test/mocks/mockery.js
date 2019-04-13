@@ -4,7 +4,6 @@ class Mockery {
 
     this.define = this.define.bind(this);
     this.create = this.create.bind(this);
-    this.seq = this.seq.bind(this);
   }
 
   define(name, defaultProps={}, options={}) {
@@ -23,6 +22,10 @@ class Mockery {
   }
 
   create(name, props={}) {
+    return this.build(name, props);
+  }
+
+  build(name, props={}) {
     let factory = this._factories[name];
     if (!factory) { throw new Error(`Unknown factory ${name}`); }
 
@@ -41,7 +44,7 @@ class Mockery {
     return factory.builder(props);
   }
 
-  seq(next) {
+  static seq(next) {
     return new Sequence(next);
   }
 }
@@ -58,4 +61,4 @@ class Sequence {
   }
 }
 
-module.exports = new Mockery();
+module.exports = Mockery;
