@@ -1,4 +1,3 @@
-const MockContext = require("../../support/mock-context");
 const Command = require("../../../lib/models/command");
 const createChaosStub = require('../../support/create-chaos-stub');
 const mocks = require("../../mocks");
@@ -208,7 +207,7 @@ describe('Command', function () {
 
   describe('#help', function () {
     beforeEach(function () {
-      this.context = new MockContext();
+      this.context = mocks.chaos.create("CommandContext");
       this.response = mocks.chaos.create("Response");
       this.response.send = sinon.fake();
 
@@ -226,7 +225,7 @@ describe('Command', function () {
 
   describe('#argsMissing', function () {
     beforeEach(function () {
-      this.context = new MockContext();
+      this.context = mocks.chaos.create("CommandContext");
       this.response = mocks.chaos.create("Response");
       this.response.send = sinon.fake();
 
