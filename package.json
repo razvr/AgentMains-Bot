@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "start": "npm run bot",
-    "bot": "node --preserve-symlinks ./test/test-bot/index.js",
+    "bot": "node --preserve-symlinks ./test/test-bot.js",
     "test": "mocha",
     "lint": "eslint .",
     "lint-watch": "esw . -w",
