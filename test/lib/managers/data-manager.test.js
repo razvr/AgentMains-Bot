@@ -19,13 +19,13 @@ describe('DataManager', function () {
   });
 
   describe(".chaos", function () {
-    it('returns a reference to nix', function () {
+    it('returns a reference to ChaosCore', function () {
       expect(this.dataManager.chaos).to.eq(this.chaos);
     });
   });
 
   describe('constructor', function () {
-    context('when no datasource is in the nix config', function() {
+    context('when no datasource is in the ChaosCore config', function () {
       beforeEach(function () {
         delete this.chaos.config.dataSource;
       });
@@ -36,7 +36,7 @@ describe('DataManager', function () {
       });
     });
 
-    context('when a datasource is specified in the nix config', function() {
+    context('when a datasource is specified in the ChaosCore config', function () {
       context('when the npm module is installed', function () {
         beforeEach(function () {
           this.tmpDir = path.resolve(__dirname, "../../tmp");

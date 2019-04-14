@@ -5,14 +5,14 @@ const CommandManager = require('../../lib/managers/command-manager');
 const ConfigManager = require('../../lib/managers/config-manager');
 const corePlugin = require('../../lib/core-plugin');
 const DataManager = require('../../lib/managers/data-manager');
-const Nix = require('../../lib/chaos-core');
+const ChaosCore = require('../../lib/chaos-core');
 const PermissionsManager = require('../../lib/managers/permissions-manager');
 const PluginManager = require('../../lib/managers/plugin-manager');
 const Service = require("../../lib/models/service");
 const ServicesManager = require('../../lib/managers/services-manager');
 const mocks = require('../mocks');
 
-describe('Nix', function () {
+describe('ChaosCore', function () {
   beforeEach(function () {
     this.config = {
       ownerUserId: "mock_ownerUserId",
@@ -26,7 +26,7 @@ describe('Nix', function () {
       id: this.config.ownerUserId,
     });
 
-    this.chaos = new Nix(this.config);
+    this.chaos = new ChaosCore(this.config);
     this.chaos.discord = this.discord;
   });
 
@@ -43,7 +43,7 @@ describe('Nix', function () {
     it('verifies the config', function () {
       this.config = { verifyConfig: sinon.fake() };
 
-      this.chaos = new Nix(this.config);
+      this.chaos = new ChaosCore(this.config);
       expect(this.config.verifyConfig).to.have.been.called;
     });
 
@@ -53,7 +53,7 @@ describe('Nix', function () {
 
     describe('creates and binds managers', function () {
       beforeEach(function () {
-        this.chaos = new Nix(this.config);
+        this.chaos = new ChaosCore(this.config);
       });
 
       it('creates and binds a DataManager', function () {
@@ -98,12 +98,12 @@ describe('Nix', function () {
         test: () => 'test_string',
       };
 
-      this.chaos = new Nix(this.config);
+      this.chaos = new ChaosCore(this.config);
       expect(this.chaos.responseStrings.test).to.eq(this.config.responseStrings.test);
     });
 
     it('loads the core plugin', function () {
-      this.chaos = new Nix(this.config);
+      this.chaos = new ChaosCore(this.config);
       const loadedPlugins = this.chaos.pluginManager.plugins;
       expect(loadedPlugins.map((p) => p.name)).to.include(corePlugin.name);
     });
@@ -111,7 +111,7 @@ describe('Nix', function () {
     it('loads plugins from the config', function () {
       this.config.plugins = [{ name: 'testPlugin' }];
 
-      this.chaos = new Nix(this.config);
+      this.chaos = new ChaosCore(this.config);
 
       const loadedPlugins = this.chaos.pluginManager.plugins;
       expect(loadedPlugins.map((p) => p.name)).to.include('testPlugin');
@@ -122,7 +122,7 @@ describe('Nix', function () {
 
       this.config.services = { 'testPlugin': [TestService] };
 
-      this.chaos = new Nix(this.config);
+      this.chaos = new ChaosCore(this.config);
 
       let testService = this.chaos.getService('testPlugin', 'TestService');
       expect(testService).to.be.an.instanceOf(TestService);
@@ -134,7 +134,7 @@ describe('Nix', function () {
         run: () => {},
       }];
 
-      this.chaos = new Nix(this.config);
+      this.chaos = new ChaosCore(this.config);
 
       expect(this.chaos.getCommand('testCommand')).not.to.be.undefined;
     });
@@ -288,7 +288,7 @@ describe('Nix', function () {
           .subscribe(() => done(), (error) => done(error));
       });
 
-      it('starts nix related event streams', function (done) {
+      it('starts ChaosCore related event streams', function (done) {
         this.chaos.listen()
           .do(() => expect(this.chaos.streams.command$).to.be.an.instanceOf(Rx.Observable))
           .subscribe(() => done(), (error) => done(error));
@@ -320,7 +320,7 @@ describe('Nix', function () {
   });
 
   describe('#shutdown', function () {
-    context('when nix is listening', function () {
+    context('when ChaosCore is listening', function () {
       beforeEach(function () {
         this.ready$ = this.chaos.listen();
       });
@@ -334,7 +334,7 @@ describe('Nix', function () {
       });
     });
 
-    context('when nix is not listening', function () {
+    context('when ChaosCore is not listening', function () {
       it('throws an error', function () {
         expect(() => this.chaos.shutdown()).to.throw(
           Error, "Bot is not listening",

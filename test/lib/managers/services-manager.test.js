@@ -63,7 +63,7 @@ describe('ServicesManager', function () {
       expect(this.servicesManager.getService('test', 'TestService')).to.be.an.instanceof(TestService);
     });
 
-    it('initializes the service with a reference to nix', function () {
+    it('initializes the service with a reference to ChaosCore', function () {
       this.servicesManager.addService('test', TestService);
       let testService = this.servicesManager.getService('test', 'TestService');
       expect(testService.chaos).to.eq(this.chaos);

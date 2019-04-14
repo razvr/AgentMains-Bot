@@ -8,7 +8,7 @@ describe('ConfigManager', function () {
   });
 
   describe(".chaos", function () {
-    it('returns a reference to nix', function () {
+    it('returns a reference to ChaosCore', function () {
       expect(this.configManager.chaos).to.eq(this.chaos);
     });
   });

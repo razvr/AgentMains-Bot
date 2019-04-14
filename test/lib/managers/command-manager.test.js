@@ -16,7 +16,7 @@ describe('CommandManager', function () {
   });
 
   describe(".chaos", function () {
-    it('returns the nix that the manager was created with', function () {
+    it('returns the ChaosCore that the manager was created with', function () {
       expect(this.commandManager.chaos).to.eq(this.chaos);
     });
   });

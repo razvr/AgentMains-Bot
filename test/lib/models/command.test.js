@@ -37,7 +37,7 @@ describe('Command', function () {
   });
 
   describe('constructor', function () {
-    it("assigns nix from the passed in reference", function () {
+    it("assigns ChaosCore from the passed in reference", function () {
       this.command = new Command(this.chaos, this.cmdConfig);
       expect(this.command.chaos).to.eq(this.chaos);
     });
@@ -65,7 +65,7 @@ describe('Command', function () {
     });
 
     it("ignores the chaos field from the cmdConfig", function () {
-      this.cmdConfig.chaos = "notNix";
+      this.cmdConfig.chaos = "notChaosCore";
       this.command = new Command(this.chaos, this.cmdConfig);
       expect(this.command.chaos).to.eq(this.chaos);
     });

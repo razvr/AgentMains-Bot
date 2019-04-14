@@ -9,7 +9,7 @@ describe('PluginManager', function () {
   });
 
   describe(".chaos", function () {
-    it('returns the nix reference that the manager was constructed with', function () {
+    it('returns the ChaosCore reference that the manager was constructed with', function () {
       expect(this.pluginManager.chaos).to.eq(this.chaos);
     });
   });

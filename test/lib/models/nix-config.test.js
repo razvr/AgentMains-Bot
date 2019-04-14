@@ -1,13 +1,13 @@
-const NixConfig = require('../../../lib/models/chaos-config');
+const ChaosConfig = require('../../../lib/models/chaos-config');
 
-describe('NixConfig', function () {
+describe('ChaosConfig', function () {
   beforeEach(function () {
     this.options = {
       ownerUserId: "mock_ownerId",
       loginToken: "mock_loginToken",
     };
 
-    this.chaosConfig = new NixConfig(this.options);
+    this.chaosConfig = new ChaosConfig(this.options);
   });
 
   describe('attributes', function () {
@@ -47,7 +47,7 @@ describe('NixConfig', function () {
     ].forEach(([attribute, value]) => {
       it(`assigns ${attribute} from the options`, function () {
         this.options[attribute] = value;
-        this.chaosConfig = new NixConfig(this.options);
+        this.chaosConfig = new ChaosConfig(this.options);
         expect(this.chaosConfig[attribute]).to.eq(value);
       });
     });
@@ -69,7 +69,7 @@ describe('NixConfig', function () {
 
       it('throws an error', function () {
         expect(() => this.chaosConfig.verifyConfig()).to.throw(
-          NixConfig.InvalidConfigError, "ownerUserId is required",
+          ChaosConfig.InvalidConfigError, "ownerUserId is required",
         );
       });
     });
@@ -81,7 +81,7 @@ describe('NixConfig', function () {
 
       it('throws an error', function () {
         expect(() => this.chaosConfig.verifyConfig()).to.throw(
-          NixConfig.InvalidConfigError, "loginToken is required",
+          ChaosConfig.InvalidConfigError, "loginToken is required",
         );
       });
     });
