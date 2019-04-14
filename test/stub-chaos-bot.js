@@ -1,3 +1,5 @@
+const Rx = require('rx');
+
 const mocks = require('./mocks');
 
 module.exports = (chaosBot) => {
@@ -7,7 +9,7 @@ module.exports = (chaosBot) => {
   };
 
   chaosBot.handleError = (error) => {
-    return new Promise((resolve, reject) => reject(error));
+    return Rx.Observable.throw(error);
   };
 
   chaosBot.discord.login = () => {
