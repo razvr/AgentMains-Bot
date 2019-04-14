@@ -10,5 +10,5 @@ module.exports.utility = require('./lib/utility');
 
 module.exports.test = {
   mocks: require('./test/mocks'),
-  stub: require('./test/stub-chaos-bot'),
+  stubChaosBot: require('./test/stub-chaos-bot'),
 };
