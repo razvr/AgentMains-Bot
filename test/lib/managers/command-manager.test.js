@@ -86,7 +86,7 @@ describe('CommandManager', function () {
         this.commandManager.addCommand(this.command);
       });
 
-      it('returns the module', function () {
+      it('returns the plugin', function () {
         expect(this.commandManager.getCommand('commandOne').name).to.eq("commandOne");
       });
     });

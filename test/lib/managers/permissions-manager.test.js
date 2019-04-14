@@ -66,7 +66,7 @@ describe('PermissionsManager', function () {
         this.permissionsManager.addPermissionLevel("testOne");
       });
 
-      it('returns the module', function () {
+      it('returns the plugin', function () {
         expect(this.permissionsManager.getPermissionLevel('testOne')).to.eq("testOne");
       });
 

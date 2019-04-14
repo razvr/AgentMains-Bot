@@ -23,44 +23,44 @@ describe('PluginManager', function () {
 
     context('when plugins have been added', function () {
       beforeEach(function () {
-        this.moduleOne = { name: "moduleOne" };
-        this.moduleTwo = { name: "moduleTwo" };
-        this.moduleThree = { name: "moduleThree" };
+        this.pluginOne = { name: "pluginOne" };
+        this.pluginTwo = { name: "pluginTwo" };
+        this.pluginThree = { name: "pluginThree" };
 
-        this.pluginManager.addPlugin(this.moduleOne);
-        this.pluginManager.addPlugin(this.moduleTwo);
-        this.pluginManager.addPlugin(this.moduleThree);
+        this.pluginManager.addPlugin(this.pluginOne);
+        this.pluginManager.addPlugin(this.pluginTwo);
+        this.pluginManager.addPlugin(this.pluginThree);
       });
 
       it('returns a list of all added plugins', function () {
         expect(this.pluginManager.plugins.map((m) => m.name)).to.deep.eq([
-          "moduleOne",
-          "moduleTwo",
-          "moduleThree",
+          "pluginOne",
+          "pluginTwo",
+          "pluginThree",
         ]);
       });
     });
   });
 
   describe("constructor", function () {
-    it('initializes the manager with an empty module list', function () {
+    it('initializes the manager with an empty plugin list', function () {
       expect(this.pluginManager.plugins).to.deep.eq([]);
     });
   });
 
   describe("#getPlugin", function () {
-    context('when the module has been added', function () {
+    context('when the plugin has been added', function () {
       beforeEach(function () {
         this.testPlugin = { name: "TestPlugin" };
         this.pluginManager.addPlugin(this.testPlugin);
       });
 
-      it('returns the module', function () {
+      it('returns the plugin', function () {
         expect(this.pluginManager.getPlugin('TestPlugin').name).to.eq("TestPlugin");
       });
     });
 
-    context('when the module has not been added', function () {
+    context('when the plugin has not been added', function () {
       it('raises an error', function () {
         expect(() => this.pluginManager.getPlugin('TestPlugin')).to.throw(
           Error, "Plugin 'TestPlugin' could not be found.",
@@ -74,12 +74,12 @@ describe('PluginManager', function () {
       this.testPlugin = { name: "TestPlugin" };
     });
 
-    it('makes the module retrievable via #getPlugin', function () {
+    it('makes the plugin retrievable via #getPlugin', function () {
       this.pluginManager.addPlugin(this.testPlugin);
       expect(this.pluginManager.getPlugin('TestPlugin').name).to.eq("TestPlugin");
     });
 
-    context('when the module has already been added', function () {
+    context('when the plugin has already been added', function () {
       beforeEach(function () {
         this.pluginManager.addPlugin(this.testPlugin);
       });
@@ -91,7 +91,7 @@ describe('PluginManager', function () {
       });
     });
 
-    context('when the module has services', function () {
+    context('when the plugin has services', function () {
       class ServiceOne extends Service {
       }
 
@@ -117,7 +117,7 @@ describe('PluginManager', function () {
       });
     });
 
-    context('when the module has config actions', function () {
+    context('when the plugin has config actions', function () {
       beforeEach(function () {
         this.testPlugin.configActions = [
           { name: "testActionOne" },
@@ -137,7 +137,7 @@ describe('PluginManager', function () {
       });
     });
 
-    context('when the module has commands', function () {
+    context('when the plugin has commands', function () {
       beforeEach(function () {
         this.testPlugin.commands = [
           { name: "testActionOne", run: sinon.fake() },
@@ -157,7 +157,7 @@ describe('PluginManager', function () {
       });
     });
 
-    context('when the module has new permission levels', function () {
+    context('when the plugin has new permission levels', function () {
       beforeEach(function () {
         this.testPlugin.permissions = [
           "test1",

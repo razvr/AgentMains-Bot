@@ -3,8 +3,8 @@ const Rx = require('rx');
 const mocks = require('./mocks');
 
 module.exports = (chaosBot) => {
-  chaosBot.stubService = (moduleName, serviceName, service) => {
-    let serviceKey = `${moduleName}.${serviceName}`.toLowerCase();
+  chaosBot.stubService = (pluginName, serviceName, service) => {
+    let serviceKey = `${pluginName}.${serviceName}`.toLowerCase();
     chaosBot.servicesManager._services[serviceKey] = service;
   };
 

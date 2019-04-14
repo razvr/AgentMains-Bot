@@ -42,7 +42,7 @@ describe('ConfigManager', function () {
   });
 
   describe("constructor", function () {
-    it('initializes the manager with an empty module list', function () {
+    it('initializes the manager with an empty plugin list', function () {
       expect(this.configManager.actions).to.deep.eq([]);
     });
   });
@@ -54,7 +54,7 @@ describe('ConfigManager', function () {
         this.configManager.addConfigAction('test', this.testAction);
       });
 
-      it('returns the module', function () {
+      it('returns the plugin', function () {
         expect(this.configManager.getConfigAction('test', 'testAction').name)
           .to.eq("testAction");
       });
@@ -74,12 +74,12 @@ describe('ConfigManager', function () {
       this.testAction = {name: "testAction"};
     });
 
-    it('makes the module retrievable via #getPlugin', function () {
+    it('makes the plugin retrievable via #getPlugin', function () {
       this.configManager.addConfigAction('test', this.testAction);
       expect(this.configManager.getConfigAction('test', 'testAction').name).to.eq("testAction");
     });
 
-    context('when the module has already been added', function () {
+    context('when the plugin has already been added', function () {
       beforeEach(function () {
         this.configManager.addConfigAction('test', this.testAction);
       });
