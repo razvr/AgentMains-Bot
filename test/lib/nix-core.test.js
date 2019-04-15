@@ -718,17 +718,6 @@ describe('ChaosCore', function () {
         });
     });
 
-    it('runs pluginService prepareDefaultData', function (done) {
-      let pluginService = this.chaos.getService('core', 'pluginService');
-      sinon.spy(pluginService, 'prepareDefaultData');
-
-      this.chaos.onJoinGuild(this.guild)
-        .subscribe(() => {}, (error) => done(error), () => {
-          expect(pluginService.prepareDefaultData).to.have.been.calledOnceWith(this.chaos, this.guild.id);
-          done();
-        });
-    });
-
     it('runs servicesManager onJoinGuild', function (done) {
       sinon.spy(this.chaos.servicesManager, 'onJoinGuild');
 

@@ -1,6 +1,7 @@
 const PluginManager = require('../../../lib/managers/plugin-manager');
 const Service = require("../../../lib/models/service");
 const createChaosStub = require('../../create-chaos-stub');
+const mocks = require('../../mocks');
 
 describe('PluginManager', function () {
   beforeEach(function () {
@@ -204,20 +205,35 @@ describe('PluginManager', function () {
   });
 
   describe('#onJoinGuild', function () {
+    beforeEach(function () {
+      this.guild = mocks.discord.build("Guild");
+    });
+
     context('when plugins have a onJoinGuild hook', function () {
       beforeEach(function () {
-        this.testPlugin1 = { name: "TestPlugin1", onJoinGuild: sinon.fake() };
-        this.testPlugin2 = { name: "TestPlugin2", onJoinGuild: sinon.fake() };
-        this.testPlugin3 = { name: "TestPlugin3", onJoinGuild: sinon.fake() };
+        this.testPlugin1 = { name: "TestPlugin1", onJoinGuild: sinon.fake(), prepareData: sinon.fake() };
+        this.testPlugin2 = { name: "TestPlugin2", onJoinGuild: sinon.fake(), prepareData: sinon.fake() };
+        this.testPlugin3 = { name: "TestPlugin3", onJoinGuild: sinon.fake(), prepareData: sinon.fake() };
 
         this.pluginManager.addPlugin(this.testPlugin1);
         this.pluginManager.addPlugin(this.testPlugin2);
         this.pluginManager.addPlugin(this.testPlugin3);
       });
 
-      it('triggers the hook for each', function (done) {
+      it('triggers #prepareData for each', function (done) {
         this.pluginManager
-          .onJoinGuild()
+          .onJoinGuild(this.guild)
+          .subscribe(() => {}, (error) => done(error), () => {
+            expect(this.testPlugin1.prepareData).to.have.been.calledOnce;
+            expect(this.testPlugin2.prepareData).to.have.been.calledOnce;
+            expect(this.testPlugin3.prepareData).to.have.been.calledOnce;
+            done();
+          });
+      });
+
+      it('triggers #onJoinGuild for each', function (done) {
+        this.pluginManager
+          .onJoinGuild(this.guild)
           .subscribe(() => {}, (error) => done(error), () => {
             expect(this.testPlugin1.onJoinGuild).to.have.been.calledOnce;
             expect(this.testPlugin2.onJoinGuild).to.have.been.calledOnce;

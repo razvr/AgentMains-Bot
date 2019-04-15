@@ -5,6 +5,9 @@ const chaos = new ChaosCore(config);
 
 chaos.addPlugin({
   name: "dummy",
+  defaultData: [
+    { keyword: "test.dummy", data: null },
+  ],
   commands: [{
     name: "dummy",
     description: "Test command",
