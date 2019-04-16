@@ -1,7 +1,6 @@
 const Rx = require('rx');
 
 const Mockery = require('./mockery');
-const discordMocks = require('./discord.mocks');
 const seq = Mockery.seq;
 
 const chaosMocks = new Mockery();
@@ -26,7 +25,6 @@ chaosMocks.define("Command", {
 chaosMocks.define("CommandContext", {
   command: seq(() => chaosMocks.create('Command')),
   flags: seq(() => ({})),
-  message: seq(() => discordMocks.create('Message')),
 });
 
 module.exports = chaosMocks;

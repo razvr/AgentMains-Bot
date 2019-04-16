@@ -20,11 +20,14 @@ describe('ChaosCore', function () {
       logger: { silent: true },
     };
 
-    this.discord = mocks.discord.build("Client");
-    this.owner = mocks.discord.build('User', {
+    this.discord = new mocks.discord.Client({});
+    this.owner = new mocks.discord.User({
       client: this.discord,
-      id: this.config.ownerUserId,
+      data: {
+        id: this.config.ownerUserId,
+      },
     });
+    this.discord.users.set(this.owner.id, this.owner);
 
     this.chaos = new ChaosCore(this.config);
     this.chaos.discord = this.discord;

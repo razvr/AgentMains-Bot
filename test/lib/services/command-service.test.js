@@ -1,3 +1,4 @@
+const Discord = require('discord.js');
 const Command = require('../../../lib/models/command');
 const CommandContext = require('../../../lib/models/command-context');
 const CommandService = require('../../../lib/core-plugin/services/command-service');
@@ -12,7 +13,9 @@ describe('CommandService', function () {
 
   describe('#filterCanRunCommand', function () {
     beforeEach(function () {
-      this.message = mocks.discord.build("Message");
+      this.message = new mocks.discord.Message({
+        client: this.chaos.discord,
+      });
 
       this.command = new Command(this.chaos, {
         name: "testCommand",
@@ -23,6 +26,17 @@ describe('CommandService', function () {
     });
 
     context('when the bot can not send a message to the channel', function() {
+      beforeEach(function () {
+        this.channel = this.message.channel;
+        this.channel.permissionsFor = (memberOrRole) => {
+          if (memberOrRole.id === this.chaos.discord.user.id) {
+            return new Discord.Permissions([]);
+          } else {
+            return null;
+          }
+        };
+      });
+
       it('emits no elements', function (done) {
         this.commandService.filterCanRunCommand(this.context)
           .toArray()

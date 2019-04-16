@@ -1,4 +1,5 @@
 const Rx = require('rx');
+const Discord = require('discord.js');
 
 const mocks = require('./mocks');
 
@@ -25,25 +26,31 @@ module.exports = (chaosBot) => {
   };
 
   chaosBot.discord.fetchUser = (id) => {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       if (chaosBot.discord.users.has(id)) {
         return resolve(chaosBot.discord.users.get(id));
       } else {
-        const user = mocks.discord.build('User', {
-          client: chaosBot.discord,
-          id,
-        });
-
-        chaosBot.discord.users.set(user.id, user);
-
-        return resolve(chaosBot.discord.users.get(id));
+        return reject(new Discord.DiscordAPIError(`/api/v7/users/${id}`, {
+          message: "Unknown User",
+        }));
       }
     });
   };
 
-  chaosBot.discord.destroy = () => {
-    return new Promise((resolve) => resolve());
-  };
+  chaosBot.discord.destroy = () => new Promise((resolve) => resolve(""));
+
+  const owner = new mocks.discord.User({
+    client: chaosBot.discord,
+    data: {
+      id: chaosBot.config.ownerUserId,
+    },
+  });
+  chaosBot.discord.users.set(owner.id, owner);
+
+  const user = new mocks.discord.User({
+    client: chaosBot.discord,
+  });
+  chaosBot.discord.user = user;
 
   return chaosBot;
 };

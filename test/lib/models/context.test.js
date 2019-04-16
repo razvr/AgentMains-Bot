@@ -5,7 +5,12 @@ const mocks = require('../../mocks');
 describe('Context', function () {
   beforeEach(function () {
     this.chaos = createChaosStub();
-    this.message = mocks.discord.build("Message");
+
+    this.message = new mocks.discord.Message({
+      client: this.chaos.discord,
+      data: {},
+    });
+
     this.context = mocks.chaos.create("Command");
     this.args = {};
     this.flags = {};

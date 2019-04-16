@@ -206,7 +206,9 @@ describe('PluginManager', function () {
 
   describe('#onJoinGuild', function () {
     beforeEach(function () {
-      this.guild = mocks.discord.build("Guild");
+      this.guild = new mocks.discord.Guild({
+        client: this.chaos.discord,
+      });
     });
 
     context('when plugins have a onJoinGuild hook', function () {

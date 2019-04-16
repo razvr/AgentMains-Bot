@@ -6,18 +6,21 @@ describe('Feature: Commands', function () {
   beforeEach(function (done) {
     this.chaos = createChaosStub();
     this.discord = this.chaos.discord;
-    this.guild = mocks.discord.build('Guild');
-
-    this.channel = mocks.discord.build('TextChannel', {
-      guild: this.guild,
+    this.guild = new mocks.discord.Guild({
+      client: this.discord,
     });
 
-    this.message = mocks.discord.build("Message", {
-      member: mocks.discord.build('GuildMember', {
-        guild: this.guild,
-      }),
+    this.channel = new mocks.discord.TextChannel({
       guild: this.guild,
+      data: {
+        name: 'testChannel',
+      },
+    });
+
+    this.message = new mocks.discord.Message({
       channel: this.channel,
+      client: this.discord,
+      data: {},
     });
 
     this.command = {
@@ -112,9 +115,7 @@ describe('Feature: Commands', function () {
 
     this.discord.emit('message', this.message);
     this.chaos.shutdown()
-      .do(() => {
-        expect(this.command.run).not.to.have.been.called;
-      })
+      .do(() => expect(this.command.run).not.to.have.been.called)
       .subscribe(() => done(), (error) => done(error));
   });
 });

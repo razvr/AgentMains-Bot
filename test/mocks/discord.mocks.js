@@ -1,110 +1,168 @@
-const { Collection, DiscordAPIError } = require('discord.js');
-const Mockery = require('./mockery');
-const seq = Mockery.seq;
+const Discord = require('discord.js');
 
-const discordMocks = new Mockery();
+class MockClient extends Discord.Client {
+  constructor({ data }) {
+    super(data);
+  }
 
-discordMocks.define("Client", {
-  guilds: seq(() => new Collection()),
-  users: seq(() => new Collection()),
-
-  login: () => {
+  login() {
     return new Promise((resolve) => resolve(true));
-  },
-  fetchUser: seq(() => function (userId) {
+  }
+
+  fetchUser(userId) {
     return new Promise((resolve, reject) => {
       if (this.users.has(userId)) {
         resolve(this.users.get(userId));
       } else {
-        reject(new DiscordAPIError("/api/v7/users/99999", {
+        reject(new Discord.DiscordAPIError("/api/v7/users/99999", {
           message: "Unknown User",
         }));
       }
     });
-  }),
-  addEventListener: () => {},
-  removeEventListener: () => {},
-  destroy: () => {
-    return new Promise((resolve) => resolve(true));
-  },
-});
+  }
+}
 
-discordMocks.define("Guild", {
-  client: seq(() => discordMocks.create('Client')),
-  id: seq((index) => `0000${index}`),
-  ownerID: seq((_, { client }) => discordMocks.create('User', { client }).id),
+class MockGuild extends Discord.Guild {
+  constructor({ client, data = {} }) {
+    super(
+      client,
+      {
+        id: Discord.SnowflakeUtil.generate(),
+        emojis: [],
+        ...data,
+      },
+    );
 
-  members: seq(() => new Collection()),
-  roles: seq(() => new Collection()),
-}, {
-  builder: (guild) => {
-    guild.client.guilds.set(guild.id, guild);
-    return guild;
-  },
-});
+    this.client.guilds.set(this.id, this);
+  }
+}
 
-discordMocks.define("User", {
-  client: seq(() => discordMocks.create('Client')),
-  id: seq((index) => `0000${index}`),
-  tag: seq((index) => `User${index}#000${index}`),
-
-  send: seq(() => (msg) => new Promise((resolve) => resolve(msg))),
-}, {
-  builder: (user) => {
-    user.client.users.set(user.id, user);
-    return user;
-  },
-});
-
-discordMocks.define("GuildMember", {
-  client: seq(() => discordMocks.create('Client')),
-  user: seq((_, { client }) => discordMocks.create('User', { client })),
-  guild: seq((_, { client }) => discordMocks.create('Guild', { client })),
-
-  roles: [],
-}, {
-  builder: (member) => {
-    if (!member.id) {
-      member.id = member.user.id;
+class MockUser extends Discord.User {
+  constructor({ client, data = {} }) {
+    if (data.tag) {
+      const [username, discriminator] = data.tag.split('#');
+      data.username = username;
+      data.discriminator = discriminator;
+      delete data.tag;
     }
 
-    member.guild.members.set(member.id, member);
+    super(
+      client,
+      {
+        id: Discord.SnowflakeUtil.generate(),
+        ...data,
+      },
+    );
 
-    return member;
-  },
-});
+    this.client.users.set(this.id, this);
+  }
 
-discordMocks.define("TextChannel", {
-  permissions: seq(() => new Collection()),
-  type: 'text',
+  send(msg) {
+    return new Promise((resolve) => resolve(msg));
+  }
+}
 
-  send: seq(() => (msg) => new Promise((resolve) => resolve(msg))),
-  permissionsFor: seq(() => () => discordMocks.create("Permissions")),
-});
+class MockRole extends Discord.Role {
+  constructor({ guild, data = {} }) {
+    super(
+      guild,
+      {
+        id: Discord.SnowflakeUtil.generate(),
+        ...data,
+      },
+    );
 
-discordMocks.define("Message", {
-  content: 'This is a message.',
-  author: seq(() => discordMocks.create('User')),
-  channel: seq(() => discordMocks.create('TextChannel')),
+    this.guild.roles.set(this.id, this);
+  }
+}
 
-  reply: (msg) => new Promise((resolve) => resolve(msg)),
-});
+class MockTextChannel extends Discord.TextChannel {
+  constructor({ guild, data = {}, client }) {
+    if (!guild) {
+      if (!client) {
+        client = new MockClient({});
+      }
+      guild = new MockGuild({ client });
+    }
 
-discordMocks.define("Permissions", {
-  has: () => false,
-});
+    super(
+      guild,
+      {
+        id: Discord.SnowflakeUtil.generate(),
+        ...data,
+      },
+    );
 
-discordMocks.define("Role", {
-  id: seq((index) => `0000${index}`),
-  name: seq((index) => `testRole${index}`),
+    this.guild.channels.set(this.id, this);
+  }
 
-  client: seq(() => discordMocks.create('Client')),
-  guild: seq((_, { client }) => discordMocks.create('Guild', { client })),
-}, {
-  builder: (role) => {
-    role.guild.roles.set(role.id, role);
-    return role;
-  },
-});
+  send(msg) {
+    return new Promise((resolve) => resolve(msg));
+  }
+}
 
-module.exports = discordMocks;
+class MockGuildMember extends Discord.GuildMember {
+  constructor({ guild, data = {} }) {
+    if (!data.user) {
+      data.user = new MockUser({
+        client: guild.client,
+      });
+    }
+
+    super(
+      guild,
+      {
+        id: Discord.SnowflakeUtil.generate(),
+        roles: [],
+        ...data,
+      },
+    );
+
+    this.guild.members.set(this.id, this);
+  }
+}
+
+class MockMessage extends Discord.Message {
+  constructor({ channel, data = {}, client }) {
+    if (!client) {
+      client = new MockClient({});
+    }
+
+    if (!channel) {
+      channel = new MockTextChannel({ client });
+    }
+
+    if (!data.author) {
+      data.author = new MockUser({
+        client: client,
+      });
+    }
+
+    if (channel.guild) {
+      new MockGuildMember({
+        guild: channel.guild,
+        data: {
+          user: data.author,
+        },
+      });
+    }
+
+    data = {
+      embeds: [],
+      attachments: [],
+      ...data,
+    };
+
+    super(channel, data, client);
+  }
+}
+
+module.exports = {
+  Client: MockClient,
+  Guild: MockGuild,
+  GuildMember: MockGuildMember,
+  Message: MockMessage,
+  Role: MockRole,
+  TextChannel: MockTextChannel,
+  User: MockUser,
+};

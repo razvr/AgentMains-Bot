@@ -4,7 +4,7 @@ const mocks = require('../../mocks');
 
 describe('Response', function () {
   beforeEach(function () {
-    this.message = mocks.discord.build("Message");
+    this.message = new mocks.discord.Message({});
     this.response = new Response(this.message);
   });
 

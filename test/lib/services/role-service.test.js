@@ -8,7 +8,7 @@ const mocks = require('../../mocks');
 describe('Service: RoleService', function () {
   beforeEach(function () {
     this.chaos = createChaosStub();
-    this.chaos.discord = mocks.discord.build('Client');
+    this.chaos.discord = new mocks.discord.Client({});
     this.roleService = new RoleService(this.chaos);
   });
 
@@ -17,7 +17,7 @@ describe('Service: RoleService', function () {
     const roleName = 'testRole';
 
     beforeEach(function () {
-      this.guild = mocks.discord.build('Guild', {
+      this.guild = new mocks.discord.Guild({
         client: this.chaos.discord,
       });
     });
@@ -42,11 +42,12 @@ describe('Service: RoleService', function () {
 
         context('when the role exists in the guild', function () {
           beforeEach(function () {
-            this.role = mocks.discord.build('Role', {
-              client: this.chaos.discord,
+            this.role = new mocks.discord.Role({
               guild: this.guild,
-              id: roleId,
-              name: roleName,
+              data: {
+                id: roleId,
+                name: roleName,
+              },
             });
           });
 

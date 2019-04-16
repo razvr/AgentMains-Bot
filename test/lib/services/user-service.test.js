@@ -1,4 +1,5 @@
 const Rx = require('rx');
+const Discord = require('discord.js');
 
 const UserService = require('../../../lib/core-plugin/services/user-service');
 const { UserNotFoundError } = require("../../../lib/errors");
@@ -8,16 +9,15 @@ const mocks = require('../../mocks');
 describe('Service: UserService', function () {
   beforeEach(function () {
     this.chaos = createChaosStub();
-    this.chaos.discord = mocks.discord.build('Client');
     this.userService = new UserService(this.chaos);
   });
 
   describe('#findMember', function () {
-    const memberId = '000001';
+    const memberId = Discord.SnowflakeUtil.generate();
     const memberTag = 'TestUser#0001';
 
     beforeEach(function () {
-      this.guild = mocks.discord.build('Guild', {
+      this.guild = new mocks.discord.Guild({
         client: this.chaos.discord,
       });
     });
@@ -43,16 +43,23 @@ describe('Service: UserService', function () {
 
         context('when the member exists in the guild', function () {
           beforeEach(function () {
-            this.member = mocks.discord.build('GuildMember', {
+            this.user = new mocks.discord.User({
               client: this.chaos.discord,
-              id: memberId,
-              guild: this.guild,
-              user: mocks.discord.build('User', {
-                client: this.chaos.discord,
+              data: {
                 id: memberId,
                 tag: memberTag,
-              }),
+              },
             });
+
+            this.member = new mocks.discord.GuildMember({
+              guild: this.guild,
+              data: {
+                user: this.user,
+              },
+            });
+
+            this.chaos.discord.users.set(this.user.id, this.user);
+            this.guild.members.set(this.member.id, this.member);
           });
 
           it('emits the found member', function (done) {
@@ -66,7 +73,7 @@ describe('Service: UserService', function () {
   });
 
   describe('#findUser', function () {
-    const userId = '000001';
+    const userId = Discord.SnowflakeUtil.generate();
     const userTag = 'TestUser#0001';
 
     Object.entries({
@@ -84,18 +91,23 @@ describe('Service: UserService', function () {
                 expect(error.message).to.eq(`The user '${userString}' could not be found`);
                 return Rx.Observable.empty();
               })
-              .subscribe(() => done(new Error('Error was not raised')), (error) => done(error), () => done());
+              .flatMap(() => Rx.Observable.throw(new Error('Error was not raised')))
+              .subscribe(() => {}, done, done);
           });
         });
 
         context('when the user exists', function () {
           beforeEach(function () {
-            this.user = mocks.discord.build('User', {
+            this.user = new mocks.discord.User({
               client: this.chaos.discord,
-              id: userId,
-              tag: userTag,
+              data: {
+                id: userId,
+                tag: userTag,
+              },
             });
+            this.chaos.discord.users.set(this.user.id, this.user);
           });
+
           it('emits the found user', function (done) {
             this.userService.findUser(userString)
               .toArray()
