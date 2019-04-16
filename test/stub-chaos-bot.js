@@ -15,14 +15,12 @@ module.exports = (chaosBot) => {
 
   chaosBot.discord.login = () => {
     if (!chaosBot.discord.user) {
-      return chaosBot.discord.fetchUser(chaosBot.config.ownerUserId)
-        .then((user) => {
-          chaosBot.discord.user = user;
-          return "";
-        });
-    } else {
-      return new Promise((resolve) => resolve(""));
+      chaosBot.discord.user = new mocks.discord.ClientUser({
+        client: chaosBot.discord,
+      });
     }
+
+    return new Promise((resolve) => resolve(""));
   };
 
   chaosBot.discord.fetchUser = (id) => {
@@ -46,11 +44,6 @@ module.exports = (chaosBot) => {
     },
   });
   chaosBot.discord.users.set(owner.id, owner);
-
-  const user = new mocks.discord.User({
-    client: chaosBot.discord,
-  });
-  chaosBot.discord.user = user;
 
   return chaosBot;
 };

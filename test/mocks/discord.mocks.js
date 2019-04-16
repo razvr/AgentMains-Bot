@@ -22,6 +22,31 @@ class MockClient extends Discord.Client {
   }
 }
 
+class MockClientUser extends Discord.ClientUser {
+  constructor({ client, data = {} }) {
+    if (data.tag) {
+      const [username, discriminator] = data.tag.split('#');
+      data.username = username;
+      data.discriminator = discriminator;
+      delete data.tag;
+    }
+
+    super(
+      client,
+      {
+        id: Discord.SnowflakeUtil.generate(),
+        ...data,
+      },
+    );
+
+    this.client.users.set(this.id, this);
+  }
+
+  send(msg) {
+    return new Promise((resolve) => resolve(msg));
+  }
+}
+
 class MockGuild extends Discord.Guild {
   constructor({ client, data = {} }) {
     super(
@@ -159,6 +184,7 @@ class MockMessage extends Discord.Message {
 
 module.exports = {
   Client: MockClient,
+  ClientUser: MockClientUser,
   Guild: MockGuild,
   GuildMember: MockGuildMember,
   Message: MockMessage,

@@ -6,9 +6,10 @@ const createChaosStub = require('../../create-chaos-stub');
 const mocks = require('../../mocks');
 
 describe('CommandService', function () {
-  beforeEach(function () {
+  beforeEach(function (done) {
     this.chaos = createChaosStub();
     this.commandService = new CommandService(this.chaos);
+    this.chaos.discord.login().then(() => done());
   });
 
   describe('#filterCanRunCommand', function () {
