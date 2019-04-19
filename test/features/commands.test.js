@@ -4,7 +4,7 @@ const mocks = require('../mocks');
 
 describe('Feature: Commands', function () {
   beforeEach(function (done) {
-    this.chaos = createChaosStub();
+    this.chaos = createChaosStub({ logger: { level: 'debug' } });
     this.discord = this.chaos.discord;
     this.guild = new mocks.discord.Guild({
       client: this.discord,
@@ -23,17 +23,27 @@ describe('Feature: Commands', function () {
       data: {},
     });
 
+    this.plugin = {
+      name: "test-plugin",
+      commands: [],
+    };
+
     this.command = {
       name: "test",
-      pluginName: 'core',
+      pluginName: this.plugin.name,
       args: [],
       run: sinon.fake(),
     };
 
     this.commandService = this.chaos.getService('core', 'CommandService');
+    this.pluginService = this.chaos.getService('core', 'pluginService');
     sinon.stub(this.commandService, 'canSendMessage').returns(Rx.Observable.of(true));
 
-    this.chaos.listen().subscribe(() => done(), (error) => done(error));
+    this.chaos.addPlugin(this.plugin);
+
+    this.chaos.listen()
+      .flatMap(() => this.pluginService.enablePlugin(this.guild.id, this.plugin.name))
+      .subscribe(() => done(), (error) => done(error));
   });
 
   afterEach(function (done) {
@@ -49,6 +59,7 @@ describe('Feature: Commands', function () {
 
   it('runs basic commands', function (done) {
     this.message.content = '!test';
+
     this.chaos.addCommand(this.command);
 
     this.discord.emit('message', this.message);
@@ -109,13 +120,50 @@ describe('Feature: Commands', function () {
     this.message.content = '!test';
 
     this.command.permissions = ['test'];
-
     this.chaos.addPermissionLevel('test');
     this.chaos.addCommand(this.command);
 
     this.discord.emit('message', this.message);
     this.chaos.shutdown()
       .do(() => expect(this.command.run).not.to.have.been.called)
+      .subscribe(() => done(), (error) => done(error));
+  });
+
+  it('does not run commands that part of disabled plugins', function (done) {
+    this.message.content = '!test';
+
+    this.chaos.addCommand(this.command);
+
+    Rx.Observable.of('')
+      .flatMap(() => this.pluginService.disablePlugin(this.guild.id, this.plugin.name))
+      .do(() => this.discord.emit('message', this.message))
+      .flatMap(() => this.chaos.shutdown())
+      .do(() => expect(this.command.run).not.to.have.been.called)
+      .subscribe(() => done(), (error) => done(error));
+  });
+
+  it('does not run commands that are explicitly disabled', function (done) {
+    this.message.content = '!test';
+
+    this.chaos.addCommand(this.command);
+
+    Rx.Observable.of('')
+      .flatMap(() => this.commandService.disableCommand(this.message.guild.id, this.command.name))
+      .do(() => this.discord.emit('message', this.message))
+      .flatMap(() => this.chaos.shutdown())
+      .do(() => expect(this.command.run).not.to.have.been.called)
+      .subscribe(() => done(), (error) => done(error));
+  });
+
+  it('runs commands that are not explicitly disabled', function (done) {
+    this.message.content = '!test';
+
+    this.chaos.addCommand(this.command);
+
+    Rx.Observable.of('')
+      .do(() => this.discord.emit('message', this.message))
+      .flatMap(() => this.chaos.shutdown())
+      .do(() => expect(this.command.run).to.have.been.called)
       .subscribe(() => done(), (error) => done(error));
   });
 });
