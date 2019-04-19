@@ -1,4 +1,5 @@
 const ConfigManager = require('../../../lib/managers/config-manager');
+const createChaosStub = require('../../create-chaos-stub');
 
 describe('ConfigManager', function () {
   beforeEach(function () {
@@ -7,19 +8,19 @@ describe('ConfigManager', function () {
   });
 
   describe(".chaos", function () {
-    it('returns a reference to chaos', function () {
+    it('returns a reference to ChaosCore', function () {
       expect(this.configManager.chaos).to.eq(this.chaos);
     });
   });
 
   describe('.actions', function () {
-    context('when no modules have been added', function () {
-      it('returns an empty list of modules', function () {
+    context('when no plugins have been added', function () {
+      it('returns an empty list of plugins', function () {
         expect(this.configManager.actions).to.deep.eq([]);
       });
     });
 
-    context('when modules have been added', function () {
+    context('when plugins have been added', function () {
       beforeEach(function () {
         this.actionOne = {name: "actionOne"};
         this.actionTwo = {name: "actionTwo"};
@@ -41,7 +42,7 @@ describe('ConfigManager', function () {
   });
 
   describe("constructor", function () {
-    it('initializes the manager with an empty module list', function () {
+    it('initializes the manager with an empty plugin list', function () {
       expect(this.configManager.actions).to.deep.eq([]);
     });
   });
@@ -53,7 +54,7 @@ describe('ConfigManager', function () {
         this.configManager.addConfigAction('test', this.testAction);
       });
 
-      it('returns the module', function () {
+      it('returns the plugin', function () {
         expect(this.configManager.getConfigAction('test', 'testAction').name)
           .to.eq("testAction");
       });
@@ -73,12 +74,12 @@ describe('ConfigManager', function () {
       this.testAction = {name: "testAction"};
     });
 
-    it('makes the module retrievable via #getModule', function () {
+    it('makes the plugin retrievable via #getPlugin', function () {
       this.configManager.addConfigAction('test', this.testAction);
       expect(this.configManager.getConfigAction('test', 'testAction').name).to.eq("testAction");
     });
 
-    context('when the module has already been added', function () {
+    context('when the plugin has already been added', function () {
       beforeEach(function () {
         this.configManager.addConfigAction('test', this.testAction);
       });

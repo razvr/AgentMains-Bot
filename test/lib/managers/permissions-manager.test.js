@@ -1,4 +1,5 @@
 const PermissionsManager = require("../../../lib/managers/permissions-manager");
+const createChaosStub = require('../../create-chaos-stub');
 
 describe('PermissionsManager', function () {
   beforeEach(function () {
@@ -7,7 +8,7 @@ describe('PermissionsManager', function () {
   });
 
   describe(".chaos", function () {
-    it('returns the chaos that the manager was created with', function () {
+    it('returns the ChaosCore that the manager was created with', function () {
       expect(this.permissionsManager.chaos).to.eq(this.chaos);
     });
   });
@@ -19,14 +20,14 @@ describe('PermissionsManager', function () {
       });
     });
 
-    context('when modules have been added', function () {
+    context('when plugins have been added', function () {
       beforeEach(function () {
         this.permissionsManager.addPermissionLevel("testOne");
         this.permissionsManager.addPermissionLevel("testTwo");
         this.permissionsManager.addPermissionLevel("testThree");
       });
 
-      it('returns a list of all added modules', function () {
+      it('returns a list of all added plugins', function () {
         expect(this.permissionsManager.levels).to.deep.eq([
           "testOne",
           "testTwo",
@@ -65,7 +66,7 @@ describe('PermissionsManager', function () {
         this.permissionsManager.addPermissionLevel("testOne");
       });
 
-      it('returns the module', function () {
+      it('returns the plugin', function () {
         expect(this.permissionsManager.getPermissionLevel('testOne')).to.eq("testOne");
       });
 

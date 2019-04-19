@@ -1,12 +1,6 @@
-const Rx = require('rx');
-
 const ServicesManager = require('../../../lib/managers/services-manager');
 const Service = require("../../../lib/models/service");
-
-const ModuleService = require('../../../lib/services/module-service');
-const CommandService = require('../../../lib/services/command-service');
-const PermissionsService = require('../../../lib/services/permissions-service');
-const UserService = require('../../../lib/services/user-service');
+const createChaosStub = require('../../create-chaos-stub');
 
 describe('ServicesManager', function () {
   beforeEach(function () {
@@ -69,7 +63,7 @@ describe('ServicesManager', function () {
       expect(this.servicesManager.getService('test', 'TestService')).to.be.an.instanceof(TestService);
     });
 
-    it('initializes the service with a reference to chaos', function () {
+    it('initializes the service with a reference to ChaosCore', function () {
       this.servicesManager.addService('test', TestService);
       let testService = this.servicesManager.getService('test', 'TestService');
       expect(testService.chaos).to.eq(this.chaos);
@@ -111,55 +105,10 @@ describe('ServicesManager', function () {
     });
   });
 
-  describe('#loadServices', function () {
-    beforeEach(function () {
-      sinon.spy(this.servicesManager, 'addService');
-    });
-
-    it('loads all core services', function () {
-      this.servicesManager.loadServices();
-
-      expect(this.servicesManager.addService).to.have.been.calledWith('core', ModuleService);
-      expect(this.servicesManager.addService).to.have.been.calledWith('core', CommandService);
-      expect(this.servicesManager.addService).to.have.been.calledWith('core', PermissionsService);
-      expect(this.servicesManager.addService).to.have.been.calledWith('core', UserService);
-    });
-
-    context('when there are services in the chaos config', function () {
-      class ConfigService1 extends Service {}
-
-      class ConfigService2 extends Service {}
-
-      class ConfigService3 extends Service {}
-
-      beforeEach(function () {
-        this.chaos.config.services = {
-          test: [
-            ConfigService1,
-            ConfigService2,
-            ConfigService3,
-          ],
-        };
-      });
-
-      it('loads services from the config', function () {
-        this.servicesManager.loadServices();
-
-        expect(this.servicesManager.addService).to.have.been.calledWith('test', ConfigService1);
-        expect(this.servicesManager.addService).to.have.been.calledWith('test', ConfigService2);
-        expect(this.servicesManager.addService).to.have.been.calledWith('test', ConfigService3);
-      });
-    });
-  });
-
-  describe('#configureServices', function () {
+  describe('#onListen', function () {
     context('when services have been added to the manager', function () {
       class ConfigurableService extends Service {
-        configureService() {
-          this.configured = true;
-
-          return Rx.Observable.of(true);
-        }
+        onListen() { this.configured = true; }
       }
 
       class ServiceOne extends ConfigurableService {}
@@ -175,24 +124,15 @@ describe('ServicesManager', function () {
       });
 
       it('configures all services', function (done) {
-        this.servicesManager
-          .configureServices()
-          .subscribe(
-            () => {
-              let services = [
-                this.servicesManager.getService('test', 'ServiceOne'),
-                this.servicesManager.getService('test', 'ServiceTwo'),
-                this.servicesManager.getService('test', 'ServiceThree'),
-              ];
-
-              expect(services.every((service) => service.configured)).to.eq(true);
-
-              done();
-            },
-            (error) => {
-              done(error);
-            },
-          );
+        this.servicesManager.onListen()
+          .do(() => {
+            [
+              this.servicesManager.getService('test', 'ServiceOne'),
+              this.servicesManager.getService('test', 'ServiceTwo'),
+              this.servicesManager.getService('test', 'ServiceThree'),
+            ].forEach((service) => expect(service.configured).to.eq(true));
+          })
+          .subscribe(() => done(), (error) => done(error));
       });
     });
   });

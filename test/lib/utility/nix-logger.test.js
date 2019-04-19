@@ -1,9 +1,9 @@
-const NixLogger = require("../../../lib/utility/chaos-logger");
+const ChaosLogger = require("../../../lib/chaos-logger");
 
-describe('NixLogger', function () {
+describe('ChaosLogger', function () {
   describe('::createLogger', function () {
     it('Creates an logger', function () {
-      let logger = NixLogger.createLogger({});
+      let logger = ChaosLogger.createLogger({});
 
       expect(logger).to.respondTo("error");
       expect(logger).to.respondTo("warn");
@@ -17,11 +17,11 @@ describe('NixLogger', function () {
 
   describe('::.logLevels', function () {
     it('returns levels', function () {
-      expect(NixLogger.logLevels.levels).to.not.be.undefined;
+      expect(ChaosLogger.logLevels.levels).to.not.be.undefined;
     });
 
     it('returns colours', function () {
-      expect(NixLogger.logLevels.colors).to.not.be.undefined;
+      expect(ChaosLogger.logLevels.colors).to.not.be.undefined;
     });
   });
 });

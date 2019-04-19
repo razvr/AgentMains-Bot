@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/nix-core.iml" filepath="$PROJECT_DIR$/.idea/nix-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/chaos-core.iml" filepath="$PROJECT_DIR$/.idea/chaos-core.iml" />
     </modules>
   </component>
 </project>

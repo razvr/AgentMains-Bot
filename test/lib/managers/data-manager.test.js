@@ -3,6 +3,7 @@ const DiskDataSource = require('chaos-data-disk');
 const path = require('path');
 const fs = require('fs');
 const Rx = require('rx');
+const createChaosStub = require('../../create-chaos-stub');
 
 const DataManager = require('../../../lib/managers/data-manager');
 
@@ -18,13 +19,13 @@ describe('DataManager', function () {
   });
 
   describe(".chaos", function () {
-    it('returns a reference to chaos', function () {
+    it('returns a reference to ChaosCore', function () {
       expect(this.dataManager.chaos).to.eq(this.chaos);
     });
   });
 
   describe('constructor', function () {
-    context('when no datasource is in the chaos config', function() {
+    context('when no datasource is in the ChaosCore config', function () {
       beforeEach(function () {
         delete this.chaos.config.dataSource;
       });
@@ -35,7 +36,7 @@ describe('DataManager', function () {
       });
     });
 
-    context('when a datasource is specified in the chaos config', function() {
+    context('when a datasource is specified in the ChaosCore config', function () {
       context('when the npm module is installed', function () {
         beforeEach(function () {
           this.tmpDir = path.resolve(__dirname, "../../tmp");
@@ -102,7 +103,7 @@ describe('DataManager', function () {
         this.dataSource.onListen = sinon.fake.returns(Rx.Observable.of(true));
       });
 
-      it("calls the datasource's onNixListen", function () {
+      it("calls the datasource's onListen", function () {
         let hook$ = this.dataManager.onListen();
         expect(hook$).to.be.an.instanceOf(Rx.Observable);
         expect(this.dataManager._dataSource.onListen).to.have.been.called;
@@ -137,7 +138,7 @@ describe('DataManager', function () {
         this.dataSource.onJoinGuild = sinon.fake.returns(Rx.Observable.of(true));
       });
 
-      it("calls the datasource's onNixListen", function () {
+      it("calls the datasource's onJoinGuild", function () {
         let hook$ = this.dataManager.onJoinGuild();
         expect(hook$).to.be.an.instanceOf(Rx.Observable);
         expect(this.dataManager._dataSource.onJoinGuild).to.have.been.called;

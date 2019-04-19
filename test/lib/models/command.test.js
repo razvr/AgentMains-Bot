@@ -1,12 +1,13 @@
-const MockContext = require("../../support/mock-context");
 const Command = require("../../../lib/models/command");
+const createChaosStub = require('../../create-chaos-stub');
+const mocks = require("../../mocks");
 
 describe('Command', function () {
   beforeEach(function () {
     this.chaos = createChaosStub();
     this.cmdConfig = {
       name: "testCommand",
-      moduleName: "test",
+      pluginName: "test",
       run: function () {},
     };
 
@@ -16,14 +17,13 @@ describe('Command', function () {
   describe('attributes', function () {
     [
       "chaos",
-      "moduleName",
+      "pluginName",
       "name",
       "description",
       "run",
       "ownerOnly",
       "adminOnly",
       "permissions",
-      "enabledByDefault",
       "showInHelp",
       "flags",
       "args",
@@ -36,20 +36,19 @@ describe('Command', function () {
   });
 
   describe('constructor', function () {
-    it("assigns chaos from the passed in reference", function () {
+    it("assigns ChaosCore from the passed in reference", function () {
       this.command = new Command(this.chaos, this.cmdConfig);
       expect(this.command.chaos).to.eq(this.chaos);
     });
 
     [
-      ["moduleName", "value"],
+      ["pluginName", "value"],
       ["name", "value"],
       ["description", "value"],
       ["run", sinon.fake()],
       ["ownerOnly", "value"],
       ["adminOnly", "value"],
       ["permissions", "value"],
-      ["enabledByDefault", "value"],
       ["showInHelp", "value"],
       ["flags", []],
       ["args", []],
@@ -64,7 +63,7 @@ describe('Command', function () {
     });
 
     it("ignores the chaos field from the cmdConfig", function () {
-      this.cmdConfig.chaos = "notNix";
+      this.cmdConfig.chaos = "notChaosCore";
       this.command = new Command(this.chaos, this.cmdConfig);
       expect(this.command.chaos).to.eq(this.chaos);
     });
@@ -89,30 +88,6 @@ describe('Command', function () {
       it('raises an error', function () {
         expect(() => new Command(this.chaos, this.cmdConfig)).to.throw(
           Error, "Name for command is missing.",
-        );
-      });
-    });
-
-    context('when the module name is missing', function () {
-      beforeEach(function () {
-        delete this.cmdConfig.moduleName;
-      });
-
-      it('raises an error', function () {
-        expect(() => new Command(this.chaos, this.cmdConfig)).to.throw(
-          Error, `moduleName for command ${this.cmdConfig.name} is missing.`,
-        );
-      });
-    });
-
-    context('when the module name not a string', function () {
-      beforeEach(function () {
-        this.cmdConfig.moduleName = {};
-      });
-
-      it('raises an error', function () {
-        expect(() => new Command(this.chaos, this.cmdConfig)).to.throw(
-          Error, `moduleName for command ${this.cmdConfig.name} is missing.`,
         );
       });
     });
@@ -187,8 +162,8 @@ describe('Command', function () {
 
   describe('#execCommand', function () {
     beforeEach(function () {
-      this.context = Mockery.create("CommandContext");
-      this.response = Mockery.create("Response");
+      this.context = mocks.chaos.build("CommandContext");
+      this.response = mocks.chaos.build("Response");
     });
 
     it('calls #checkMissingArgs', function () {
@@ -230,8 +205,9 @@ describe('Command', function () {
 
   describe('#help', function () {
     beforeEach(function () {
-      this.context = new MockContext();
-      this.response = Mockery.create("Response");
+      this.context = mocks.chaos.create("CommandContext");
+      this.response = mocks.chaos.create("Response");
+      this.response.send = sinon.fake();
 
       this.context.chaos = this.chaos;
     });
@@ -247,8 +223,9 @@ describe('Command', function () {
 
   describe('#argsMissing', function () {
     beforeEach(function () {
-      this.context = new MockContext();
-      this.response = Mockery.create("Response");
+      this.context = mocks.chaos.create("CommandContext");
+      this.response = mocks.chaos.create("Response");
+      this.response.send = sinon.fake();
 
       this.context.chaos = this.chaos;
     });

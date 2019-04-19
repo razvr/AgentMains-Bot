@@ -1,4 +1,3 @@
-const Rx = require('rx');
 const Service = require("../../../lib/models/service");
 
 describe('Service', function () {

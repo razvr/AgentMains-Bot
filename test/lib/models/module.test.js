@@ -1,17 +1,15 @@
-const Module = require('../../../lib/models/module');
+const Plugin = require('../../../lib/models/plugin');
 
-describe('Module', function () {
+describe('Plugin', function () {
   beforeEach(function () {
     this.options = {name: "test"};
 
-    this.module = new Module(this.options);
+    this.module = new Plugin(this.options);
   });
 
   describe('attributes', function () {
     [
       "name",
-      "enabledByDefault",
-      "canBeDisabled",
       "defaultData",
       "permissions",
       "services",
@@ -27,21 +25,19 @@ describe('Module', function () {
   describe('constructor', function () {
     [
       ["name", "value"],
-      ["enabledByDefault", "value"],
-      ["canBeDisabled", "value"],
       ["defaultData", "value"],
       ["permissions", []],
       ["services", {}],
       ["configActions", "value"],
       ["commands", "value"],
-      ["onNixListen", sinon.fake()],
+      ["onListen", sinon.fake()],
       ["onEnabled", sinon.fake()],
       ["onDisabled", sinon.fake()],
       ["customField", "value"],
     ].forEach(([attribute, value]) => {
       it(`assigns ${attribute} from the options`, function () {
         this.options[attribute] = value;
-        this.module = new Module(this.options);
+        this.module = new Plugin(this.options);
         expect(this.module[attribute]).to.eq(value);
       });
     });
