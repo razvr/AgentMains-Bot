@@ -12,9 +12,8 @@ module.exports = {
   // is highly recommended 
   name: 'AwesomePlugin',
   
-  // Mark this plugin as something that should be enabled by default when the 
-  // bot is added to a new guild. 
-  enabledByDefault: false,
+  // A description of the plugin. Used when listing plugins.
+  description: 'This Plugin does awesome things.',
   
   // Define data that should be loaded automatically when the bot joins a new
   // guild. Useful for setting up expected data structures, or preloading some

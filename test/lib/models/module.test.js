@@ -10,7 +10,6 @@ describe('Plugin', function () {
   describe('attributes', function () {
     [
       "name",
-      "enabledByDefault",
       "defaultData",
       "permissions",
       "services",
@@ -26,7 +25,6 @@ describe('Plugin', function () {
   describe('constructor', function () {
     [
       ["name", "value"],
-      ["enabledByDefault", "value"],
       ["defaultData", "value"],
       ["permissions", []],
       ["services", {}],
