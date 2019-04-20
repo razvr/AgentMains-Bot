@@ -168,10 +168,10 @@ describe('ChaosCore', function () {
     });
 
     describe('bootstrap process', function () {
-      it('configures services', function (done) {
+      it('triggers onListen for services', function (done) {
         sinon.spy(this.chaos.servicesManager, 'onListen');
         this.chaos.listen()
-          .do(() => expect(this.chaos.servicesManager.onListen).to.have.been.called)
+          .do(() => expect(this.chaos.servicesManager.onListen).to.have.been.calledOnce)
           .subscribe(() => done(), (error) => done(error));
       });
 
@@ -190,15 +190,15 @@ describe('ChaosCore', function () {
         });
       });
 
-      it('configures commands', function (done) {
+      it('triggers onListen for commands', function (done) {
         sinon.spy(this.chaos.commandManager, 'onListen');
 
         this.chaos.listen()
-          .do(() => expect(this.chaos.commandManager.onListen).to.have.been.called)
+          .do(() => expect(this.chaos.commandManager.onListen).to.have.been.calledOnce)
           .subscribe(() => done(), (error) => done(error));
       });
 
-      context('when configuring commands fails', function () {
+      context('when onListen for commands fails', function () {
         beforeEach(function () {
           this.error = new Error("mock error");
           sinon.stub(this.chaos.commandManager, 'onListen').throws(this.error);
