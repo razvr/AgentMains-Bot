@@ -2,7 +2,8 @@ const MemoryDataSource = require('chaos-data-memory');
 const DiskDataSource = require('chaos-data-disk');
 const path = require('path');
 const fs = require('fs');
-const Rx = require('rx');
+const { Observable, of } = require('rxjs');
+
 const createChaosStub = require('../../create-chaos-stub');
 
 const DataManager = require('../../../lib/managers/data-manager');
@@ -55,7 +56,7 @@ describe('DataManager', function () {
         });
       });
 
-      context('when the npm module is not installed', function() {
+      context('when the npm module is not installed', function () {
         beforeEach(function () {
           this.chaos.config.dataSource.type = "test";
         });
@@ -84,7 +85,7 @@ describe('DataManager', function () {
 
       it("returns an Observable of true", function (done) {
         let hook$ = this.dataManager.onListen();
-        expect(hook$).to.be.an.instanceOf(Rx.Observable);
+        expect(hook$).to.be.an.instanceOf(Observable);
 
         hook$.subscribe(
           (value) => {
@@ -100,26 +101,26 @@ describe('DataManager', function () {
 
     context('when the datasource has a onListen', function () {
       beforeEach(function () {
-        this.dataSource.onListen = sinon.fake.returns(Rx.Observable.of(true));
+        this.dataSource.onListen = sinon.fake.returns(of(true));
       });
 
       it("calls the datasource's onListen", function () {
         let hook$ = this.dataManager.onListen();
-        expect(hook$).to.be.an.instanceOf(Rx.Observable);
+        expect(hook$).to.be.an.instanceOf(Observable);
         expect(this.dataManager._dataSource.onListen).to.have.been.called;
       });
     });
   });
 
   describe('#onJoinGuild', function () {
-    context('when the datasource does not have a onJoinGuild', function() {
+    context('when the datasource does not have a onJoinGuild', function () {
       beforeEach(function () {
         delete this.dataSource.onJoinGuild;
       });
 
       it("returns an Observable of true", function (done) {
         let hook$ = this.dataManager.onJoinGuild();
-        expect(hook$).to.be.an.instanceOf(Rx.Observable);
+        expect(hook$).to.be.an.instanceOf(Observable);
 
         hook$.subscribe(
           (value) => {
@@ -135,12 +136,12 @@ describe('DataManager', function () {
 
     context('when the datasource has a onJoinGuild', function () {
       beforeEach(function () {
-        this.dataSource.onJoinGuild = sinon.fake.returns(Rx.Observable.of(true));
+        this.dataSource.onJoinGuild = sinon.fake.returns(of(true));
       });
 
       it("calls the datasource's onJoinGuild", function () {
         let hook$ = this.dataManager.onJoinGuild();
-        expect(hook$).to.be.an.instanceOf(Rx.Observable);
+        expect(hook$).to.be.an.instanceOf(Observable);
         expect(this.dataManager._dataSource.onJoinGuild).to.have.been.called;
       });
     });
@@ -148,7 +149,7 @@ describe('DataManager', function () {
 
   describe('#setGuildData', function () {
     it('calls through to the datasource setData', function () {
-      this.dataSource.setData = sinon.fake.returns(Rx.Observable.of(true));
+      this.dataSource.setData = sinon.fake.returns(of(true));
       this.dataManager.setGuildData("guildId", "keyword", "data");
       expect(this.dataSource.setData).to.have.been
         .calledWith("guild", "guildId", "keyword", "data");
@@ -157,7 +158,7 @@ describe('DataManager', function () {
 
   describe('#getGuildData', function () {
     it('calls through to the datasource getData', function () {
-      this.dataSource.getData = sinon.fake.returns(Rx.Observable.of(true));
+      this.dataSource.getData = sinon.fake.returns(of(true));
       this.dataManager.getGuildData("guildId", "keyword");
       expect(this.dataSource.getData).to.have.been
         .calledWith("guild", "guildId", "keyword");

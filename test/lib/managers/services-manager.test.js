@@ -1,3 +1,5 @@
+const { tap } = require('rxjs/operators');
+
 const ServicesManager = require('../../../lib/managers/services-manager');
 const Service = require("../../../lib/models/service");
 const createChaosStub = require('../../create-chaos-stub');
@@ -124,15 +126,15 @@ describe('ServicesManager', function () {
       });
 
       it('configures all services', function (done) {
-        this.servicesManager.onListen()
-          .do(() => {
+        this.servicesManager.onListen().pipe(
+          tap(() => {
             [
               this.servicesManager.getService('test', 'ServiceOne'),
               this.servicesManager.getService('test', 'ServiceTwo'),
               this.servicesManager.getService('test', 'ServiceThree'),
             ].forEach((service) => expect(service.configured).to.eq(true));
-          })
-          .subscribe(() => done(), (error) => done(error));
+          }),
+        ).subscribe(() => done(), (error) => done(error));
       });
     });
   });

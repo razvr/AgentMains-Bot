@@ -1,4 +1,5 @@
-const Rx = require('rx');
+const { EMPTY } = require('rxjs');
+const { catchError, tap } = require('rxjs/operators');
 
 const RoleService = require('../../../lib/core-plugin/services/role-service');
 const { RoleNotFoundError } = require("../../../lib/errors");
@@ -30,13 +31,13 @@ describe('Service: RoleService', function () {
       context(`when the roleString is a ${roleStringType}`, function () {
         context('when the role does not exist', function () {
           it('throws a RoleNotFoundError', function (done) {
-            this.roleService.findRole(this.guild, roleString)
-              .catch((error) => {
+            this.roleService.findRole(this.guild, roleString).pipe(
+              catchError((error) => {
                 expect(error).to.be.an.instanceOf(RoleNotFoundError);
                 expect(error.message).to.eq(`The role '${roleString}' could not be found`);
-                return Rx.Observable.empty();
-              })
-              .subscribe(() => done(new Error('Error was not raised')), (error) => done(error), () => done());
+                return EMPTY;
+              }),
+            ).subscribe(() => done(new Error('Error was not raised')), (error) => done(error), () => done());
           });
         });
 
@@ -52,9 +53,9 @@ describe('Service: RoleService', function () {
           });
 
           it('emits the found member', function (done) {
-            this.roleService.findRole(this.guild, roleString)
-              .map((role) => expect(role).to.eq(this.role))
-              .subscribe(() => done(), (error) => done(error));
+            this.roleService.findRole(this.guild, roleString).pipe(
+              tap((role) => expect(role).to.eq(this.role)),
+            ).subscribe(() => done(), (error) => done(error));
           });
         });
       });

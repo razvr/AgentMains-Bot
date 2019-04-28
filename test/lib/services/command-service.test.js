@@ -1,4 +1,6 @@
 const Discord = require('discord.js');
+const { toArray, map } = require('rxjs/operators');
+
 const Command = require('../../../lib/models/command');
 const CommandContext = require('../../../lib/models/command-context');
 const CommandService = require('../../../lib/core-plugin/services/command-service');
@@ -26,7 +28,7 @@ describe('CommandService', function () {
       this.context = new CommandContext(this.chaos, this.message, this.command, {}, {});
     });
 
-    context('when the bot can not send a message to the channel', function() {
+    context('when the bot can not send a message to the channel', function () {
       beforeEach(function () {
         this.channel = this.message.channel;
         this.channel.permissionsFor = (memberOrRole) => {
@@ -39,10 +41,10 @@ describe('CommandService', function () {
       });
 
       it('emits no elements', function (done) {
-        this.commandService.filterCanRunCommand(this.context)
-          .toArray()
-          .map((emitted) => expect(emitted.length).to.eq(0))
-          .subscribe(() => done(), (error) => done(error));
+        this.commandService.filterCanRunCommand(this.context).pipe(
+          toArray(),
+          map((emitted) => expect(emitted.length).to.eq(0)),
+        ).subscribe(() => done(), (error) => done(error));
       });
     });
   });

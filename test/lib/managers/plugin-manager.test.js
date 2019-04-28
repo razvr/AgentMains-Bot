@@ -1,3 +1,5 @@
+const { toArray, tap } = require('rxjs/operators');
+
 const PluginManager = require('../../../lib/managers/plugin-manager');
 const Service = require("../../../lib/models/service");
 const createChaosStub = require('../../create-chaos-stub');
@@ -223,25 +225,25 @@ describe('PluginManager', function () {
       });
 
       it('triggers #prepareData for each', function (done) {
-        this.pluginManager
-          .onJoinGuild(this.guild)
-          .subscribe(() => {}, (error) => done(error), () => {
+        this.pluginManager.onJoinGuild(this.guild).pipe(
+          toArray(),
+          tap(() => {
             expect(this.testPlugin1.prepareData).to.have.been.calledOnce;
             expect(this.testPlugin2.prepareData).to.have.been.calledOnce;
             expect(this.testPlugin3.prepareData).to.have.been.calledOnce;
-            done();
-          });
+          }),
+        ).subscribe(() => done(), (error) => done(error));
       });
 
       it('triggers #onJoinGuild for each', function (done) {
-        this.pluginManager
-          .onJoinGuild(this.guild)
-          .subscribe(() => {}, (error) => done(error), () => {
+        this.pluginManager.onJoinGuild(this.guild).pipe(
+          toArray(),
+          tap(() => {
             expect(this.testPlugin1.onJoinGuild).to.have.been.calledOnce;
             expect(this.testPlugin2.onJoinGuild).to.have.been.calledOnce;
             expect(this.testPlugin3.onJoinGuild).to.have.been.calledOnce;
-            done();
-          });
+          }),
+        ).subscribe(() => done(), (error) => done(error));
       });
     });
   });

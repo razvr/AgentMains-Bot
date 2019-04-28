@@ -1,4 +1,5 @@
-const Rx = require('rx');
+const { Observable } = require('rxjs');
+
 const Response = require('../../../lib/models/response');
 const mocks = require('../../mocks');
 
@@ -49,7 +50,7 @@ describe('Response', function () {
 
       it("returns an empty observable", function (done) {
         let result$ = this.response.send();
-        expect(result$).to.be.an.instanceOf(Rx.Observable);
+        expect(result$).to.be.an.instanceOf(Observable);
 
         result$.subscribe(
           this.nextCallback,
@@ -75,7 +76,7 @@ describe('Response', function () {
 
       it("returns an observable of the response from discord", function (done) {
         let result$ = this.response.send();
-        expect(result$).to.be.an.instanceOf(Rx.Observable);
+        expect(result$).to.be.an.instanceOf(Observable);
 
         result$.subscribe(
           this.nextCallback,
@@ -101,7 +102,7 @@ describe('Response', function () {
 
       it("returns an observable of the response from discord", function (done) {
         let result$ = this.response.send();
-        expect(result$).to.be.an.instanceOf(Rx.Observable);
+        expect(result$).to.be.an.instanceOf(Observable);
 
         result$.subscribe(
           this.nextCallback,
@@ -123,13 +124,13 @@ describe('Response', function () {
       it("sends an embed to the channel", function () {
         this.response.send();
         expect(this.message.channel.send).to.have.been.calledOnceWith(
-          this.response.content, {embed: this.response.embed},
+          this.response.content, { embed: this.response.embed },
         );
       });
 
       it("returns an observable of the response from discord", function (done) {
         let result$ = this.response.send();
-        expect(result$).to.be.an.instanceOf(Rx.Observable);
+        expect(result$).to.be.an.instanceOf(Observable);
 
         result$.subscribe(
           this.nextCallback,
@@ -155,7 +156,7 @@ describe('Response', function () {
 
       it("returns an observable of the response from discord", function (done) {
         let result$ = this.response.send();
-        expect(result$).to.be.an.instanceOf(Rx.Observable);
+        expect(result$).to.be.an.instanceOf(Observable);
 
         result$.subscribe(
           this.nextCallback,
@@ -175,7 +176,7 @@ describe('Response', function () {
 
       it("returns an observable that throws an error", function (done) {
         let result$ = this.response.send();
-        expect(result$).to.be.an.instanceOf(Rx.Observable);
+        expect(result$).to.be.an.instanceOf(Observable);
 
         result$.subscribe(
           this.nextCallback,
@@ -193,7 +194,7 @@ describe('Response', function () {
     context('when the shorthand is used', function () {
       context('when type is used in the shorthand', function () {
         beforeEach(function () {
-          this.options = {type: 'reply'};
+          this.options = { type: 'reply' };
           this.message.reply = sinon.fake.returns(new Promise((resolve) => resolve("discordResponse")));
         });
 
@@ -210,7 +211,7 @@ describe('Response', function () {
 
       context('when content is used in the shorthand', function () {
         beforeEach(function () {
-          this.options = {content: 'message'};
+          this.options = { content: 'message' };
           this.message.channel.send = sinon.fake.returns(new Promise((resolve) => resolve("discordResponse")));
         });
 
@@ -227,8 +228,8 @@ describe('Response', function () {
 
       context('when embed is used in the shorthand', function () {
         beforeEach(function () {
-          this.embed = {title: "mock_embed"};
-          this.options = {embed: this.embed};
+          this.embed = { title: "mock_embed" };
+          this.options = { embed: this.embed };
           this.message.channel.send = sinon.fake.returns(new Promise((resolve) => resolve("discordResponse")));
         });
 
@@ -245,7 +246,7 @@ describe('Response', function () {
         it('sends the correct response', function () {
           this.response.send(this.options);
           expect(this.message.channel.send).to.have.been.calledOnceWith(
-            '', {embed: this.response.embed},
+            '', { embed: this.response.embed },
           );
         });
       });

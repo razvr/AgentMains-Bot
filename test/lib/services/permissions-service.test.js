@@ -1,4 +1,5 @@
-const Rx = require('rx');
+const { of, EMPTY } = require('rxjs');
+const { tap, toArray, catchError } = require('rxjs/operators');
 
 const PermissionsService = require('../../../lib/core-plugin/services/permissions-service');
 const createChaosStub = require('../../create-chaos-stub');
@@ -30,14 +31,14 @@ describe('PermissionsService', function () {
       });
 
       it('raises a PermissionLevelNotFound error', function (done) {
-        this.permissionsService.getPermissionsData(this.guild.id, this.level)
-          .toArray()
-          .catch((error) => {
+        this.permissionsService.getPermissionsData(this.guild.id, this.level).pipe(
+          toArray(),
+          catchError((error) => {
             expect(error.name).to.eq('PermLevelNotFoundError');
             expect(error.message).to.eq(`The permission level '${this.level}' could not be found.`);
-            return Rx.Observable.empty();
-          })
-          .subscribe(() => done(new Error("Expected an error to be raised")), (error) => done(error), () => done());
+            return EMPTY;
+          }),
+        ).subscribe(() => done(new Error("Expected an error to be raised")), (error) => done(error), () => done());
       });
     });
 
@@ -49,33 +50,32 @@ describe('PermissionsService', function () {
 
       context('when there is no data for the level', function () {
         beforeEach(function () {
-          sinon.stub(this.chaos, 'getGuildData').returns(Rx.Observable.of(null));
+          sinon.stub(this.chaos, 'getGuildData').returns(of(null));
         });
 
         it('saves a default set of data', function (done) {
           sinon.spy(this.chaos, 'setGuildData');
-          this.permissionsService.getPermissionsData(this.guild.id, this.level)
-            .toArray()
-            .map(() => {
+          this.permissionsService.getPermissionsData(this.guild.id, this.level).pipe(
+            toArray(),
+            tap(() => {
               expect(this.chaos.setGuildData).to.have.been.calledWith(
                 this.guild.id,
                 `core.permissions.${this.level}`,
                 { name: "admin", users: [], roles: [] },
               );
-            })
-            .subscribe(() => done(), (error) => done(error));
+            }),
+          ).subscribe(() => done(), (error) => done(error));
         });
 
         it('emits a default set of data', function (done) {
-          this.permissionsService
-            .getPermissionsData(this.guild.id, this.level)
-            .toArray()
-            .do((emitted) => {
+          this.permissionsService.getPermissionsData(this.guild.id, this.level).pipe(
+            toArray(),
+            tap((emitted) => {
               expect(emitted).to.deep.equal([
                 { name: 'admin', users: [], roles: [] },
               ]);
-            })
-            .subscribe(() => done(), (error) => done(error));
+            }),
+          ).subscribe(() => done(), (error) => done(error));
         });
       });
 
@@ -85,14 +85,13 @@ describe('PermissionsService', function () {
             users: ["user1"],
             roles: ["role1"],
           };
-          sinon.stub(this.chaos, 'getGuildData').returns(Rx.Observable.of(this.data));
+          sinon.stub(this.chaos, 'getGuildData').returns(of(this.data));
         });
 
         it('emits the saved data', function (done) {
-          this.permissionsService.getPermissionsData(this.guild.id, this.level)
-            .toArray()
-            .map((emitted) => expect(emitted).to.deep.eq([this.data]))
-            .subscribe(() => done(), (error) => done(error));
+          this.permissionsService.getPermissionsData(this.guild.id, this.level).pipe(
+            tap((data) => expect(data).to.deep.eq(this.data)),
+          ).subscribe(() => done(), (error) => done(error));
         });
       });
     });
@@ -114,14 +113,14 @@ describe('PermissionsService', function () {
       });
 
       it('raises a PermLevelNotFoundError error', function (done) {
-        this.permissionsService.setPermissionsData(this.guild.id, this.level, this.data)
-          .toArray()
-          .catch((error) => {
+        this.permissionsService.setPermissionsData(this.guild.id, this.level, this.data).pipe(
+          toArray(),
+          catchError((error) => {
             expect(error.name).to.eq('PermLevelNotFoundError');
             expect(error.message).to.eq(`The permission level '${this.level}' could not be found.`);
-            return Rx.Observable.empty();
-          })
-          .subscribe(() => done(new Error("Expected an error to be raised")), (error) => done(error), () => done());
+            return EMPTY;
+          }),
+        ).subscribe(() => done(new Error("Expected an error to be raised")), (error) => done(error), () => done());
       });
     });
 
@@ -133,23 +132,23 @@ describe('PermissionsService', function () {
 
       it('saves the passed data to the guild data', function (done) {
         sinon.spy(this.chaos, 'setGuildData');
-        this.permissionsService.setPermissionsData(this.guild.id, this.level, this.data)
-          .toArray()
-          .map(() => {
+        this.permissionsService.setPermissionsData(this.guild.id, this.level, this.data).pipe(
+          toArray(),
+          tap(() => {
             expect(this.chaos.setGuildData).to.have.been.calledWith(
               this.guild.id,
               `core.permissions.${this.level}`,
               this.data,
             );
-          })
-          .subscribe(() => done(), (error) => done(error));
+          }),
+        ).subscribe(() => done(), (error) => done(error));
       });
 
       it('emits the saved data', function (done) {
-        this.permissionsService.setPermissionsData(this.guild.id, this.level, this.data)
-          .toArray()
-          .map((emitted) => expect(emitted).to.deep.eq([this.data]))
-          .subscribe(() => done(), (error) => done(error));
+        this.permissionsService.setPermissionsData(this.guild.id, this.level, this.data).pipe(
+          toArray(),
+          tap((emitted) => expect(emitted).to.deep.eq([this.data])),
+        ).subscribe(() => done(), (error) => done(error));
       });
     });
   });
@@ -165,11 +164,11 @@ describe('PermissionsService', function () {
 
     it('adds the user to the given permission level', function (done) {
       sinon.stub(this.permissionsService, 'setPermissionsData')
-        .callsFake((guildId, level, data) => Rx.Observable.of(data));
+        .callsFake((guildId, level, data) => of(data));
 
-      this.permissionsService.addUser(this.guild, this.level, this.user)
-        .toArray()
-        .map(() => {
+      this.permissionsService.addUser(this.guild, this.level, this.user).pipe(
+        toArray(),
+        tap(() => {
           expect(this.permissionsService.setPermissionsData).to.have.been.calledWith(
             this.guild.id,
             this.level,
@@ -179,8 +178,8 @@ describe('PermissionsService', function () {
               roles: [],
             },
           );
-        })
-        .subscribe(() => done(), (error) => done(error));
+        }),
+      ).subscribe(() => done(), (error) => done(error));
     });
 
     context('when the permission level does not exist', function () {
@@ -189,34 +188,34 @@ describe('PermissionsService', function () {
       });
 
       it('raises a PermLevelNotFoundError', function (done) {
-        this.permissionsService.addUser(this.guild, this.level, this.user)
-          .toArray()
-          .catch((error) => {
+        this.permissionsService.addUser(this.guild, this.level, this.user).pipe(
+          toArray(),
+          catchError((error) => {
             expect(error.name).to.eq('PermLevelNotFoundError');
             expect(error.message).to.eq(`The permission level '${this.level}' could not be found.`);
-            return Rx.Observable.empty();
-          })
-          .subscribe(() => done(new Error("Expected an error to be raised")), (error) => done(error), () => done());
+            return EMPTY;
+          }),
+        ).subscribe(() => done(new Error("Expected an error to be raised")), (error) => done(error), () => done());
       });
     });
 
     context('when the user has already been added to the permission level', function () {
       beforeEach(function () {
-        sinon.stub(this.permissionsService, 'getPermissionsData').returns(Rx.Observable.of({
+        sinon.stub(this.permissionsService, 'getPermissionsData').returns(of({
           users: [this.user.id],
           roles: [],
         }));
       });
 
       it('raises a PermLevelError', function (done) {
-        this.permissionsService.addUser(this.guild, this.level, this.user)
-          .toArray()
-          .catch((error) => {
+        this.permissionsService.addUser(this.guild, this.level, this.user).pipe(
+          toArray(),
+          catchError((error) => {
             expect(error.name).to.eq('PermLevelError');
             expect(error.message).to.eq(`The user ${this.user.username} already has the permission level ${this.level}`);
-            return Rx.Observable.empty();
-          })
-          .subscribe(() => done(new Error("Expected an error to be raised")), (error) => done(error), () => done());
+            return EMPTY;
+          }),
+        ).subscribe(() => done(new Error("Expected an error to be raised")), (error) => done(error), () => done());
       });
     });
   });

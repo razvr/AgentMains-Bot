@@ -1,4 +1,4 @@
-const Rx = require('rx');
+const { of } = require('rxjs');
 
 const Mockery = require('./mockery');
 const seq = Mockery.seq;
@@ -13,7 +13,7 @@ chaosMocks.define("Response", {
   embed: null,
   type: "mock_type",
   content: "mock_content",
-  send: seq(() => () => Rx.Observable.of('')),
+  send: seq(() => () => of('')),
 });
 
 chaosMocks.define("Command", {

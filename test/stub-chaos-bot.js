@@ -1,4 +1,5 @@
-const Rx = require('rx');
+const { throwError } = require('rxjs');
+
 const Discord = require('discord.js');
 
 const mocks = require('./mocks');
@@ -10,7 +11,7 @@ module.exports = (chaosBot) => {
   };
 
   chaosBot.handleError = (error) => {
-    return Rx.Observable.throw(error);
+    return throwError(error);
   };
 
   chaosBot.discord.login = () => {

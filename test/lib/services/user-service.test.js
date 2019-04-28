@@ -1,4 +1,6 @@
-const Rx = require('rx');
+const { EMPTY } = require('rxjs');
+const { catchError, tap, toArray } = require('rxjs/operators');
+
 const Discord = require('discord.js');
 
 const UserService = require('../../../lib/core-plugin/services/user-service');
@@ -31,13 +33,13 @@ describe('Service: UserService', function () {
       context(`when the userString is a ${userStringType}`, function () {
         context('when the member does not exist', function () {
           it('throws a UserNotFoundError', function (done) {
-            this.userService.findMember(this.guild, userString)
-              .catch((error) => {
+            this.userService.findMember(this.guild, userString).pipe(
+              catchError((error) => {
                 expect(error).to.be.an.instanceOf(UserNotFoundError);
                 expect(error.message).to.eq(`The user '${userString}' could not be found`);
-                return Rx.Observable.empty();
-              })
-              .subscribe(() => done(new Error('Error was not raised')), (error) => done(error), () => done());
+                return EMPTY;
+              }),
+            ).subscribe(() => done(new Error('Error was not raised')), (error) => done(error), () => done());
           });
         });
 
@@ -63,9 +65,9 @@ describe('Service: UserService', function () {
           });
 
           it('emits the found member', function (done) {
-            this.userService.findMember(this.guild, userString)
-              .map((member) => expect(member).to.eq(this.member))
-              .subscribe(() => done(), (error) => done(error));
+            this.userService.findMember(this.guild, userString).pipe(
+              tap((member) => expect(member).to.eq(this.member)),
+            ).subscribe(() => done(), (error) => done(error));
           });
         });
       });
@@ -85,14 +87,14 @@ describe('Service: UserService', function () {
       context(`when the userString is a ${userStringType}`, function () {
         context('when the user does not exist', function () {
           it('throws a UserNotFoundError', function (done) {
-            this.userService.findUser(userString)
-              .catch((error) => {
+            this.userService.findUser(userString).pipe(
+              toArray(),
+              catchError((error) => {
                 expect(error).to.be.an.instanceOf(UserNotFoundError);
                 expect(error.message).to.eq(`The user '${userString}' could not be found`);
-                return Rx.Observable.empty();
-              })
-              .flatMap(() => Rx.Observable.throw(new Error('Error was not raised')))
-              .subscribe(() => {}, done, done);
+                return EMPTY;
+              }),
+            ).subscribe(() => done(new Error('Error was not raised')), done, done);
           });
         });
 
@@ -109,10 +111,9 @@ describe('Service: UserService', function () {
           });
 
           it('emits the found user', function (done) {
-            this.userService.findUser(userString)
-              .toArray()
-              .map(([user]) => expect(user).to.eq(this.user))
-              .subscribe(() => done(), (error) => done(error));
+            this.userService.findUser(userString).pipe(
+              tap((user) => expect(user).to.eq(this.user)),
+            ).subscribe(() => done(), (error) => done(error));
           });
         });
       });

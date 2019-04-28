@@ -1,4 +1,5 @@
-const Rx = require('rx');
+const { zip } = require('rxjs');
+const { flatMap, tap } = require('rxjs/operators');
 
 const createChaosStub = require('../create-chaos-stub');
 const mocks = require("../mocks");
@@ -32,17 +33,17 @@ describe('Feature: Plugin Data', function () {
     });
 
     this.chaos.addPlugin(this.plugin);
-    this.chaos.listen()
-      .flatMap(() => Rx.Observable.zip(
+    this.chaos.listen().pipe(
+      flatMap(() => zip(
         this.chaos.getGuildData(this.guild.id, "test.data1"),
         this.chaos.getGuildData(this.guild.id, "test.data2"),
         this.chaos.getGuildData(this.guild.id, "test.data3"),
-      ))
-      .do(([data1, data2, data3]) => {
+      )),
+      tap(([data1, data2, data3]) => {
         expect(data1).to.eq("test.value1");
         expect(data2).to.eq("test.value2");
         expect(data3).to.eq("test.value3");
-      })
-      .subscribe(() => done(), (error) => done(error));
+      }),
+    ).subscribe(() => done(), (error) => done(error));
   });
 });
