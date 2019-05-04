@@ -11,7 +11,6 @@ describe('ConfigAction', function () {
     [
       "name",
       "description",
-      "services",
       "inputs",
       "run",
     ].forEach((attribute) => {
