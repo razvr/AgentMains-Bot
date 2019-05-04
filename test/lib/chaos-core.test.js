@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { Observable, of, throwError, EMPTY } = require('rxjs');
+const { Observable, of, EMPTY } = require('rxjs');
 const { tap, flatMap, catchError, toArray } = require('rxjs/operators');
 
 const CommandManager = require('../../lib/managers/command-manager');
@@ -176,20 +176,6 @@ describe('ChaosCore', function () {
         ).subscribe(() => done(), (error) => done(error));
       });
 
-      context('when configuring services fails', function () {
-        beforeEach(function () {
-          this.error = new Error("mock error");
-          sinon.stub(this.chaos.servicesManager, 'onListen').throws(this.error);
-        });
-
-        it('triggers the error callback', function (done) {
-          this.chaos.listen().subscribe(
-            () => done(new Error("Error callback was not called")),
-            () => done(),
-          );
-        });
-      });
-
       it('triggers onListen for commands', function (done) {
         sinon.spy(this.chaos.commandManager, 'onListen');
 
@@ -198,40 +184,11 @@ describe('ChaosCore', function () {
         ).subscribe(() => done(), (error) => done(error));
       });
 
-      context('when onListen for commands fails', function () {
-        beforeEach(function () {
-          this.error = new Error("mock error");
-          sinon.stub(this.chaos.commandManager, 'onListen').throws(this.error);
-        });
-
-        it('triggers the error callback', function (done) {
-          this.chaos.listen()
-            .subscribe(
-              () => done(new Error("Error callback was not called")),
-              () => done(),
-            );
-        });
-      });
-
       it('logs into discord', function (done) {
         this.chaos.discord.login = sinon.fake.resolves(true);
         this.chaos.listen().pipe(
           tap(() => expect(this.chaos.discord.login).to.have.been.calledWith(this.config.loginToken)),
         ).subscribe(() => done(), (error) => done(error));
-      });
-
-      context('when logging into discord fails', function () {
-        beforeEach(function () {
-          this.error = new Error("mock error");
-          this.chaos.discord.login = sinon.fake.rejects(this.error);
-        });
-
-        it('triggers the error callback', function (done) {
-          this.chaos.listen().subscribe(
-            () => done(new Error("Error callback was not called")),
-            () => done(),
-          );
-        });
       });
 
       it('tries to find the owner', function (done) {
@@ -242,41 +199,12 @@ describe('ChaosCore', function () {
         ).subscribe(() => done(), (error) => done(error));
       });
 
-      context('when finding the owner into discord fails', function () {
-        beforeEach(function () {
-          this.error = new Error("mock error");
-          sinon.stub(this.chaos, 'findOwner').returns(throwError(new Error(this.error)));
-        });
-
-        it('triggers the error callback', function (done) {
-          this.chaos.listen()
-            .subscribe(
-              () => done(new Error("Error callback was not called")),
-              () => done(),
-            );
-        });
-      });
-
       it('triggers the onListen hook', function (done) {
         sinon.spy(this.chaos, 'onListen');
 
         this.chaos.listen().pipe(
           tap(() => expect(this.chaos.onListen).to.have.been.calledWith()),
         ).subscribe(() => done(), (error) => done(error));
-      });
-
-      context('when the onListen hook fails', function () {
-        beforeEach(function () {
-          this.error = new Error("mock error");
-          sinon.stub(this.chaos, 'onListen').returns(throwError(this.error));
-        });
-
-        it('triggers the error callback', function (done) {
-          this.chaos.listen().subscribe(
-            () => done(new Error("Error callback was not called")),
-            () => done(),
-          );
-        });
       });
 
       it('starts all Discord event streams', function (done) {
@@ -286,12 +214,6 @@ describe('ChaosCore', function () {
               expect(this.chaos.streams[eventType + '$']).to.be.an.instanceOf(Observable);
             });
           }),
-        ).subscribe(() => done(), (error) => done(error));
-      });
-
-      it('starts ChaosCore related event streams', function (done) {
-        this.chaos.listen().pipe(
-          tap(() => expect(this.chaos.streams.command$).to.be.an.instanceOf(Observable)),
         ).subscribe(() => done(), (error) => done(error));
       });
 
@@ -450,109 +372,6 @@ describe('ChaosCore', function () {
     });
   });
 
-  describe('#runHook', function () {
-    beforeEach(function () {
-      this.hookListener = {};
-      this.hookName = 'onTest';
-    });
-
-    context('when the hookListener does not have the hook', function () {
-      beforeEach(function () {
-        delete this.hookListener[this.hookName];
-      });
-
-      it('returns an Observable', function () {
-        expect(this.chaos.runHook(this.hookListener, this.hookName)).to.be.an.instanceOf(Observable);
-      });
-
-      it('returns emits true', function (done) {
-        let nextCallback = sinon.fake();
-        this.chaos.runHook(this.hookListener, this.hookName)
-          .subscribe(nextCallback, (error) => done(error), () => {
-            expect(nextCallback).to.have.been.calledOnceWith(true);
-            done();
-          });
-      });
-    });
-
-    context('when the hookListener does have the hook', function () {
-      beforeEach(function () {
-        this.returnValue = {};
-        this.hook = sinon.fake.returns(this.returnValue);
-        this.hookListener[this.hookName] = this.hook;
-      });
-
-      it('returns an Observable', function () {
-        expect(this.chaos.runHook(this.hookListener, this.hookName)).to.be.an.instanceOf(Observable);
-      });
-
-      it('runs the hook', function (done) {
-        this.chaos.runHook(this.hookListener, this.hookName)
-          .subscribe(() => {}, (error) => done(error), () => {
-            expect(this.hook).to.have.been.calledOnce;
-            done();
-          });
-      });
-
-      it('emits true', function (done) {
-        let nextCallback = sinon.fake();
-        this.chaos.runHook(this.hookListener, this.hookName)
-          .subscribe(nextCallback, (error) => done(error), () => {
-            expect(nextCallback).to.have.been.calledOnceWith(true);
-            done();
-          });
-      });
-
-      context('when arguments are passed', function () {
-        beforeEach(function () {
-          this.args = ['arg1', 'arg2', 'arg3'];
-        });
-
-        it('runs the hook with the passed args', function (done) {
-          this.chaos.runHook(this.hookListener, this.hookName, this.args)
-            .subscribe(() => {}, (error) => done(error), () => {
-              expect(this.hook).to.have.been.calledOnceWith('arg1', 'arg2', 'arg3');
-              done();
-            });
-        });
-      });
-
-      context('when the hook does throw an error', function () {
-        beforeEach(function () {
-          this.error = new Error('mock error');
-          this.hook = sinon.fake.throws(this.error);
-          this.hookListener[this.hookName] = this.hook;
-
-          this.chaos.handleError = sinon.fake.returns(of(''));
-        });
-
-        it('runs handleError', function (done) {
-          this.chaos.runHook(this.hookListener, this.hookName)
-            .subscribe(() => {}, (error) => done(error), () => {
-              expect(this.chaos.handleError).to.have.been.calledOnceWith(this.error);
-              done();
-            });
-        });
-
-        context('when raiseError is true', function () {
-          beforeEach(function () {
-            this.args = [];
-            this.raiseError = true;
-          });
-
-          it('re-throws the error', function (done) {
-            this.chaos.runHook(this.hookListener, this.hookName, this.args, this.raiseError)
-              .subscribe(() => done('next was called'), (error) => {
-                  expect(error).to.eq(this.error);
-                  done();
-                },
-              );
-          });
-        });
-      });
-    });
-  });
-
   describe('#handleError', function () {
     beforeEach(function () {
       this.error = new Error('mock error');
@@ -616,17 +435,21 @@ describe('ChaosCore', function () {
   });
 
   describe('#onListen', function () {
+    beforeEach(function () {
+      this.chaos.streams = {
+        message$: EMPTY,
+      };
+    });
+
     it('returns an Observable', function () {
       expect(this.chaos.onListen()).to.be.an.instanceOf(Observable);
     });
 
     it('emits true', function (done) {
-      let nextCallback = sinon.fake();
-      this.chaos.onListen()
-        .subscribe(nextCallback, (error) => done(error), () => {
-          expect(nextCallback).to.have.been.calledOnceWith(true);
-          done();
-        });
+      this.chaos.onListen().pipe(
+        toArray(),
+        tap((emitted) => expect(emitted).to.deep.equal([true])),
+      ).subscribe(() => done(), (error) => done(error));
     });
 
     it('runs servicesManager onListen', function (done) {
