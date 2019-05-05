@@ -1,10 +1,12 @@
 const Plugin = require('../../../lib/models/plugin');
+const createChaosStub = require('../../create-chaos-stub');
 
 describe('Plugin', function () {
   beforeEach(function () {
-    this.options = {name: "test"};
+    this.chaos = createChaosStub();
+    this.options = { name: "test" };
 
-    this.module = new Plugin(this.options);
+    this.plugin = new Plugin(this.chaos, this.options);
   });
 
   describe('attributes', function () {
@@ -17,7 +19,7 @@ describe('Plugin', function () {
       "commands",
     ].forEach((attribute) => {
       it(attribute, function () {
-        expect(this.module[attribute]).not.to.be.undefined;
+        expect(this.plugin[attribute]).not.to.be.undefined;
       });
     });
   });
@@ -37,8 +39,8 @@ describe('Plugin', function () {
     ].forEach(([attribute, value]) => {
       it(`assigns ${attribute} from the options`, function () {
         this.options[attribute] = value;
-        this.module = new Plugin(this.options);
-        expect(this.module[attribute]).to.eq(value);
+        this.plugin = new Plugin(this.chaos, this.options);
+        expect(this.plugin[attribute]).to.eq(value);
       });
     });
   });

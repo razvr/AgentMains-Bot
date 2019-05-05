@@ -2,9 +2,10 @@ const ConfigAction = require('../../../lib/models/config-action');
 
 describe('ConfigAction', function () {
   beforeEach(function () {
+    this.chaos = {};
     this.options = { name: "test" };
 
-    this.configAction = new ConfigAction(this.options);
+    this.configAction = new ConfigAction(this.chaos, this.options);
   });
 
   describe('attributes', function () {
@@ -31,7 +32,7 @@ describe('ConfigAction', function () {
     ].forEach(([attribute, value]) => {
       it(`assigns ${attribute} from the options`, function () {
         this.options[attribute] = value;
-        this.configAction = new ConfigAction(this.options);
+        this.configAction = new ConfigAction(this.chaos, this.options);
         expect(this.configAction[attribute]).to.eq(value);
       });
     });

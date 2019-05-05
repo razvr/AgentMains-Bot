@@ -2,7 +2,6 @@ const { zip } = require('rxjs');
 const { flatMap, tap } = require('rxjs/operators');
 
 const createChaosStub = require('../create-chaos-stub');
-const { MockPlugin } = require("../mocks/chaos.mocks");
 const { MockGuild } = require("../mocks/discord.mocks");
 
 describe('Feature: Plugin Data', function () {
@@ -21,13 +20,13 @@ describe('Feature: Plugin Data', function () {
 
   it('ChaosCore loads default plugin data onListen', function (done) {
     this.chaos = createChaosStub();
-    this.plugin = new MockPlugin({
+    this.plugin = {
       defaultData: [
         { keyword: "test.data1", data: "test.value1" },
         { keyword: "test.data2", data: "test.value2" },
         { keyword: "test.data3", data: "test.value3" },
       ],
-    });
+    };
 
     this.guild = new MockGuild({
       client: this.chaos.discord,

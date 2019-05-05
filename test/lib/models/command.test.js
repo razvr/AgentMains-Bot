@@ -211,7 +211,9 @@ describe('Command', function () {
 
   describe('#argsMissing', function () {
     beforeEach(function () {
-      this.context = new MockCommandContext({});
+      this.context = new MockCommandContext({
+        chaos: this.chaos,
+      });
       this.response = new MockResponse({});
       this.response.send = sinon.fake();
 
