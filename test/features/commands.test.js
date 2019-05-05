@@ -6,7 +6,7 @@ const mocks = require('../mocks');
 
 describe('Feature: Commands', function () {
   beforeEach(function (done) {
-    this.chaos = createChaosStub();
+    this.chaos = createChaosStub({ logger: { level: 'silly' } });
     this.discord = this.chaos.discord;
     this.guild = new mocks.discord.Guild({
       client: this.discord,
