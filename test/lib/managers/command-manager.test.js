@@ -1,5 +1,6 @@
 const CommandManager = require("../../../lib/managers/command-manager");
 const createChaosStub = require('../../create-chaos-stub');
+const { Command } = require("../../../index");
 
 describe('CommandManager', function () {
   beforeEach(function () {
@@ -56,25 +57,40 @@ describe('CommandManager', function () {
   });
 
   describe("#addCommand", function () {
-    beforeEach(function () {
-      this.command = { pluginName: 'test', name: "commandOne", run: () => {} };
-    });
+    class TestCommand extends Command {
+      constructor(chaos) {
+        super(chaos, {
+          name: "testCmd",
+          pluginName: 'test',
+        });
+      }
+    }
 
-    it('makes the command retrievable via #getCommand', function () {
-      this.commandManager.addCommand(this.command);
-      expect(this.commandManager.getCommand('commandOne').name).to.eq(this.command.name);
-    });
+    Object.entries({
+      "a object based command": {
+        pluginName: 'test',
+        name: "testCmd",
+      },
+      "a class based command": TestCommand,
+    }).forEach(([commandType, command]) => {
+      context(`when adding ${commandType}`, function () {
+        it('makes the command retrievable via #getCommand', function () {
+          this.commandManager.addCommand(command);
+          expect(this.commandManager.getCommand('testCmd').name).to.eq('testCmd');
+        });
 
-    context('when a command with the same name has already been added', function () {
-      beforeEach(function () {
-        this.otherCommand = { pluginName: 'test', name: "commandOne", run: () => {} };
-        this.commandManager.addCommand(this.otherCommand);
-      });
+        context('when a command with the same name has already been added', function () {
+          beforeEach(function () {
+            this.otherCommand = { pluginName: 'test', name: 'testCmd', run: () => {} };
+            this.commandManager.addCommand(this.otherCommand);
+          });
 
-      it('raises an error', function () {
-        expect(() => this.commandManager.addCommand(this.command)).to.throw(
-          Error, "Command 'commandOne' has already been added.",
-        );
+          it('raises an error', function () {
+            expect(() => this.commandManager.addCommand(command)).to.throw(
+              Error, "Command 'testCmd' has already been added.",
+            );
+          });
+        });
       });
     });
   });

@@ -92,18 +92,6 @@ describe('Command', function () {
       });
     });
 
-    context('when the run method is missing', function () {
-      beforeEach(function () {
-        delete this.cmdConfig.run;
-      });
-
-      it('raises an error', function () {
-        expect(() => new Command(this.chaos, this.cmdConfig)).to.throw(
-          Error, `run function for command ${this.cmdConfig.name} is missing.`,
-        );
-      });
-    });
-
     context('when the run method is not a function', function () {
       beforeEach(function () {
         this.cmdConfig.run = 'not a function';

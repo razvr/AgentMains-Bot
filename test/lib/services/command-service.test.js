@@ -23,7 +23,6 @@ describe('CommandService', function () {
       this.command = new Command(this.chaos, {
         name: "testCommand",
         pluginName: "testPlugin",
-        run: () => {},
       });
       this.context = new CommandContext(this.chaos, this.message, this.command, {}, {});
     });
