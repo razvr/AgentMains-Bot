@@ -1,5 +1,6 @@
 const Command = require("../../../lib/models/command");
 const createChaosStub = require('../../create-chaos-stub');
+const { InvalidComponentError } = require("../../../lib/errors");
 const { MockCommandContext, MockResponse } = require("../../mocks/chaos.mocks");
 
 describe('Command', function () {
@@ -67,15 +68,18 @@ describe('Command', function () {
       this.command = new Command(this.chaos, this.cmdConfig);
       expect(this.command.chaos).to.eq(this.chaos);
     });
+  });
 
+  describe('#validate', function () {
     context('when the name is missing', function () {
       beforeEach(function () {
         delete this.cmdConfig.name;
+        this.command = new Command(this.chaos, this.cmdConfig);
       });
 
       it('raises an error', function () {
-        expect(() => new Command(this.chaos, this.cmdConfig)).to.throw(
-          Error, "Name for command is missing.",
+        expect(() => this.command.validate()).to.throw(
+          InvalidComponentError, "Name for command is missing.",
         );
       });
     });
@@ -83,23 +87,12 @@ describe('Command', function () {
     context('when the name not a string', function () {
       beforeEach(function () {
         this.cmdConfig.name = {};
+        this.command = new Command(this.chaos, this.cmdConfig);
       });
 
       it('raises an error', function () {
-        expect(() => new Command(this.chaos, this.cmdConfig)).to.throw(
-          Error, "Name for command is missing.",
-        );
-      });
-    });
-
-    context('when the run method is not a function', function () {
-      beforeEach(function () {
-        this.cmdConfig.run = 'not a function';
-      });
-
-      it('raises an error', function () {
-        expect(() => new Command(this.chaos, this.cmdConfig)).to.throw(
-          Error, `run function for command ${this.cmdConfig.name} is missing.`,
+        expect(() => this.command.validate()).to.throw(
+          InvalidComponentError, "Name for command is missing.",
         );
       });
     });
