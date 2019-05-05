@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "chai": "^4.1.2",
-    "chaos-data-disk": "github:chaos-core/chaos-data-disk#RxJs-6",
+    "chaos-data-dummy": "./test/fixtures/chaos-data-dummy",
     "chaos-data-memory": "github:chaos-core/chaos-data-memory#RxJs-6",
     "discord.js": "~11.4.2",
     "eslint": "^4.14.0",

@@ -1,7 +1,5 @@
 const MemoryDataSource = require('chaos-data-memory');
-const DiskDataSource = require('chaos-data-disk');
-const path = require('path');
-const fs = require('fs');
+const DummyDataSource = require('chaos-data-dummy');
 const { Observable, of } = require('rxjs');
 
 const createChaosStub = require('../../create-chaos-stub');
@@ -40,19 +38,12 @@ describe('DataManager', function () {
     context('when a datasource is specified in the ChaosCore config', function () {
       context('when the npm module is installed', function () {
         beforeEach(function () {
-          this.tmpDir = path.resolve(__dirname, "../../tmp");
-
-          this.chaos.config.dataSource.type = "disk";
-          this.chaos.config.dataSource.dataDir = this.tmpDir;
+          this.chaos.config.dataSource.type = "dummy";
         });
 
-        afterEach(function () {
-          fs.rmdirSync(this.tmpDir);
-        });
-
-        it('correctly loads the datasource', function () {
+        it('correctly loads the data source', function () {
           this.dataManager = new DataManager(this.chaos);
-          expect(this.dataManager._dataSource).to.be.a.instanceOf(DiskDataSource);
+          expect(this.dataManager._dataSource).to.be.a.instanceOf(DummyDataSource);
         });
       });
 

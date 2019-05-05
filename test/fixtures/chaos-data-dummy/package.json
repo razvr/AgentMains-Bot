@@ -1,0 +1,7 @@
+{
+  "name": "chaos-data-dummy",
+  "version": "1.0.0",
+  "description": "A test dummy data source from NPM",
+  "main": "index.js",
+  "license": "MIT"
+}
