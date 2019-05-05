@@ -1,6 +1,6 @@
 const Command = require("../../../lib/models/command");
 const createChaosStub = require('../../create-chaos-stub');
-const mocks = require("../../mocks");
+const { MockCommandContext, MockResponse } = require("../../mocks/chaos.mocks");
 
 describe('Command', function () {
   beforeEach(function () {
@@ -162,8 +162,8 @@ describe('Command', function () {
 
   describe('#execCommand', function () {
     beforeEach(function () {
-      this.context = mocks.chaos.build("CommandContext");
-      this.response = mocks.chaos.build("Response");
+      this.context = new MockCommandContext({});
+      this.response = new MockResponse({});
     });
 
     it('calls #checkMissingArgs', function () {
@@ -205,8 +205,8 @@ describe('Command', function () {
 
   describe('#help', function () {
     beforeEach(function () {
-      this.context = mocks.chaos.create("CommandContext");
-      this.response = mocks.chaos.create("Response");
+      this.context = new MockCommandContext({});
+      this.response = new MockResponse({});
       this.response.send = sinon.fake();
 
       this.context.chaos = this.chaos;
@@ -223,8 +223,8 @@ describe('Command', function () {
 
   describe('#argsMissing', function () {
     beforeEach(function () {
-      this.context = mocks.chaos.create("CommandContext");
-      this.response = mocks.chaos.create("Response");
+      this.context = new MockCommandContext({});
+      this.response = new MockResponse({});
       this.response.send = sinon.fake();
 
       this.context.chaos = this.chaos;

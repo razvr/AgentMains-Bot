@@ -1,30 +1,47 @@
-const { of } = require('rxjs');
+const Plugin = require('../../lib/models/plugin');
+const Response = require('../../lib/models/response');
+const Command = require('../../lib/models/command');
+const CommandContext = require('../../lib/models/command-context');
 
-const Mockery = require('./mockery');
-const seq = Mockery.seq;
+class MockPlugin extends Plugin {
+  constructor(options) {
+    super({
+      name: "testPlugin",
+      ...options,
+    });
+  }
+}
 
-const chaosMocks = new Mockery();
+class MockResponse extends Response {
+  constructor({ message, type, content, embed }) {
+    super(message, type, content, embed);
+  }
+}
 
-chaosMocks.define("Plugin", {
-  name: "testPlugin",
-});
+class MockCommand extends Command {
+  constructor({ chaos, ...options }) {
+    super(chaos, {
+      name: 'testCommand',
+      description: 'This is a test command',
+      run: () => {},
+      ...options,
+    });
+  }
+}
 
-chaosMocks.define("Response", {
-  embed: null,
-  type: "mock_type",
-  content: "mock_content",
-  send: seq(() => () => of('')),
-});
+class MockCommandContext extends CommandContext {
+  constructor({ chaos, message = "hello", command = null, args = [], flags = {} }) {
+    if (!command) {
+      command = new MockCommand({ chaos });
+    }
 
-chaosMocks.define("Command", {
-  name: 'testCommand',
-  description: 'This is a test command',
-  run: () => {},
-});
+    super(chaos, message, command, args, flags);
+  }
+}
 
-chaosMocks.define("CommandContext", {
-  command: seq(() => chaosMocks.create('Command')),
-  flags: seq(() => ({})),
-});
-
-module.exports = chaosMocks;
+module.exports = {
+  MockPlugin,
+  MockResponse,
+  MockCommand,
+  MockCommandContext,
+};

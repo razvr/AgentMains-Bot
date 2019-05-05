@@ -1,11 +1,11 @@
 const { Observable } = require('rxjs');
 
 const Response = require('../../../lib/models/response');
-const mocks = require('../../mocks');
+const { MockMessage } = require("../../mocks/discord.mocks");
 
 describe('Response', function () {
   beforeEach(function () {
-    this.message = new mocks.discord.Message({});
+    this.message = new MockMessage({});
     this.response = new Response(this.message);
   });
 

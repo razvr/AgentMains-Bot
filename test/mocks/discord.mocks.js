@@ -183,12 +183,12 @@ class MockMessage extends Discord.Message {
 }
 
 module.exports = {
-  Client: MockClient,
-  ClientUser: MockClientUser,
-  Guild: MockGuild,
-  GuildMember: MockGuildMember,
-  Message: MockMessage,
-  Role: MockRole,
-  TextChannel: MockTextChannel,
-  User: MockUser,
+  MockClient,
+  MockClientUser,
+  MockGuild,
+  MockGuildMember,
+  MockMessage,
+  MockRole,
+  MockTextChannel,
+  MockUser,
 };

@@ -1,8 +1,7 @@
 const { throwError } = require('rxjs');
 
 const Discord = require('discord.js');
-
-const mocks = require('./mocks');
+const { MockUser, MockClientUser } = require("./mocks/discord.mocks");
 
 module.exports = (chaosBot) => {
   chaosBot.stubService = (pluginName, serviceName, service) => {
@@ -16,7 +15,7 @@ module.exports = (chaosBot) => {
 
   chaosBot.discord.login = () => {
     if (!chaosBot.discord.user) {
-      chaosBot.discord.user = new mocks.discord.ClientUser({
+      chaosBot.discord.user = new MockClientUser({
         client: chaosBot.discord,
       });
     }
@@ -38,7 +37,7 @@ module.exports = (chaosBot) => {
 
   chaosBot.discord.destroy = () => new Promise((resolve) => resolve(""));
 
-  const owner = new mocks.discord.User({
+  const owner = new MockUser({
     client: chaosBot.discord,
     data: {
       id: chaosBot.config.ownerUserId,

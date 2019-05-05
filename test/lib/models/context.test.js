@@ -1,17 +1,18 @@
 const Context = require('../../../lib/models/command-context');
 const createChaosStub = require('../../create-chaos-stub');
-const mocks = require('../../mocks');
+const { MockCommand } = require("../../mocks/chaos.mocks");
+const { MockMessage } = require("../../mocks/discord.mocks");
 
 describe('Context', function () {
   beforeEach(function () {
     this.chaos = createChaosStub();
 
-    this.message = new mocks.discord.Message({
+    this.message = new MockMessage({
       client: this.chaos.discord,
       data: {},
     });
 
-    this.context = mocks.chaos.create("Command");
+    this.context = new MockCommand({});
     this.args = {};
     this.flags = {};
 

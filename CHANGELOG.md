@@ -1,9 +1,13 @@
 Next
 ====
 
-Major Features
+Breaking Changes
 --------------
 - Upgrade to RxJS 6
+- Moved discord and chaos mocks to `ChaosCore.test`
+  - `const {MockGuild} = require('chaos-core').test.discordMocks`
+  - `const {MockCommand} = require('chaos-core').test.chaosMocks`
+- Removed Mockery from chaos mocks
 
 Minor Features
 --------------

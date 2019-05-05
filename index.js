@@ -9,7 +9,8 @@ module.exports.ConfigAction = require('./lib/models/config-action');
 module.exports.utility = require('./lib/utility');
 
 module.exports.test = {
-  mocks: require('./test/mocks'),
+  discordMocks: require('./test/mocks/discord.mocks'),
+  chaosMocks: require('./test/mocks/chaos.mocks'),
   stubChaosBot: require('./test/stub-chaos-bot'),
   createChaosStub: require('./test/create-chaos-stub'),
 };

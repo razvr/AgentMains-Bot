@@ -3,7 +3,7 @@ const { toArray, tap } = require('rxjs/operators');
 const PluginManager = require('../../../lib/managers/plugin-manager');
 const Service = require("../../../lib/models/service");
 const createChaosStub = require('../../create-chaos-stub');
-const mocks = require('../../mocks');
+const { MockGuild } = require("../../mocks/discord.mocks");
 const { LoadPluginError } = require("../../../lib/errors/plugin-manager-errors");
 
 describe('PluginManager', function () {
@@ -241,7 +241,7 @@ describe('PluginManager', function () {
 
   describe('#onJoinGuild', function () {
     beforeEach(function () {
-      this.guild = new mocks.discord.Guild({
+      this.guild = new MockGuild({
         client: this.chaos.discord,
       });
     });

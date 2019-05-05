@@ -5,7 +5,7 @@ const Command = require('../../../lib/models/command');
 const CommandContext = require('../../../lib/models/command-context');
 const CommandService = require('../../../lib/core-plugin/services/command-service');
 const createChaosStub = require('../../create-chaos-stub');
-const mocks = require('../../mocks');
+const { MockMessage } = require("../../mocks/discord.mocks");
 
 describe('CommandService', function () {
   beforeEach(function (done) {
@@ -16,7 +16,7 @@ describe('CommandService', function () {
 
   describe('#filterCanRunCommand', function () {
     beforeEach(function () {
-      this.message = new mocks.discord.Message({
+      this.message = new MockMessage({
         client: this.chaos.discord,
       });
 

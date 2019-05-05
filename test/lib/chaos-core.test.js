@@ -11,7 +11,7 @@ const PermissionsManager = require('../../lib/managers/permissions-manager');
 const PluginManager = require('../../lib/managers/plugin-manager');
 const Service = require("../../lib/models/service");
 const ServicesManager = require('../../lib/managers/services-manager');
-const mocks = require('../mocks');
+const { MockClient, MockUser } = require("../mocks/discord.mocks");
 
 describe('ChaosCore', function () {
   beforeEach(function () {
@@ -21,8 +21,8 @@ describe('ChaosCore', function () {
       logger: { silent: true },
     };
 
-    this.discord = new mocks.discord.Client({});
-    this.owner = new mocks.discord.User({
+    this.discord = new MockClient({});
+    this.owner = new MockUser({
       client: this.discord,
       data: {
         id: this.config.ownerUserId,

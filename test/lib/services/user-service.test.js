@@ -6,7 +6,9 @@ const Discord = require('discord.js');
 const UserService = require('../../../lib/core-plugin/services/user-service');
 const { UserNotFoundError } = require("../../../lib/errors");
 const createChaosStub = require('../../create-chaos-stub');
-const mocks = require('../../mocks');
+const { MockGuildMember } = require("../../mocks/discord.mocks");
+const { MockUser } = require("../../mocks/discord.mocks");
+const { MockGuild } = require("../../mocks/discord.mocks");
 
 describe('Service: UserService', function () {
   beforeEach(function () {
@@ -19,7 +21,7 @@ describe('Service: UserService', function () {
     const memberTag = 'TestUser#0001';
 
     beforeEach(function () {
-      this.guild = new mocks.discord.Guild({
+      this.guild = new MockGuild({
         client: this.chaos.discord,
       });
     });
@@ -45,7 +47,7 @@ describe('Service: UserService', function () {
 
         context('when the member exists in the guild', function () {
           beforeEach(function () {
-            this.user = new mocks.discord.User({
+            this.user = new MockUser({
               client: this.chaos.discord,
               data: {
                 id: memberId,
@@ -53,7 +55,7 @@ describe('Service: UserService', function () {
               },
             });
 
-            this.member = new mocks.discord.GuildMember({
+            this.member = new MockGuildMember({
               guild: this.guild,
               data: {
                 user: this.user,
@@ -100,7 +102,7 @@ describe('Service: UserService', function () {
 
         context('when the user exists', function () {
           beforeEach(function () {
-            this.user = new mocks.discord.User({
+            this.user = new MockUser({
               client: this.chaos.discord,
               data: {
                 id: userId,

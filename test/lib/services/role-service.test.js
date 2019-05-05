@@ -4,12 +4,12 @@ const { catchError, tap } = require('rxjs/operators');
 const RoleService = require('../../../lib/core-plugin/services/role-service');
 const { RoleNotFoundError } = require("../../../lib/errors");
 const createChaosStub = require('../../create-chaos-stub');
-const mocks = require('../../mocks');
+const { MockGuild, MockClient, MockRole } = require("../../mocks/discord.mocks");
 
 describe('Service: RoleService', function () {
   beforeEach(function () {
     this.chaos = createChaosStub();
-    this.chaos.discord = new mocks.discord.Client({});
+    this.chaos.discord = new MockClient({});
     this.roleService = new RoleService(this.chaos);
   });
 
@@ -18,7 +18,7 @@ describe('Service: RoleService', function () {
     const roleName = 'testRole';
 
     beforeEach(function () {
-      this.guild = new mocks.discord.Guild({
+      this.guild = new MockGuild({
         client: this.chaos.discord,
       });
     });
@@ -43,7 +43,7 @@ describe('Service: RoleService', function () {
 
         context('when the role exists in the guild', function () {
           beforeEach(function () {
-            this.role = new mocks.discord.Role({
+            this.role = new MockRole({
               guild: this.guild,
               data: {
                 id: roleId,
