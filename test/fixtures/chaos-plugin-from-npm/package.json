@@ -1,0 +1,7 @@
+{
+  "name": "chaos-plugin-from-npm",
+  "version": "1.0.0",
+  "description": "A test dummy plugin from NPM",
+  "main": "index.js",
+  "license": "MIT"
+}

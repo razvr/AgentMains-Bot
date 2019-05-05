@@ -4,6 +4,7 @@ const PluginManager = require('../../../lib/managers/plugin-manager');
 const Service = require("../../../lib/models/service");
 const createChaosStub = require('../../create-chaos-stub');
 const mocks = require('../../mocks');
+const { LoadPluginError } = require("../../../lib/errors/plugin-manager-errors");
 
 describe('PluginManager', function () {
   beforeEach(function () {
@@ -80,6 +81,38 @@ describe('PluginManager', function () {
     it('makes the plugin retrievable via #getPlugin', function () {
       this.pluginManager.addPlugin(this.testPlugin);
       expect(this.pluginManager.getPlugin('TestPlugin').name).to.eq("TestPlugin");
+    });
+
+    context('when the plugin is a string', function () {
+      it('loads the plugin from npm', function () {
+        this.pluginManager.addPlugin("from-npm");
+        expect(this.pluginManager.getPlugin("fromNpm").name).to.eq("fromNpm");
+      });
+
+      context('when the npm package is not installed', function () {
+        it('throws an error', function () {
+          expect(() => {
+            this.pluginManager.addPlugin("not-found");
+          }).to.throw(
+            LoadPluginError,
+            "Unable to load plugin 'chaos-plugin-not-found'. Is the npm module 'chaos-plugin-not-found' installed?",
+          );
+        });
+      });
+    });
+
+    context('when the plugin has dependencies', function () {
+      it('loads the dependencies from npm', function () {
+        this.pluginManager.addPlugin({
+          name: 'withDeps',
+          dependencies: [
+            "from-npm",
+          ],
+        });
+
+        expect(this.pluginManager.getPlugin("withDeps").name).to.eq("withDeps");
+        expect(this.pluginManager.getPlugin("fromNpm").name).to.eq("fromNpm");
+      });
     });
 
     context('when the plugin has already been added', function () {
