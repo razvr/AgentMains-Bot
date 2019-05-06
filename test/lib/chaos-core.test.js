@@ -9,7 +9,6 @@ const DataManager = require('../../lib/managers/data-manager');
 const ChaosCore = require('../../lib/chaos-core');
 const PermissionsManager = require('../../lib/managers/permissions-manager');
 const PluginManager = require('../../lib/managers/plugin-manager');
-const Service = require("../../lib/models/service");
 const ServicesManager = require('../../lib/managers/services-manager');
 const { MockClient, MockUser } = require("../mocks/discord.mocks");
 

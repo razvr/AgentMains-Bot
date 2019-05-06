@@ -17,7 +17,6 @@ describe('Context', function () {
     this.flags = {};
 
     this.context = new Context(
-      this.chaos,
       this.message,
       this.command,
       this.args,
@@ -28,7 +27,6 @@ describe('Context', function () {
   describe('constructor', function () {
     it('assigns attributes', function () {
       expect(this.context.message).to.eq(this.message);
-      expect(this.context.chaos).to.eq(this.chaos);
       expect(this.context.command).to.eq(this.command);
       expect(this.context.args).to.eq(this.args);
       expect(this.context.flags).to.eq(this.flags);

@@ -24,7 +24,7 @@ describe('CommandService', function () {
         name: "testCommand",
         pluginName: "testPlugin",
       });
-      this.context = new CommandContext(this.chaos, this.message, this.command, {}, {});
+      this.context = new CommandContext(this.message, this.command, {}, {});
     });
 
     context('when the bot can not send a message to the channel', function () {

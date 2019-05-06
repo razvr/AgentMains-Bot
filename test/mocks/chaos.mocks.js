@@ -30,12 +30,12 @@ class MockCommand extends Command {
 }
 
 class MockCommandContext extends CommandContext {
-  constructor({ chaos, message = "hello", command = null, args = [], flags = {} }) {
+  constructor({chaos, message = "hello", command = null, args = [], flags = {} }) {
     if (!command) {
       command = new MockCommand({ chaos });
     }
 
-    super(chaos, message, command, args, flags);
+    super(message, command, args, flags);
   }
 }
 

@@ -9,6 +9,7 @@ Breaking Changes
   - `const {MockCommand} = require('chaos-core').test.chaosMocks`
 - Removed Mockery from chaos mocks
 - Removed `services` and `commands` from config
+- Removed chaos from commandContext
 
 Minor Features
 --------------
