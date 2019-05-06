@@ -7,14 +7,6 @@ const createChaosStub = require('../../create-chaos-stub');
 describe('ServicesManager', function () {
   beforeEach(function () {
     this.chaos = createChaosStub();
-
-    this.chaos.services = {
-      core: {
-        serviceOne: { name: "serviceOne" },
-        serviceTwo: { name: "serviceTwo" },
-      },
-    };
-
     this.servicesManager = new ServicesManager(this.chaos);
   });
 

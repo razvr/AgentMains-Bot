@@ -120,28 +120,6 @@ describe('ChaosCore', function () {
       const loadedPlugins = this.chaos.pluginManager.plugins;
       expect(loadedPlugins.map((p) => p.name)).to.include('testPlugin');
     });
-
-    it('loads services from the config', function () {
-      class TestService extends Service {}
-
-      this.config.services = { 'testPlugin': [TestService] };
-
-      this.chaos = new ChaosCore(this.config);
-
-      let testService = this.chaos.getService('testPlugin', 'TestService');
-      expect(testService).to.be.an.instanceOf(TestService);
-    });
-
-    it('loads commands from the config', function () {
-      this.config.commands = [{
-        name: 'testCommand',
-        run: () => {},
-      }];
-
-      this.chaos = new ChaosCore(this.config);
-
-      expect(this.chaos.getCommand('testCommand')).not.to.be.undefined;
-    });
   });
 
   describe('#listen', function () {

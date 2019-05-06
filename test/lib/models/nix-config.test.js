@@ -19,9 +19,7 @@ describe('ChaosConfig', function () {
       "logger",
       "responseStrings",
       "defaultPrefix",
-      "services",
       "plugins",
-      "commands",
       "messageOwnerOnBoot",
     ].forEach((attribute) => {
       it(attribute, function () {

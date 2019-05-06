@@ -5,14 +5,6 @@ const { Command } = require("../../../index");
 describe('CommandManager', function () {
   beforeEach(function () {
     this.chaos = createChaosStub();
-
-    this.chaos.services = {
-      core: {
-        serviceOne: {name: "serviceOne"},
-        serviceTwo: {name: "serviceTwo"},
-      },
-    };
-
     this.commandManager = new CommandManager(this.chaos);
   });
 
@@ -29,7 +21,7 @@ describe('CommandManager', function () {
       });
     });
 
-    context('when plugins have been added', function () {
+    context('when commands have been added', function () {
       beforeEach(function () {
         this.commandOne = { pluginName: 'test', name: "commandOne", run: () => {} };
         this.commandTwo = { pluginName: 'test', name: "commandTwo", run: () => {} };
