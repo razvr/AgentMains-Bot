@@ -5,8 +5,11 @@ module.exports.Plugin = require('./lib/models/plugin');
 module.exports.Service = require('./lib/models/service');
 module.exports.Command = require('./lib/models/command');
 module.exports.ConfigAction = require('./lib/models/config-action');
+module.exports.CommandContext = require('./lib/models/command-context');
+module.exports.Response = require('./lib/models/response');
 
 module.exports.utility = require('./lib/utility');
+module.exports.errors = require('./lib/errors');
 
 module.exports.test = {
   discordMocks: require('./test/mocks/discord.mocks'),

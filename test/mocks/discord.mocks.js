@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const { Collection } = require('discord.js');
 
 class MockClient extends Discord.Client {
   constructor({ data }) {
@@ -24,6 +25,10 @@ class MockClient extends Discord.Client {
 
 class MockClientUser extends Discord.ClientUser {
   constructor({ client, data = {} }) {
+    if (!client) {
+      client = new MockClient({});
+    }
+
     if (data.tag) {
       const [username, discriminator] = data.tag.split('#');
       data.username = username;
@@ -49,6 +54,10 @@ class MockClientUser extends Discord.ClientUser {
 
 class MockGuild extends Discord.Guild {
   constructor({ client, data = {} }) {
+    if (!client) {
+      client = new MockClient({});
+    }
+
     super(
       client,
       {
@@ -89,6 +98,10 @@ class MockUser extends Discord.User {
 
 class MockRole extends Discord.Role {
   constructor({ guild, data = {} }) {
+    if (!guild) {
+      guild = new MockGuild({});
+    }
+
     super(
       guild,
       {
@@ -138,12 +151,32 @@ class MockGuildMember extends Discord.GuildMember {
       guild,
       {
         id: Discord.SnowflakeUtil.generate(),
-        roles: [],
+        roles: new Collection(),
         ...data,
       },
     );
 
     this.guild.members.set(this.id, this);
+  }
+
+  addRole(role) {
+    this._roles.set(role.id, role);
+    return Promise.resolve(this);
+  }
+
+  addRoles(roles) {
+    roles.forEach((role) => this.roles.set(role.id, role));
+    return Promise.resolve(this);
+  }
+
+  removeRole(role) {
+    this._roles.delete(role.id);
+    return Promise.resolve(this);
+  }
+
+  removeRoles(roles) {
+    roles.forEach((role) => this.roles.delete(role.id));
+    return Promise.resolve(this);
   }
 }
 
