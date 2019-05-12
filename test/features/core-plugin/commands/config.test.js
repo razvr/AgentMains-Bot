@@ -1,23 +1,31 @@
-const { of } = require('rxjs');
-const { tap, flatMap } = require('rxjs/operators');
+const { tap } = require('rxjs/operators');
+const { SnowflakeUtil } = require("discord.js");
 
 const createChaosStub = require('../../../create-chaos-stub');
-const { MockGuild, MockTextChannel, MockMessage } = require("../../../mocks/discord.mocks");
+const { MockGuild, MockMessage } = require("../../../mocks/discord.mocks");
 
-describe('Feature: !config', function () {
+describe('Command: !config', function () {
   beforeEach(function (done) {
     this.chaos = createChaosStub();
+    this.command = this.chaos.getCommand('config');
+
     this.discord = this.chaos.discord;
     this.guild = new MockGuild({
       client: this.discord,
     });
 
-    this.channel = new MockTextChannel({
+    this.channel = {
+      id: SnowflakeUtil.generate(),
+      type: 'text',
+      name: 'testChannel',
+
       guild: this.guild,
-      data: {
-        name: 'testChannel',
-      },
-    });
+
+      send: sinon.fake.resolves('Message'),
+      permissionsFor: () => ({
+        has: () => true,
+      }),
+    };
 
     this.message = new MockMessage({
       channel: this.channel,
@@ -25,25 +33,16 @@ describe('Feature: !config', function () {
       data: {},
     });
 
-    this.plugin = {
+    this.chaos.addPlugin({
       name: "test",
-      commands: [],
-    };
+      configActions: [
+        { name: "action1" },
+        { name: "action2" },
+        { name: "action3" },
+      ],
+    });
 
-    this.testAction = {
-      name: "testAction",
-      run: sinon.fake(),
-    };
-
-    const commandService = this.chaos.getService('core', 'CommandService');
-    const pluginService = this.chaos.getService('core', 'pluginService');
-    sinon.stub(commandService, 'canSendMessage').returns(of(true));
-
-    this.chaos.addPlugin(this.plugin);
-
-    this.chaos.listen().pipe(
-      flatMap(() => pluginService.enablePlugin(this.guild.id, this.plugin.name)),
-    ).subscribe(() => done(), (error) => done(error));
+    this.chaos.listen().subscribe(() => done(), (error) => done(error));
   });
 
   afterEach(function (done) {
@@ -54,6 +53,18 @@ describe('Feature: !config', function () {
     }
   });
 
+  context('when the user is not an admin', function () {
+    it('does not run the command', function (done) {
+      this.message.content = '!config';
+      sinon.spy(this.command, 'run');
+
+      this.chaos.testCmdMessage(this.message).pipe(
+        tap(() => expect(this.command.run).not.to.have.been.called),
+        tap(({ response }) => expect(response.replies).to.have.length(0)),
+      ).subscribe(() => done(), (error) => done(error));
+    });
+  });
+
   context('when the user is an admin', function () {
     beforeEach(function (done) {
       const permissionsService = this.chaos.getService('core', 'PermissionsService');
@@ -61,14 +72,140 @@ describe('Feature: !config', function () {
         .subscribe(() => done(), (error) => done(error));
     });
 
-    it('runs a config action', function (done) {
-      this.message.content = '!config test testAction';
-      this.chaos.addConfigAction('test', this.testAction);
+    describe('!config', function () {
+      beforeEach(function () {
+        this.message.content = '!config';
+      });
 
-      this.chaos.testCmdMessage(this.message).pipe(
-        tap(() => expect(this.testAction.run).to.have.been.called),
-        tap(({response}) => expect(response.replies).to.have.length(0)),
-      ).subscribe(() => done(), (error) => done(error));
+      it('replies with the command usage', function (done) {
+        sinon.spy(this.command, 'run');
+
+        this.chaos.testCmdMessage(this.message).pipe(
+          tap(({ response }) => expect(response.replies).to.have.length(1)),
+          tap(({ response }) => expect(response.replies[0]).to.containSubset({
+            content: "I'm sorry, but I'm missing some information for that command:",
+            embed: {
+              fields: [
+                {
+                  "name": "Usage",
+                  "value": "!config [--list] <plugin> <action>",
+                },
+              ],
+            },
+          })),
+        ).subscribe(() => done(), (error) => done(error));
+      });
+    });
+
+    describe('!config --list', function () {
+      beforeEach(function () {
+        this.message.content = '!config --list';
+      });
+
+      it('replies with a list of available config actions in all plugins', function (done) {
+        sinon.spy(this.command, 'run');
+
+        const coreActions = this.chaos.configManager.actions
+          .filter((action) => action.pluginName === "core")
+          .map((action) => action.name);
+
+        this.chaos.testCmdMessage(this.message).pipe(
+          tap(({ response }) => expect(response.replies).to.have.length(1)),
+          tap(({ response }) => expect(response.replies[0]).to.containSubset({
+            content: "Here's a list of plugins with config actions:",
+            embed: {
+              fields: [
+                { name: "core", value: coreActions.join(', ') },
+                { name: "test", value: 'action1, action2, action3' },
+              ],
+            },
+          })),
+        ).subscribe(() => done(), (error) => done(error));
+      });
+    });
+
+    describe('!config {plugin}', function () {
+      beforeEach(function () {
+        this.message.content = '!config test';
+      });
+
+      it('replies with the command usage', function (done) {
+        this.chaos.testCmdMessage(this.message).pipe(
+          tap(({ response }) => expect(response.replies).to.have.length(1)),
+          tap(({ response }) => expect(response.replies[0]).to.containSubset({
+            content: "I'm sorry, but I'm missing some information for that command:",
+            embed: {
+              fields: [
+                { name: "Usage", value: "!config [--list] <plugin> <action>" },
+              ],
+            },
+          })),
+        ).subscribe(() => done(), (error) => done(error));
+      });
+    });
+
+    describe('!config {plugin} --list', function () {
+      beforeEach(function () {
+        this.message.content = '!config test --list';
+      });
+
+      it('replies with a list of available config actions in the given plugin', function (done) {
+        sinon.spy(this.command, 'run');
+
+        this.chaos.testCmdMessage(this.message).pipe(
+          tap(({ response }) => expect(response.replies).to.have.length(1)),
+          tap(({ response }) => expect(response.replies[0]).to.containSubset({
+            content: "Here's a list of config actions for test:",
+            embed: {
+              "fields": [
+                { name: "action1", value: "*Usage*:\n\t!config test action1" },
+                { name: "action2", value: "*Usage*:\n\t!config test action2" },
+                { name: "action3", value: "*Usage*:\n\t!config test action3" },
+              ],
+            },
+          })),
+        ).subscribe(() => done(), (error) => done(error));
+      });
+    });
+
+    describe('!config {plugin} {action}', function () {
+      beforeEach(function () {
+        this.message.content = '!config test action1';
+        this.action = this.chaos.getConfigAction('test', 'action1');
+      });
+
+      context('when the plugin is disabled', function () {
+        it('gives an error message', function (done) {
+          sinon.spy(this.action, 'run');
+
+          this.chaos.testCmdMessage(this.message).pipe(
+            tap(() => expect(this.action.run).not.to.have.been.called),
+            tap(({ response }) => expect(response.replies).to.have.length(1)),
+            tap(({ response }) => expect(response.replies[0]).to.containSubset({
+              content:
+                "The plugin \"test\" is currently disabled.\n" +
+                "You can use `!config core enablePlugin test` to enable it.",
+            })),
+          ).subscribe(() => done(), (error) => done(error));
+        });
+      });
+
+      context('when the plugin is enabled', function () {
+        beforeEach(function (done) {
+          this.chaos.getService('core', 'PluginService')
+            .enablePlugin(this.guild.id, 'test')
+            .subscribe(() => done(), (error) => done(error));
+        });
+
+        it('runs a config action', function (done) {
+          sinon.spy(this.action, 'run');
+
+          this.chaos.testCmdMessage(this.message).pipe(
+            tap(() => expect(this.action.run).to.have.been.called),
+            tap(({ response }) => expect(response.replies).to.have.length(0)),
+          ).subscribe(() => done(), (error) => done(error));
+        });
+      });
     });
   });
 });
