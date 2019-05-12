@@ -1,4 +1,5 @@
-const { throwError } = require('rxjs');
+const { throwError, Subject, ReplaySubject } = require('rxjs');
+const { take, tap, flatMap, merge } = require('rxjs/operators');
 
 const Discord = require('discord.js');
 const { MockUser, MockClientUser } = require("./mocks/discord.mocks");
@@ -9,7 +10,9 @@ module.exports = (chaosBot) => {
     chaosBot.servicesManager._services[serviceKey] = service;
   };
 
+  chaosBot.errors$ = new Subject();
   chaosBot.handleError = (error) => {
+    chaosBot.errors$.next(error);
     return throwError(error);
   };
 
@@ -36,6 +39,26 @@ module.exports = (chaosBot) => {
   };
 
   chaosBot.discord.destroy = () => new Promise((resolve) => resolve(""));
+
+  chaosBot.testCmdMessage = (message) => {
+    const responses = new ReplaySubject();
+
+    chaosBot.streams.postCommand$.pipe(
+      merge(chaosBot.errors$.pipe(
+        flatMap((error) => throwError(error)),
+      )),
+      take(1),
+      tap(({ response }) => chaosBot.logger.debug(`${response.replies} replies for message '${message.context}'`)),
+    ).subscribe(
+      (data) => responses.next(data),
+      (error) => responses.error(error),
+      () => responses.complete(),
+    );
+
+    chaosBot.discord.emit('message', message);
+
+    return responses;
+  };
 
   const owner = new MockUser({
     client: chaosBot.discord,
