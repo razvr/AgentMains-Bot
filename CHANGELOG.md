@@ -5,11 +5,13 @@ Breaking Changes
 --------------
 - Upgrade to RxJS 6
 - Moved discord and chaos mocks to `ChaosCore.test`
-  - `const {MockGuild} = require('chaos-core').test.discordMocks`
-  - `const {MockCommand} = require('chaos-core').test.chaosMocks`
+    - `const {MockGuild} = require('chaos-core').test.discordMocks`
+    - `const {MockCommand} = require('chaos-core').test.chaosMocks`
 - Removed Mockery from chaos mocks
 - Removed `services` and `commands` from config
+    - add new services and commands through plugins
 - Removed chaos from commandContext
+    - replace calls to `context.chaos` with `this.chaos`
 
 Minor Features
 --------------

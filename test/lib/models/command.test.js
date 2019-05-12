@@ -189,8 +189,6 @@ describe('Command', function () {
       this.context = new MockCommandContext({});
       this.response = new MockResponse({});
       this.response.send = sinon.fake();
-
-      this.context.chaos = this.chaos;
     });
 
     it("sends an embed type response", function () {
@@ -209,8 +207,6 @@ describe('Command', function () {
       });
       this.response = new MockResponse({});
       this.response.send = sinon.fake();
-
-      this.context.chaos = this.chaos;
     });
 
     it("sends an embed type response", function () {
