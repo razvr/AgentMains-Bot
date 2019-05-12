@@ -1,5 +1,5 @@
 const { of } = require('rxjs');
-const { tap, flatMap, toArray } = require('rxjs/operators');
+const { tap, flatMap } = require('rxjs/operators');
 
 const createChaosStub = require('../../../create-chaos-stub');
 const { MockGuild, MockTextChannel, MockMessage } = require("../../../mocks/discord.mocks");
@@ -63,14 +63,11 @@ describe('Feature: !config', function () {
 
     it('runs a config action', function (done) {
       this.message.content = '!config test testAction';
-
       this.chaos.addConfigAction('test', this.testAction);
 
-      of('').pipe(
-        tap(() => this.discord.emit('message', this.message)),
-        flatMap(() => this.chaos.shutdown()),
-        toArray(),
+      this.chaos.testCmdMessage(this.message).pipe(
         tap(() => expect(this.testAction.run).to.have.been.called),
+        tap(({response}) => expect(response.replies).to.have.length(0)),
       ).subscribe(() => done(), (error) => done(error));
     });
   });

@@ -18,5 +18,8 @@ Minor Features
 - added chaos.notifyError and chaos.catchError operators
     - chaos.notifyError will notify the bot owner of an error, and rethrow it
     - chaos.catchError will also notify, but will silence the error
+- added testCmdMessage to stubbed Chaos bots
+    - emits {context, response} when the bot has finished handling the message
+    - currently only works with messages that contain commands
 - added .replies to command Responses
     - records all sent replies for the command

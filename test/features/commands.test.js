@@ -58,11 +58,9 @@ describe('Feature: Commands', function () {
 
   it('runs basic commands', function (done) {
     this.message.content = '!test';
-
     this.chaos.addCommand(this.command);
 
-    this.discord.emit('message', this.message);
-    this.chaos.shutdown().pipe(
+    this.chaos.testCmdMessage(this.message).pipe(
       tap(() => expect(this.command.run).to.have.been.called),
     ).subscribe(() => done(), (error) => done(error));
   });
@@ -78,8 +76,7 @@ describe('Feature: Commands', function () {
 
     this.chaos.addCommand(this.command);
 
-    this.discord.emit('message', this.message);
-    this.chaos.shutdown().pipe(
+    this.chaos.testCmdMessage(this.message).pipe(
       tap(() => {
         expect(this.command.run).to.have.been.calledWith(sinon.match({
           args: {
@@ -103,8 +100,7 @@ describe('Feature: Commands', function () {
 
     this.chaos.addCommand(this.command);
 
-    this.discord.emit('message', this.message);
-    this.chaos.shutdown().pipe(
+    this.chaos.testCmdMessage(this.message).pipe(
       tap(() => {
         expect(this.command.run).not.to.have.been.called;
         expect(this.channel.send).to.have.been.calledWith("I'm sorry, but I'm missing some information for that command:");
@@ -119,46 +115,38 @@ describe('Feature: Commands', function () {
     this.chaos.addPermissionLevel('test');
     this.chaos.addCommand(this.command);
 
-    this.discord.emit('message', this.message);
-    this.chaos.shutdown().pipe(
+    this.chaos.testCmdMessage(this.message).pipe(
       tap(() => expect(this.command.run).not.to.have.been.called),
     ).subscribe(() => done(), (error) => done(error));
   });
 
   it('does not run commands that part of disabled plugins', function (done) {
     this.message.content = '!test';
-
     this.chaos.addCommand(this.command);
 
     of('').pipe(
       flatMap(() => this.pluginService.disablePlugin(this.guild.id, this.plugin.name)),
-      tap(() => this.discord.emit('message', this.message)),
-      flatMap(() => this.chaos.shutdown()),
+      flatMap(() => this.chaos.testCmdMessage(this.message)),
       tap(() => expect(this.command.run).not.to.have.been.called),
     ).subscribe(() => done(), (error) => done(error));
   });
 
   it('does not run commands that are explicitly disabled', function (done) {
     this.message.content = '!test';
-
     this.chaos.addCommand(this.command);
 
     of('').pipe(
       flatMap(() => this.commandService.disableCommand(this.message.guild.id, this.command.name)),
-      tap(() => this.discord.emit('message', this.message)),
-      flatMap(() => this.chaos.shutdown()),
+      flatMap(() => this.chaos.testCmdMessage(this.message)),
       tap(() => expect(this.command.run).not.to.have.been.called),
     ).subscribe(() => done(), (error) => done(error));
   });
 
   it('runs commands that are not explicitly disabled', function (done) {
     this.message.content = '!test';
-
     this.chaos.addCommand(this.command);
 
-    of('').pipe(
-      tap(() => this.discord.emit('message', this.message)),
-      flatMap(() => this.chaos.shutdown()),
+    this.chaos.testCmdMessage(this.message).pipe(
       tap(() => expect(this.command.run).to.have.been.called),
     ).subscribe(() => done(), (error) => done(error));
   });
