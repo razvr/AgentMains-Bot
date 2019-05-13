@@ -1,37 +1,13 @@
 const { tap } = require('rxjs/operators');
-const { SnowflakeUtil } = require("discord.js");
 
 const createChaosStub = require('../../../create-chaos-stub');
-const { MockGuild, MockMessage } = require("../../../mocks/discord.mocks");
+const { MockMessage } = require("../../../mocks/discord.mocks");
 
 describe('Command: !config', function () {
   beforeEach(function (done) {
     this.chaos = createChaosStub();
     this.command = this.chaos.getCommand('config');
-
-    this.discord = this.chaos.discord;
-    this.guild = new MockGuild({
-      client: this.discord,
-    });
-
-    this.channel = {
-      id: SnowflakeUtil.generate(),
-      type: 'text',
-      name: 'testChannel',
-
-      guild: this.guild,
-
-      send: sinon.fake.resolves('Message'),
-      permissionsFor: () => ({
-        has: () => true,
-      }),
-    };
-
-    this.message = new MockMessage({
-      channel: this.channel,
-      client: this.discord,
-      data: {},
-    });
+    this.message = new MockMessage({});
 
     this.chaos.addPlugin({
       name: "test",
@@ -68,7 +44,7 @@ describe('Command: !config', function () {
   context('when the user is an admin', function () {
     beforeEach(function (done) {
       const permissionsService = this.chaos.getService('core', 'PermissionsService');
-      permissionsService.addUser(this.guild, 'admin', this.message.author)
+      permissionsService.addUser(this.message.guild, 'admin', this.message.author)
         .subscribe(() => done(), (error) => done(error));
     });
 
@@ -193,7 +169,7 @@ describe('Command: !config', function () {
       context('when the plugin is enabled', function () {
         beforeEach(function (done) {
           this.chaos.getService('core', 'PluginService')
-            .enablePlugin(this.guild.id, 'test')
+            .enablePlugin(this.message.guild.id, 'test')
             .subscribe(() => done(), (error) => done(error));
         });
 

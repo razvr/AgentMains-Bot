@@ -1,52 +1,13 @@
 const { tap, flatMap } = require('rxjs/operators');
-const { SnowflakeUtil, Collection} = require("discord.js");
 
 const createChaosStub = require('../../../create-chaos-stub');
+const { MockMessage } = require("../../../mocks/discord.mocks");
 
 describe('Command: !help', function () {
   beforeEach(function (done) {
     this.chaos = createChaosStub();
     this.command = this.chaos.getCommand('help');
-
-    this.discord = this.chaos.discord;
-    this.guild = {
-      id: SnowflakeUtil.generate(),
-      name: "Test Guild",
-    };
-
-    this.user = {
-      id: SnowflakeUtil.generate(),
-    };
-
-    this.member = {
-      id: this.user.id,
-      user: this.user,
-      guild: this.guild,
-
-      roles: new Collection(),
-    };
-
-    this.channel = {
-      id: SnowflakeUtil.generate(),
-      type: 'text',
-      name: 'testChannel',
-
-      guild: this.guild,
-
-      send: sinon.fake.resolves('Message'),
-      permissionsFor: () => ({
-        has: () => true,
-      }),
-    };
-
-    this.message = {
-      content: "",
-
-      guild: this.guild,
-      author: this.user,
-      member: this.member,
-      channel: this.channel,
-    };
+    this.message = new MockMessage({});
 
     this.chaos.addPlugin({
       name: "test",
@@ -59,14 +20,15 @@ describe('Command: !help', function () {
 
     this.chaos.listen().pipe(
       flatMap(() => this.chaos.getService('core', 'PluginService')
-        .enablePlugin(this.guild.id, 'test'),
+        .enablePlugin(this.message.guild.id, 'test'),
       ),
     ).subscribe(() => done(), (error) => done(error));
   });
 
   afterEach(function (done) {
     if (this.chaos.listening) {
-      this.chaos.shutdown().subscribe(() => done(), (error) => done(error));
+      this.chaos.shutdown()
+        .subscribe(() => done(), (error) => done(error));
     } else {
       done();
     }
@@ -111,7 +73,7 @@ describe('Command: !help', function () {
     context('when plugins are disabled', function () {
       beforeEach(function (done) {
         this.chaos.getService('core', 'PluginService')
-          .disablePlugin(this.guild.id, 'test')
+          .disablePlugin(this.message.guild.id, 'test')
           .subscribe(() => done(), (error) => done(error));
       });
 
@@ -142,7 +104,7 @@ describe('Command: !help', function () {
     context('when commands are explicitly disabled', function () {
       beforeEach(function (done) {
         this.chaos.getService('core', 'CommandService')
-          .disableCommand(this.guild.id, 'command2')
+          .disableCommand(this.message.guild.id, 'command2')
           .subscribe(() => done(), (error) => done(error));
       });
 
@@ -184,7 +146,7 @@ describe('Command: !help', function () {
         });
 
         this.chaos.getService('core', 'PermissionsService')
-          .addUser(this.guild, 'admin', this.user)
+          .addUser(this.message.guild, 'admin', this.message.author)
           .subscribe(() => done(), (error) => done(error));
       });
 

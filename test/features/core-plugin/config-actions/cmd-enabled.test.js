@@ -1,37 +1,13 @@
 const { tap, flatMap } = require('rxjs/operators');
-const { SnowflakeUtil } = require("discord.js");
 
 const createChaosStub = require('../../../create-chaos-stub');
-const { MockGuild, MockMessage } = require("../../../mocks/discord.mocks");
+const { MockMessage } = require("../../../mocks/discord.mocks");
 
 describe('Config: core.cmdEnabled?', function () {
   beforeEach(function (done) {
     this.chaos = createChaosStub();
     this.action = this.chaos.getConfigAction('core', 'cmdEnabled?');
-
-    this.discord = this.chaos.discord;
-    this.guild = new MockGuild({
-      client: this.discord,
-    });
-
-    this.channel = {
-      id: SnowflakeUtil.generate(),
-      type: 'text',
-      name: 'testChannel',
-
-      guild: this.guild,
-
-      send: sinon.fake.resolves('Message'),
-      permissionsFor: () => ({
-        has: () => true,
-      }),
-    };
-
-    this.message = new MockMessage({
-      channel: this.channel,
-      client: this.discord,
-      data: {},
-    });
+    this.message = new MockMessage({});
 
     this.chaos.addPlugin({
       name: "test",
@@ -44,9 +20,9 @@ describe('Config: core.cmdEnabled?', function () {
 
     this.chaos.listen().pipe(
       flatMap(() => this.chaos.getService('core', 'PermissionsService')
-        .addUser(this.guild, 'admin', this.message.author)),
+        .addUser(this.message.guild, 'admin', this.message.author)),
       flatMap(() => this.chaos.getService('core', 'PluginService')
-        .enablePlugin(this.guild.id, 'test')),
+        .enablePlugin(this.message.guild.id, 'test')),
     ).subscribe(() => done(), (error) => done(error));
   });
 
@@ -81,7 +57,7 @@ describe('Config: core.cmdEnabled?', function () {
             fields: [
               {
                 name: "Usage",
-                value: "!config core cmdEnabled? <command>",
+                value: `!config core cmdEnabled? <command>`,
               },
               {
                 name: "Inputs",
@@ -118,7 +94,7 @@ describe('Config: core.cmdEnabled?', function () {
     context('when the command is disabled', function () {
       beforeEach(function (done) {
         this.chaos.getService('core', 'CommandService')
-          .disableCommand(this.guild.id, 'testCommand')
+          .disableCommand(this.message.guild.id, 'testCommand')
           .subscribe(() => done(), (error) => done(error));
       });
 

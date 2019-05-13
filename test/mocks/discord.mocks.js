@@ -137,6 +137,12 @@ class MockTextChannel extends Discord.TextChannel {
   send(msg) {
     return new Promise((resolve) => resolve(msg));
   }
+
+  permissionsFor() {
+    return {
+      has: () => true,
+    };
+  }
 }
 
 class MockGuildMember extends Discord.GuildMember {
