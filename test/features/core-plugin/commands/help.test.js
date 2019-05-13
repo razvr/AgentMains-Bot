@@ -5,7 +5,7 @@ const createChaosStub = require('../../../create-chaos-stub');
 
 describe('Command: !help', function () {
   beforeEach(function (done) {
-    this.chaos = createChaosStub({logger: { level: 'silly'}});
+    this.chaos = createChaosStub();
     this.command = this.chaos.getCommand('help');
 
     this.discord = this.chaos.discord;
