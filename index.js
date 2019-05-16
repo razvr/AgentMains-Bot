@@ -10,10 +10,4 @@ module.exports.Response = require('./lib/models/response');
 
 module.exports.utility = require('./lib/utility');
 module.exports.errors = require('./lib/errors');
-
-module.exports.test = {
-  discordMocks: require('./test/mocks/discord.mocks'),
-  chaosMocks: require('./test/mocks/chaos.mocks'),
-  stubChaosBot: require('./test/stub-chaos-bot'),
-  createChaosStub: require('./test/create-chaos-stub'),
-};
+module.exports.test = require('./lib/test');

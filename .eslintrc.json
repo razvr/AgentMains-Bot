@@ -6,12 +6,23 @@
       "experimentalObjectRestSpread": true
     }
   },
+  "plugins": [
+    "chai-expect"
+  ],
   "env": {
     "node": true,
-    "es6": true
+    "es6": true,
+    "mocha": true
   },
   "extends": "eslint:recommended",
+  "globals": {
+    "expect": "readonly",
+    "sinon": "readonly"
+  },
   "rules": {
+    "chai-expect/missing-assertion": "error",
+    "chai-expect/terminating-properties": "error",
+    "chai-expect/no-inner-compare": "error",
     "no-console": [ "error" ],
     "comma-dangle": ["error", {
       "arrays": "always-multiline",
