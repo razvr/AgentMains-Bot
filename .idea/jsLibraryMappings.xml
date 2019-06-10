@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="JavaScriptLibraryMappings">
-    <file url="PROJECT" libraries="{@types/chai, @types/mocha, @types/rx, @types/sinon-chai}" />
+    <file url="file://$PROJECT_DIR$" libraries="{@types/chai, @types/mocha, @types/sinon-chai, chaos-core/node_modules}" />
+    <file url="PROJECT" libraries="{@types/chai, @types/mocha, @types/sinon-chai, chaos-core/node_modules}" />
     <includedPredefinedLibrary name="Node.js Core" />
+    <excludedPredefinedLibrary name="HTML" />
   </component>
 </project>
