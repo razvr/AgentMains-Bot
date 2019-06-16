@@ -50,10 +50,6 @@ module.exports = {
   // commands, configActions, etc... are loaded by this point.
   onListen: () => {},
   
-  // A hook for when the bot has joined a guild, either at startup, or when the
-  // bot has joined a new guild. 
-  onJoinGuild: (guild) => {},
-  
   // A hook for when the plugin is enabled in a guild, either at startup, or 
   // when the plugin is manually enabled.
   onEnabled: (guild) => {},
