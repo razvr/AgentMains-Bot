@@ -10,7 +10,8 @@ respectfully. All handlers for each stage will be run before the next stage
 completes.
 
 You can emit your own events, or emit existing events for testing, with 
-`chaos.emit('event', payload)`.
+`chaos.emit('event', payload)`. `.emit` returns an Observable that can be 
+subscribed to run additional code after all event listener have finished.
 
 example:
 ```js
