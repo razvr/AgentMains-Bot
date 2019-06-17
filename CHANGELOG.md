@@ -12,6 +12,14 @@ Breaking Changes
     - add new services and commands through plugins
 - Removed chaos from commandContext
     - replace calls to `context.chaos` with `this.chaos`
+- Deprecated `onListen` and `onJoinGuild`
+    - use new event system
+    
+Major Features
+--------------
+- Event system
+    - Listeners and handlers can be added to events emited by ChaosCore
+    - See [docs/developers/events.md](./docs/developers/events.md) for details
 
 Minor Features
 --------------
