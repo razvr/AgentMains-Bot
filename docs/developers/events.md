@@ -49,6 +49,8 @@ The current list of ChaosCore specific events are:
 
 | event          | payload  | description                                                |
 |----------------|----------|------------------------------------------------------------|
+| chaos.listen   |          | Emitted when the bot has started to listen                 |
+| chaos.ready    |          | Emitted when the bot has finished start up                 |
 | chaos.command  | Message  | Emitted when a message is found to contain a valid command |
 | chaos.response | Response | Emitted when a command makes a response                    |
 
