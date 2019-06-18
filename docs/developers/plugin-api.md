@@ -46,10 +46,6 @@ module.exports = {
   
   // === Plugin Hooks === //
   
-  // A hook for when the bot has started to listen. All other plugins, service,
-  // commands, configActions, etc... are loaded by this point.
-  onListen: () => {},
-  
   // A hook for when the plugin is enabled in a guild, either at startup, or 
   // when the plugin is manually enabled.
   onEnabled: (guild) => {},
