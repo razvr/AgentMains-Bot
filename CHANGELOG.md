@@ -18,8 +18,11 @@ Breaking Changes
 Major Features
 --------------
 - Event system
-    - Listeners and handlers can be added to events emited by ChaosCore
+    - Listeners and handlers can be added to events emitted by ChaosCore
     - See [docs/developers/events.md](./docs/developers/events.md) for details
+- `this.logger` added to ChaosComponents
+    - `Plugin`, `Command`, `ConfigAction`, `Service` now have easy access to
+      chaos' logger.
 
 Minor Features
 --------------
