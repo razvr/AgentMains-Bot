@@ -20,5 +20,6 @@
     <orderEntry type="library" name="@types/sinon" level="application" />
     <orderEntry type="library" name="@types/sinon-chai" level="application" />
     <orderEntry type="library" name="@types/mocha" level="application" />
+    <orderEntry type="library" name="@types/sinon-chai" level="application" />
   </component>
 </module>
