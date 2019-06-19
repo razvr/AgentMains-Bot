@@ -47,12 +47,17 @@ Chaos Events
 
 The current list of ChaosCore specific events are:
 
-| event          | payload  | description                                                |
-|----------------|----------|------------------------------------------------------------|
-| chaos.listen   |          | Emitted when the bot has started to listen                 |
-| chaos.ready    |          | Emitted when the bot has finished start up                 |
-| chaos.command  | Message  | Emitted when a message is found to contain a valid command |
-| chaos.response | Response | Emitted when a command makes a response                    |
+| event          | payload  | description                                |
+|----------------|----------|--------------------------------------------|
+| chaos.startup  |          | Emitted when the bot is starting           |
+| chaos.listen   |          | Emitted when the bot has started to listen |
+| chaos.ready    |          | Emitted when the bot has finished startup  |
+| chaos.command  | Message  | Emitted when a message has a valid command |
+| chaos.response | Response | Emitted when a command makes a response    |
+
+If you have tasks that need to be run as soon as possible when starting to 
+listen (eg. binding services, connecting to the database) you can add a listener
+to `chaos.startup`.
 
 
 [Discord Client]: https://discord.js.org/#/docs/main/stable/class/Client
