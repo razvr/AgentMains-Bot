@@ -1,4 +1,4 @@
-Next
+v4.0.1-dev
 ====
 
 Breaking Changes
@@ -34,3 +34,7 @@ Minor Features
     - currently only works with messages that contain commands
 - added .replies to command Responses
     - records all sent replies for the command
+
+Bug Fixes
+---------
+- Fix `RoleService.findRole` not matching basic role mentions 
