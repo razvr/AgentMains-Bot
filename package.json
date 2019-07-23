@@ -36,7 +36,7 @@
     "winston": "^3.0.0"
   },
   "peerDependencies": {
-    "discord.js": "~11.4.2",
+    "discord.js": "^11.5.1",
     "rxjs": "^6.5.1"
   },
   "devDependencies": {
@@ -46,7 +46,7 @@
     "chaos-data-dummy": "file:test/fixtures/chaos-data-dummy",
     "chaos-data-memory": "github:chaos-core/chaos-data-memory#RxJs-6",
     "chaos-plugin-from-npm": "file:test/fixtures/chaos-plugin-from-npm",
-    "discord.js": "~11.4.2",
+    "discord.js": "^11.5.1",
     "eslint": "^4.14.0",
     "eslint-plugin-chai-expect": "^2.0.1",
     "eslint-watch": "^4.0.2",
