@@ -1,5 +1,5 @@
-const { of } = require('rxjs');
-const { tap, flatMap } = require('rxjs/operators');
+const { of, Subject, ReplaySubject } = require('rxjs');
+const { take, tap, flatMap } = require('rxjs/operators');
 
 const createChaosStub = require('../../lib/test/create-chaos-stub');
 const { MockMessage } = require("../../lib/test/mocks/discord.mocks");
@@ -7,7 +7,7 @@ const { MockMessage } = require("../../lib/test/mocks/discord.mocks");
 describe('Feature: Commands', function () {
   beforeEach(function (done) {
     this.chaos = createChaosStub();
-    this.message = new MockMessage({});
+    this.message = new MockMessage();
 
     this.plugin = {
       name: "test-plugin",
@@ -18,6 +18,24 @@ describe('Feature: Commands', function () {
       name: "test",
       args: [],
       run: sinon.fake(),
+    };
+
+    const responses$ = new Subject();
+    this.chaos.addEventListener('chaos.response', (response) => responses$.next(response));
+
+    this.testMessage = (message) => {
+      const cmdResponses = new ReplaySubject();
+      responses$.pipe(
+        take(1),
+        tap((response) => {
+          cmdResponses.next({ response });
+          cmdResponses.complete();
+        }),
+      ).subscribe();
+
+      this.chaos.discord.emit('message', message);
+
+      return cmdResponses;
     };
 
     this.commandService = this.chaos.getService('core', 'CommandService');
@@ -43,7 +61,7 @@ describe('Feature: Commands', function () {
     this.message.content = '!test';
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    this.chaos.testCmdMessage(this.message).pipe(
+    this.testMessage(this.message).pipe(
       tap(() => expect(this.command.run).to.have.been.called),
     ).subscribe(() => done(), (error) => done(error));
   });
@@ -59,7 +77,7 @@ describe('Feature: Commands', function () {
 
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    this.chaos.testCmdMessage(this.message).pipe(
+    this.testMessage(this.message).pipe(
       tap(() => {
         expect(this.command.run).to.have.been.calledWith(sinon.match({
           args: {
@@ -83,7 +101,7 @@ describe('Feature: Commands', function () {
 
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    this.chaos.testCmdMessage(this.message).pipe(
+    this.testMessage(this.message).pipe(
       tap(() => {
         expect(this.command.run).not.to.have.been.called;
         expect(this.message.channel.send).to.have.been.calledWith(
@@ -100,7 +118,7 @@ describe('Feature: Commands', function () {
     this.chaos.addPermissionLevel('test');
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    this.chaos.testCmdMessage(this.message).pipe(
+    this.testMessage(this.message).pipe(
       tap(() => expect(this.command.run).not.to.have.been.called),
     ).subscribe(() => done(), (error) => done(error));
   });
@@ -111,7 +129,7 @@ describe('Feature: Commands', function () {
 
     of('').pipe(
       flatMap(() => this.pluginService.disablePlugin(this.message.guild.id, this.plugin.name)),
-      flatMap(() => this.chaos.testCmdMessage(this.message)),
+      flatMap(() => this.testMessage(this.message)),
       tap(() => expect(this.command.run).not.to.have.been.called),
     ).subscribe(() => done(), (error) => done(error));
   });
@@ -122,7 +140,7 @@ describe('Feature: Commands', function () {
 
     of('').pipe(
       flatMap(() => this.commandService.disableCommand(this.message.guild.id, this.command.name)),
-      flatMap(() => this.chaos.testCmdMessage(this.message)),
+      flatMap(() => this.testMessage(this.message)),
       tap(() => expect(this.command.run).not.to.have.been.called),
     ).subscribe(() => done(), (error) => done(error));
   });
@@ -131,7 +149,7 @@ describe('Feature: Commands', function () {
     this.message.content = '!test';
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    this.chaos.testCmdMessage(this.message).pipe(
+    this.testMessage(this.message).pipe(
       tap(() => expect(this.command.run).to.have.been.called),
     ).subscribe(() => done(), (error) => done(error));
   });
