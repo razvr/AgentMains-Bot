@@ -1,12 +1,13 @@
-v4.0.1-dev
-====
+v4.0.5-dev
+======
 
 Breaking Changes
---------------
+----------------
 - Upgrade to RxJS 6
 - Moved discord and chaos mocks to `ChaosCore.test`
     - `const {MockGuild} = require('chaos-core').test.discordMocks`
     - `const {MockCommand} = require('chaos-core').test.chaosMocks`
+- Removed inheritance of mocks 
 - Removed Mockery from chaos mocks
 - Removed `services` and `commands` from config
     - add new services and commands through plugins
@@ -23,17 +24,20 @@ Major Features
 - `this.logger` added to ChaosComponents
     - `Plugin`, `Command`, `ConfigAction`, `Service` now have easy access to
       chaos' logger.
+- allow components (commands, services, configActions, etc...) to be Class based
+  - extend ChaosCore.Command, Service, or ConfigAction
+- plugins can be listed by name
 
 Minor Features
 --------------
-- added chaos.notifyError and chaos.catchError operators
-    - chaos.notifyError will notify the bot owner of an error, and rethrow it
-    - chaos.catchError will also notify, but will silence the error
-- added testCmdMessage to stubbed Chaos bots
-    - emits {context, response} when the bot has finished handling the message
-    - currently only works with messages that contain commands
-- added .replies to command Responses
+- added `chaos.notifyError` and `chaos.catchError` operators
+    - `chaos.notifyError` will notify the bot owner of an error, and rethrow it
+    - `chaos.catchError` will also notify, but will silence the error
+- added `testCommand` and `testConfigAction` to stubbed Chaos bots
+    - creates an observable that can be used to test a command or config action
+- added `.replies` to command `Responses`
     - records all sent replies for the command
+- added User directed documentation for core plugin
 
 Bug Fixes
 ---------
