@@ -1,4 +1,4 @@
-v4.0.5-dev
+v4.0.6
 ======
 
 Breaking Changes
