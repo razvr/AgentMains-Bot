@@ -8,15 +8,25 @@ chaos.addPlugin({
   defaultData: [
     { keyword: "test.dummy", data: null },
   ],
-  commands: [{
-    name: "dummy",
-    description: "Test command",
-    permissions: ["dummy"],
+  commands: [
+    {
+      name: "dummy",
+      description: "Test command",
+      permissions: ["dummy"],
 
-    run(context, response) {
-      return response.send({ content: "Hello World!" });
+      run(context, response) {
+        return response.send({ content: "Hello World!" });
+      },
+    }, {
+      name: "repeat",
+      description: "repeat the input",
+      args: [ { name: 'input', greedy: true }],
+
+      run(context, response) {
+        return response.send({ content: context.args.input });
+      },
     },
-  }],
+  ],
 });
 
 chaos.listen();
