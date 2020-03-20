@@ -1,24 +1,7 @@
 # Chaos-core [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
-> 
 
 
-
-## Installation
-
-Clone this repository, and run:
-```sh
-$ npm install
-```
-
-## Usage
-
-```js
-$ npm run bot
-```
-## License
-
-MIT © [Stephen A. Wilson]()
-
+MIT © [Stephen A. Wilson](https://github.com/zeragamba)
 
 [npm-image]: https://badge.fury.io/js/chaos-core.svg
 [npm-url]: https://npmjs.org/package/chaos-core

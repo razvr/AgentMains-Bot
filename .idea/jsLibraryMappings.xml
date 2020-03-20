@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="JavaScriptLibraryMappings">
-    <file url="PROJECT" libraries="{@types/mocha, chaos-core/node_modules}" />
+<<<<<<< v4.2.0-dev
+    <file url="PROJECT" libraries="{@types/chai, @types/chai-subset, @types/mocha, @types/sinon, @types/sinon-chai, chaos-core/node_modules}" />
+=======
+    <file url="PROJECT" libraries="{@types/chai-subset, @types/mocha, @types/sinon, @types/sinon-chai, chaos-core/node_modules}" />
+>>>>>>> version update
     <includedPredefinedLibrary name="Node.js Core" />
     <excludedPredefinedLibrary name="HTML" />
   </component>
