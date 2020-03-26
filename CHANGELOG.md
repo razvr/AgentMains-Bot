@@ -3,17 +3,21 @@ v5.0.0
 
 Breaking Changes
 ----------------
-- Removes deprecations from v4.2.0
+- Remove `ChaosCore#responseStrings`
+- Remove `ChaosConfig#responseStrings`
+- Remove `Plugin#responseStrings`
 
 v4.2.0
 ======
 
 Deprecations
 ------------
-- Deprecate `chaos.responseStrings`
-    - use `chaos.strings` instead
-- Deprecate `responseStrings` property in plugins
-    - use `strings` instead
+- Deprecate `ChaosCore#responseStrings`
+    - use `ChaosCore#strings` instead
+- Deprecate `Plugin#responseStrings` property in plugins
+    - use `Plugin#strings` instead
+- Deprecate `ChaosConfig#responseStrings` property in config
+    - use `ChaosConfig#strings` instead
 - Deprecate loading dependant plugins by name
     - require plugins manually and use `chaos.addPlugin` instead
 - Deprecate 'Plugin.onListen'
