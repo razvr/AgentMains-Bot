@@ -6,6 +6,7 @@ Breaking Changes
 - Remove `ChaosCore#responseStrings`
 - Remove `ChaosConfig#responseStrings`
 - Remove `Plugin#responseStrings`
+- Remove `Context#inputs`
 
 v4.2.0
 ======
@@ -20,13 +21,13 @@ Deprecations
     - use `ChaosConfig#strings` instead
 - Deprecate loading dependant plugins by name
     - require plugins manually and use `chaos.addPlugin` instead
-- Deprecate 'Plugin.onListen'
-- Deprecate 'Plugin.onEnabled'
-- Deprecate 'Plugin.prepareData'
-- Deprecate 'Plugin.onJoinGuild', 'Service.onJoinGuild'
+- Deprecate `Plugin#onListen`
+- Deprecate `Plugin#onEnabled`
+- Deprecate `Plugin#prepareData`
+- Deprecate `Plugin#onJoinGuild`, `Service#onJoinGuild`
     - use `chaos.on("guildCreate", () => {})` instead
-- Deprecate 'Context.inputs'
-    - use 'Context.args' instead
+- Deprecate `Context#inputs`
+    - use `Context#args` instead
 
 v4.0.6
 ======
