@@ -33,6 +33,7 @@
     "test": "test"
   },
   "dependencies": {
+    "deepmerge": "^4.2.2",
     "winston": "^3.2.1"
   },
   "peerDependencies": {
