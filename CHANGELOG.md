@@ -1,3 +1,10 @@
+v5.0.0
+======
+
+Breaking Changes
+----------------
+- Removes deprecations from v4.2.0
+
 v4.2.0
 ======
 
