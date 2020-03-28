@@ -46,7 +46,6 @@
     "chaos-data-disk": "^4.1.0",
     "chaos-data-dummy": "file:test/fixtures/chaos-data-dummy",
     "chaos-data-memory": "^4.0.1",
-    "chaos-plugin-from-npm": "file:test/fixtures/chaos-plugin-from-npm",
     "discord.js": "^11.5.1",
     "eslint": "^6.1.0",
     "eslint-plugin-chai-expect": "^2.0.1",

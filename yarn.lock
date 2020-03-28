@@ -338,9 +338,6 @@ chaos-data-memory@^4.0.1:
   resolved "https://registry.yarnpkg.com/chaos-data-memory/-/chaos-data-memory-4.0.1.tgz#63cf805ba163571ea5ecd84ea66cb83df737e231"
   integrity sha512-MQ4r4Lb6CelQEZwRet7HRJ5QTL3VH4ofHsXSRTIqa1xly+Z2O3TP9XwPaIpiYUFj0Cpksnwsu7jrS6nQfYEIOQ==
 
-"chaos-plugin-from-npm@file:test/fixtures/chaos-plugin-from-npm":
-  version "1.0.0"
-
 chardet@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/chardet/-/chardet-0.7.0.tgz#90094849f0937f2eedc2425d0d28a9e5f0cbad9e"
