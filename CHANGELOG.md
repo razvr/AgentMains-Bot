@@ -1,21 +1,25 @@
 v4.2.0
 ======
 
-Deprecations
-------------
+- Utilize the `chaos.strings` system in all core commands
+    - see [strings.md](docs/developers/strings.md) for more info
+
+Deprecations (will be removed in v5)
+----------------------------
 - Deprecate `chaos.responseStrings`
     - use `chaos.strings` instead
 - Deprecate `responseStrings` property in plugins
     - use `strings` instead
 - Deprecate loading dependant plugins by name
     - require plugins manually and use `chaos.addPlugin` instead
-- Deprecate 'Plugin.onListen'
-- Deprecate 'Plugin.onEnabled'
-- Deprecate 'Plugin.prepareData'
-- Deprecate 'Plugin.onJoinGuild', 'Service.onJoinGuild'
+- Deprecate `Plugin.onListen`
+- Deprecate `Plugin.onEnabled`
+- Deprecate `Plugin.prepareData`
+- Deprecate `Plugin.onJoinGuild`, `Service.onJoinGuild`
     - use `chaos.on("guildCreate", () => {})` instead
-- Deprecate 'Context.inputs'
-    - use 'Context.args' instead
+- Deprecate `Context.inputs`
+    - use `Context.args` instead
+- Deprecate `Command.services` property
 
 v4.0.6
 ======
