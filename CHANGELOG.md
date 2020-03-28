@@ -11,11 +11,14 @@ Breaking Changes
 v4.2.0
 ======
 
-Deprecations
-------------
+- Utilize the `chaos.strings` system in all core commands
+    - see [strings.md](docs/developers/strings.md) for more info
+
+Deprecations (will be removed in v5)
+----------------------------
 - Deprecate `ChaosCore#responseStrings`
-    - use `ChaosCore#strings` instead
 - Deprecate `Plugin#responseStrings` property in plugins
+    - use `ChaosCore#strings` instead
     - use `Plugin#strings` instead
 - Deprecate `ChaosConfig#responseStrings` property in config
     - use `ChaosConfig#strings` instead
@@ -28,6 +31,7 @@ Deprecations
     - use `chaos.on("guildCreate", () => {})` instead
 - Deprecate `Context#inputs`
     - use `Context#args` instead
+- Deprecate `Command#services` property
 
 v4.0.6
 ======
