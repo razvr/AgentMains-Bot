@@ -441,18 +441,18 @@ chalk@^3.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
-chaos-data-disk@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/chaos-data-disk/-/chaos-data-disk-4.1.0.tgz#60286f5e4bd5054ab76c9e5617dcd02d9cacd82e"
-  integrity sha512-ADA4+Y2Yw9/dcYr1A1QpCxTJo28xEeeMhZJ4kqmWdq4Jiu8y30j7yNF8iRLpYnueg4ab8thUc7W9+HlSz2cImg==
+chaos-data-disk@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/chaos-data-disk/-/chaos-data-disk-4.2.0.tgz#3e8e608cff2c9cdb25d62f90fffd69a071fdefc0"
+  integrity sha512-o6O3BDtKKe68z/gC47yQltNYfvzG1w7zTTK4mOPmrxvUykk7zI5yOMvHrUvYkaG6FRX+XDF+2yOR/PZ+2nGbGA==
 
 "chaos-data-dummy@file:test/fixtures/chaos-data-dummy":
   version "1.0.0"
 
-chaos-data-memory@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/chaos-data-memory/-/chaos-data-memory-4.0.1.tgz#63cf805ba163571ea5ecd84ea66cb83df737e231"
-  integrity sha512-MQ4r4Lb6CelQEZwRet7HRJ5QTL3VH4ofHsXSRTIqa1xly+Z2O3TP9XwPaIpiYUFj0Cpksnwsu7jrS6nQfYEIOQ==
+chaos-data-memory@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/chaos-data-memory/-/chaos-data-memory-4.2.0.tgz#ebc195728599d9993e8af83ccb249b946714a0b8"
+  integrity sha512-pEekBwns/edM8Pu+KXPSOPbGniLmEMBMNFEv2SgrZ/aepAK6fm8wVIsbZkljX115IW3Md3J8RrNZTzyCCxVo5Q==
 
 chardet@^0.7.0:
   version "0.7.0"
