@@ -29,7 +29,7 @@ module.exports = {
   
   // List of new permission roles that this plugin uses. Eg. 'mod', `chaosLord`
   // See the section on permissions to learn more.
-  permissions: [],
+  permissionLevels: [],
   
   // List of Services that this plugin provides. For example `ChaosService`.
   // See the section on Services to learn more.

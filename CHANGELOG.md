@@ -16,19 +16,19 @@ v4.2.0
 
 Deprecations (will be removed in v5)
 ----------------------------
-- Deprecate `ChaosCore#responseStrings`
-- Deprecate `Plugin#responseStrings` property in plugins
-    - use `ChaosCore#strings` instead
-    - use `Plugin#strings` instead
-- Deprecate `ChaosConfig#responseStrings` property in config
-    - use `ChaosConfig#strings` instead
+- Deprecate `chaos#responseStrings`
+    - use `chaos#strings` instead
+- Deprecate `responseStrings` property in plugins
+    - use `strings` instead
+- Deprecate `permissions` property in plugins
+    - use `permissionLevels` instead
 - Deprecate loading dependant plugins by name
-    - require plugins manually and use `chaos.addPlugin` instead
+    - require plugins manually and use `chaos#addPlugin` instead
 - Deprecate `Plugin#onListen`
 - Deprecate `Plugin#onEnabled`
 - Deprecate `Plugin#prepareData`
 - Deprecate `Plugin#onJoinGuild`, `Service#onJoinGuild`
-    - use `chaos.on("guildCreate", () => {})` instead
+    - use `chaos#on("guildCreate", () => {})` instead
 - Deprecate `Context#inputs`
     - use `Context#args` instead
 - Deprecate `Command#services` property
