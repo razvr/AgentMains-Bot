@@ -1,3 +1,8 @@
+v4.2.1
+======
+
+- Fix loading strings through plugins.
+
 v4.2.0
 ======
 
