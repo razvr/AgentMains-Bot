@@ -17,13 +17,24 @@ chaos.addPlugin({
       run(context, response) {
         return response.send({ content: "Hello World!" });
       },
-    }, {
+    },
+    {
       name: "repeat",
       description: "repeat the input",
-      args: [ { name: 'input', greedy: true }],
+      args: [{ name: 'input', greedy: true }],
 
       run(context, response) {
         return response.send({ content: context.args.input });
+      },
+    },
+  ],
+  configActions: [
+    {
+      name: "test",
+      description: "Test config action",
+
+      run(context, response) {
+        return response.send({ content: "Lights. Camera. ACTION!" });
       },
     },
   ],
