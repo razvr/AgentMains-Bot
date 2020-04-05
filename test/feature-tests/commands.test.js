@@ -21,7 +21,7 @@ describe('Feature: Commands', function () {
     };
 
     const responses$ = new Subject();
-    this.chaos.addEventListener('chaos.response', (response) => responses$.next(response));
+    this.chaos.on('chaos.response', (response) => responses$.next(response));
 
     this.testMessage = (message) => {
       const cmdResponses = new ReplaySubject();

@@ -3,11 +3,10 @@ Events
 
 A ChaosCore bot will emit events during the lifecycle of the bot.
 
-You can listen and handle these events by calling `chaos.on('event', handler)`
-or `chaos.addEventListener('event', handler)`. Additionally, you can add before
-and after event handlers by prefixing `event` with `:before` or `:after`
-respectfully. All handlers for each stage will be run before the next stage 
-completes.
+You can listen and handle these events by calling `chaos.on('event', handler)`. 
+Additionally, you can add before and after event handlers using with 
+`event:before` and `event:after` respectfully. All handlers for each stage will 
+be run before the next stage completes.
 
 You can emit your own events, or emit existing events for testing, with 
 `chaos.emit('event', payload)`. `.emit` returns an Observable that can be 
