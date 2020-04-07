@@ -32,6 +32,8 @@ Breaking Changes
 - Removed `chaos#shutdown$`
     - use `chaos#on("chaos.shutdown", () => {})` instead
 - Removed `Plugin#onEnabled`
+- Removed `chaos#catchError`
+    - use `chaos#handleError` instead
 
 v4.3.0
 ======
