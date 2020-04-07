@@ -17,6 +17,11 @@ New Features
     - `async .setUserData(userId, key, data)`
     - `.getService(pluginName, serviceName)`
     
+Bug Fixes
+---------
+- Fix handling of errors in grant-user and grant-role config actions
+
+
 v4.2.1
 ======
 
