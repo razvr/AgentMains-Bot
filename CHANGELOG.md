@@ -3,19 +3,70 @@ v5.0.0
 
 Breaking Changes
 ----------------
-- Remove `ChaosCore#responseStrings`
-- Remove `ChaosConfig#responseStrings`
-- Remove `Plugin#responseStrings`
-- Remove `Context#inputs`
+- Removed `ChaosCore#responseStrings`
+    - use `strings` instead
+- Removed `ChaosConfig#responseStrings`
+    - use `strings` instead
+- Removed `Plugin#responseStrings`
+    - use `strings` instead
+- Removed `responseStrings` property in plugins
+    - use `strings` instead
+- Removed `Context#inputs`
+    - use `args` instead
+- Removed `permissions` property in plugins
+    - use `permissionLevels` property instead
+- Removed loading dependant plugins by name
+    - require plugins manually and use `chaos#addPlugin` instead
+- Removed `Plugin#onListen`
+    - use `chaos#on("chaos.listen", () => {})` instead
+- Removed `Plugin#prepareData`
+    - use `chaos#on("guildCreate:before", () => {})` instead
+- Removed `Plugin#onJoinGuild`, `Service#onJoinGuild`
+    - use `chaos#on("guildCreate", () => {})` instead
+- Removed `.addEventHandler`
+    - use `.on` instead
+- Removed `.triggerEvent`
+    - use `.emit` instead
+- Removed `Command#services` property
+    - use `chaos#on("chaos.listen", () => {})` instead
+- Removed `Plugin#onEnabled`
+
+v4.3.0
+======
+
+Heads Up!
+---------
+v5.0.0 will remove RxJS as a dependency. As an upgrade path, it is recommended 
+to start using promises instead of RxJS Observable streams. Call `.toPromise()` 
+on an Observable to turn the observable stream into a promise. After the 
+upgrade to v5.0.0, you can remove the `.toPromise()`;
+
+Deprecations (will be removed in v5)
+----------------------------
+- Deprecate `.addEventHandler`
+    - use `.on` instead
+- Deprecate `.triggerEvent`
+    - use `.emit` instead
 
 New Features
 ------------
 - Add alias functions to `ChaosComponent`:
-    - `#getGuildData(guildId, key)`
-    - `#setGuildData(guildId, key, data)`
-    - `#getUserData(userId, key)`
-    - `#setUserData(userId, key, data)`
-    - `#getService(pluginName, serviceName)`
+    - `async .getGuildData(guildId, key)`
+    - `async .setGuildData(guildId, key, data)`
+    - `async .getUserData(userId, key)`
+    - `async .setUserData(userId, key, data)`
+    - `.getService(pluginName, serviceName)`
+    
+Bug Fixes
+---------
+- Fix handling of errors in grant-user and grant-role config actions
+
+
+v4.2.1
+======
+
+- Fix loading strings through plugins.
+
 
 v4.2.0
 ======

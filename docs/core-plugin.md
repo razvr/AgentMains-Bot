@@ -39,6 +39,10 @@ The core plugin contains core ChaosCore commands.
             - Disables a plugin
         - [enablePlugin](#enableplugin)
             - Enables a plugin
+            
+## Strings
+
+For overridable strings, see [core-plugin/index.strings.js](../lib/core-plugin/index.strings.js)
 
 ## Commands
 
