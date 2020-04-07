@@ -8,6 +8,13 @@ to start using promises instead of RxJS Observable streams. Call `.toPromise()`
 on an Observable to start using promises. After the upgrade to v5.0.0, you can
 remove the `.toPromise()`;
 
+Deprecations (will be removed in v5)
+----------------------------
+- Deprecate `.addEventHandler`
+    - use `.on` instead
+- Deprecate `.triggerEvent`
+    - use `.emit` instead
+
 New Features
 ------------
 - Add alias functions to `ChaosComponent`:
