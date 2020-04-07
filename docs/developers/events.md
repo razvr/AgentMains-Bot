@@ -50,6 +50,7 @@ The current list of ChaosCore specific events are:
 | chaos.ready    |          | Emitted when the bot has finished startup  |
 | chaos.command  | Message  | Emitted when a message has a valid command |
 | chaos.response | Response | Emitted when a command makes a response    |
+| chaos.shutdown |          | Emitted when the bot is shutting down      |
 
 
 [Discord Client]: https://discord.js.org/#/docs/main/stable/class/Client

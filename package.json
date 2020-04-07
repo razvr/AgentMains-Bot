@@ -47,7 +47,7 @@
     "babel-eslint": "^10.1.0",
     "chai": "^4.2.0",
     "chai-subset": "^1.6.0",
-    "chaos-data-disk": "^4.2.0",
+    "chaos-data-disk": "https://github.com/chaos-core/chaos-data-disk.git#4.3.0-dev",
     "chaos-data-dummy": "file:test/fixtures/chaos-data-dummy",
     "chaos-data-memory": "^4.2.0",
     "discord.js": "^11.5.1",

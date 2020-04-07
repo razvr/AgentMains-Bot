@@ -441,10 +441,9 @@ chalk@^3.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
-chaos-data-disk@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/chaos-data-disk/-/chaos-data-disk-4.2.0.tgz#3e8e608cff2c9cdb25d62f90fffd69a071fdefc0"
-  integrity sha512-o6O3BDtKKe68z/gC47yQltNYfvzG1w7zTTK4mOPmrxvUykk7zI5yOMvHrUvYkaG6FRX+XDF+2yOR/PZ+2nGbGA==
+"chaos-data-disk@https://github.com/chaos-core/chaos-data-disk.git#4.3.0-dev":
+  version "4.3.0-dev"
+  resolved "https://github.com/chaos-core/chaos-data-disk.git#2f4045907e2d58e2a66b7f4f5103ead72974911a"
 
 "chaos-data-dummy@file:test/fixtures/chaos-data-dummy":
   version "1.0.0"
