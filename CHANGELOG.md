@@ -34,6 +34,8 @@ Breaking Changes
 - Removed `Plugin#onEnabled`
 - Removed `chaos#catchError`
     - use `chaos#handleError` instead
+- Removed `utility#toObservable`
+    - use `chaos#asPromise` instead
 
 v4.3.0
 ======
