@@ -53,6 +53,8 @@ Deprecations (will be removed in v5)
     - use `.emit` instead
 - Deprecate `chaos#shutdown$`
     - use `chaos#on("chaos.shutdown", () => {})` instead
+- Deprecate `chaos#catchError`, and `chaos#notifyError`;
+    - use `chaos#handleError` to notify owner of errors;
 
 New Features
 ------------
