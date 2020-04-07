@@ -8,6 +8,15 @@ Breaking Changes
 - Remove `Plugin#responseStrings`
 - Remove `Context#inputs`
 
+New Features
+------------
+- Add alias functions to `ChaosComponent`:
+    - `#getGuildData(guildId, key)`
+    - `#setGuildData(guildId, key, data)`
+    - `#getUserData(userId, key)`
+    - `#setUserData(userId, key, data)`
+    - `#getService(pluginName, serviceName)`
+
 v4.2.0
 ======
 
