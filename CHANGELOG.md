@@ -1,14 +1,21 @@
 v4.3.0
 ======
 
+Heads Up!
+---------
+v5.0.0 will remove RxJS as a dependency. As an upgrade path, it is recommended 
+to start using promises instead of RxJS Observable streams. Call `.toPromise()` 
+on an Observable to start using promises. After the upgrade to v5.0.0, you can
+remove the `.toPromise()`;
+
 New Features
 ------------
 - Add alias functions to `ChaosComponent`:
-    - `#getGuildData(guildId, key)`
-    - `#setGuildData(guildId, key, data)`
-    - `#getUserData(userId, key)`
-    - `#setUserData(userId, key, data)`
-    - `#getService(pluginName, serviceName)`
+    - `async .getGuildData(guildId, key)`
+    - `async .setGuildData(guildId, key, data)`
+    - `async .getUserData(userId, key)`
+    - `async .setUserData(userId, key, data)`
+    - `.getService(pluginName, serviceName)`
     
 v4.2.1
 ======
