@@ -1,6 +1,3 @@
-const { zip } = require('rxjs');
-const { flatMap, tap } = require('rxjs/operators');
-
 const createChaosStub = require('../../lib/test/create-chaos-stub');
 const { MockGuild } = require("../../lib/test/mocks/discord.mocks");
 
@@ -18,7 +15,7 @@ describe('Feature: Plugin Data', function () {
     }
   });
 
-  it('ChaosCore loads default plugin data onListen', function (done) {
+  it('ChaosCore loads default plugin data onListen', async function () {
     this.chaos = createChaosStub();
     this.plugin = {
       defaultData: [
@@ -33,17 +30,16 @@ describe('Feature: Plugin Data', function () {
     });
 
     this.chaos.addPlugin(this.plugin);
-    this.chaos.listen().pipe(
-      flatMap(() => zip(
-        this.chaos.getGuildData(this.guild.id, "test.data1"),
-        this.chaos.getGuildData(this.guild.id, "test.data2"),
-        this.chaos.getGuildData(this.guild.id, "test.data3"),
-      )),
-      tap(([data1, data2, data3]) => {
-        expect(data1).to.eq("test.value1");
-        expect(data2).to.eq("test.value2");
-        expect(data3).to.eq("test.value3");
-      }),
-    ).subscribe(() => done(), (error) => done(error));
+    await this.chaos.listen();
+
+    let [data1, data2, data3] = await Promise.all([
+      this.chaos.getGuildData(this.guild.id, "test.data1").toPromise(),
+      this.chaos.getGuildData(this.guild.id, "test.data2").toPromise(),
+      this.chaos.getGuildData(this.guild.id, "test.data3").toPromise(),
+    ]);
+
+    expect(data1).to.eq("test.value1");
+    expect(data2).to.eq("test.value2");
+    expect(data3).to.eq("test.value3");
   });
 });

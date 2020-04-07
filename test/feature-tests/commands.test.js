@@ -5,7 +5,7 @@ const createChaosStub = require('../../lib/test/create-chaos-stub');
 const { MockMessage } = require("../../lib/test/mocks/discord.mocks");
 
 describe('Feature: Commands', function () {
-  beforeEach(function (done) {
+  beforeEach(async function () {
     this.chaos = createChaosStub();
     this.message = new MockMessage();
 
@@ -44,9 +44,8 @@ describe('Feature: Commands', function () {
 
     this.chaos.addPlugin(this.plugin);
 
-    this.chaos.listen().pipe(
-      flatMap(() => this.pluginService.enablePlugin(this.message.guild.id, this.plugin.name)),
-    ).subscribe(() => done(), (error) => done(error));
+    await this.chaos.listen();
+    await this.pluginService.enablePlugin(this.message.guild.id, this.plugin.name).toPromise();
   });
 
   afterEach(function (done) {
