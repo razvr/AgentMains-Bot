@@ -100,6 +100,8 @@ Deprecations (will be removed in v5)
 - Deprecate `Context#inputs`
     - use `Context#args` instead
 - Deprecate `Command#services` property
+- Deprecate `utility#toObservable` property
+    - use `utility#asPromise` instead
 
 v4.0.6
 ======
