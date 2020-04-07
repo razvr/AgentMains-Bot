@@ -29,6 +29,8 @@ Breaking Changes
     - use `.emit` instead
 - Removed `Command#services` property
     - use `chaos#on("chaos.listen", () => {})` instead
+- Removed `chaos#shutdown$`
+    - use `chaos#on("chaos.shutdown", () => {})` instead
 - Removed `Plugin#onEnabled`
 
 v4.3.0
