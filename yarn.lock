@@ -443,7 +443,7 @@ chalk@^3.0.0:
 
 "chaos-data-disk@https://github.com/chaos-core/chaos-data-disk.git#4.3.0-dev":
   version "4.3.0-dev"
-  resolved "https://github.com/chaos-core/chaos-data-disk.git#2f4045907e2d58e2a66b7f4f5103ead72974911a"
+  resolved "https://github.com/chaos-core/chaos-data-disk.git#2914fbbae6cde28a5eeaae66c0d92bcba6c81c99"
 
 "chaos-data-dummy@file:test/fixtures/chaos-data-dummy":
   version "1.0.0"
