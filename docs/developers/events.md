@@ -53,6 +53,7 @@ The current list of ChaosCore specific events are:
 | chaos.ready    |          | Emitted when the bot has finished startup  |
 | chaos.command  | Message  | Emitted when a message has a valid command |
 | chaos.response | Response | Emitted when a command makes a response    |
+| chaos.shutdown |          | Emitted when the bot is shutting down      |
 
 If you have tasks that need to be run as soon as possible when starting to 
 listen (eg. binding services, connecting to the database) you can add a listener

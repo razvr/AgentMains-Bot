@@ -14,6 +14,8 @@ Deprecations (will be removed in v5)
     - use `.on` instead
 - Deprecate `.triggerEvent`
     - use `.emit` instead
+- Deprecate `chaos#shutdown$`
+    - use `chaos#on("chaos.shutdown", () => {})` instead
 
 New Features
 ------------
