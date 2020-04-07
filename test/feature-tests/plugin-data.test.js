@@ -9,12 +9,9 @@ describe('Feature: Plugin Data', function () {
     this.chaos = createChaosStub();
   });
 
-  afterEach(function (done) {
+  afterEach(async function () {
     if (this.chaos.listening) {
-      this.chaos.shutdown()
-        .subscribe(() => done(), (error) => done(error));
-    } else {
-      done();
+      await this.chaos.shutdown().toPromise();
     }
   });
 
