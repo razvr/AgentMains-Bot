@@ -1,4 +1,4 @@
-const { of, from } = require('rxjs');
+const { from } = require('rxjs');
 
 const createChaosStub = require('../../lib/test/create-chaos-stub');
 const { MockMessage } = require("../../lib/test/mocks/discord.mocks");
@@ -29,7 +29,7 @@ describe('Feature: Commands', function () {
 
     this.commandService = this.chaos.getService('core', 'CommandService');
     this.pluginService = this.chaos.getService('core', 'pluginService');
-    sinon.stub(this.commandService, 'canSendMessage').returns(of(true));
+    sinon.stub(this.commandService, 'canSendMessage').returns(true);
 
     this.chaos.addPlugin(this.plugin);
 
@@ -126,5 +126,27 @@ describe('Feature: Commands', function () {
 
     await this.testMessage(this.message).toPromise();
     expect(this.command.run).to.have.been.called;
+  });
+
+  context('when a command throws an error', function () {
+    beforeEach(function () {
+      this.error = new Error("ERROR!");
+      this.message.content = '!test';
+      this.command.run = sinon.fake(() => { throw this.error; });
+      this.chaos.addCommand(this.plugin.name, this.command);
+    });
+
+    it('it gives an error message to the user', async function () {
+      let response = await this.testMessage(this.message).toPromise();
+      expect(response.replies).to.have.length(1);
+      expect(response.replies[0].content)
+        .to.include("I'm sorry, but there was an unexpected problem");
+    });
+
+    it('it triggers handleError', async function () {
+      sinon.spy(this.chaos, 'handleError');
+      await this.testMessage(this.message).toPromise();
+      expect(this.chaos.handleError).to.have.been.calledWith(this.error);
+    });
   });
 });
