@@ -20,8 +20,10 @@ describe('Feature: Commands', function () {
     };
 
     this.testMessage = (message) => {
-      const nextResponse = new Promise((resolve) => this.chaos.on('chaos.response', resolve));
-      this.chaos.discord.emit('message', message);
+      const nextResponse = new Promise((resolve) => {
+        this.chaos.on('chaos.response', (response) => resolve(response));
+        this.chaos.discord.emit('message', message);
+      });
       return from(nextResponse);
     };
 
