@@ -36,6 +36,8 @@ Breaking Changes
     - use `chaos#handleError` instead
 - Removed `utility#toObservable`
     - use `chaos#asPromise` instead
+- Removed `#testCommand` and `#testConfigAction` on stubbed bots
+    - use `#testMessage` instead
 
 v4.3.0
 ======
