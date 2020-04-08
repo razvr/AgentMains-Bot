@@ -34,8 +34,7 @@ describe('Feature: Commands', function () {
     this.chaos.addPlugin(this.plugin);
 
     await this.chaos.listen();
-    await this.pluginService.enablePlugin(this.message.guild.id, this.plugin.name)
-      .toPromise();
+    await this.pluginService.enablePlugin(this.message.guild.id, this.plugin.name);
   });
 
   afterEach(async function () {
@@ -106,7 +105,7 @@ describe('Feature: Commands', function () {
     this.message.content = '!test';
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    await this.pluginService.disablePlugin(this.message.guild.id, this.plugin.name).toPromise();
+    await this.pluginService.disablePlugin(this.message.guild.id, this.plugin.name);
     await this.testMessage(this.message).toPromise();
     expect(this.command.run).not.to.have.been.called;
   });
