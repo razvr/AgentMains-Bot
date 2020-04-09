@@ -133,6 +133,7 @@ describe('Feature: Commands', function () {
       this.message.content = '!test';
       this.command.run = sinon.fake(() => { throw this.error; });
       this.chaos.addCommand(this.plugin.name, this.command);
+      sinon.stub(this.chaos, 'handleError');
     });
 
     it('it gives an error message to the user', async function () {
@@ -143,7 +144,6 @@ describe('Feature: Commands', function () {
     });
 
     it('it triggers handleError', async function () {
-      sinon.spy(this.chaos, 'handleError');
       await this.testMessage(this.message).toPromise();
       expect(this.chaos.handleError).to.have.been.calledWith(this.error);
     });
