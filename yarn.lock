@@ -325,17 +325,18 @@ chalk@^2.0.0, chalk@^2.0.1, chalk@^2.1.0, chalk@^2.4.1, chalk@^2.4.2:
     escape-string-regexp "^1.0.5"
     supports-color "^5.3.0"
 
-"chaos-data-disk@https://github.com/chaos-core/chaos-data-disk.git#4.3.0-dev":
-  version "4.3.0-dev"
-  resolved "https://github.com/chaos-core/chaos-data-disk.git#2f4045907e2d58e2a66b7f4f5103ead72974911a"
+chaos-data-disk@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/chaos-data-disk/-/chaos-data-disk-4.3.0.tgz#284ba617a2075bf98e3a7e8c3bcf36a4512a026c"
+  integrity sha512-NF8u9631+pafxkXOAKbr6aFrc9T5beamVJ6SBEc3GIAWKzuUO2SCEam5jyMnzKPx1BwMKOFGqZBzM20yMf6Zjw==
 
 "chaos-data-dummy@file:test/fixtures/chaos-data-dummy":
   version "1.0.0"
 
-chaos-data-memory@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/chaos-data-memory/-/chaos-data-memory-4.2.0.tgz#ebc195728599d9993e8af83ccb249b946714a0b8"
-  integrity sha512-pEekBwns/edM8Pu+KXPSOPbGniLmEMBMNFEv2SgrZ/aepAK6fm8wVIsbZkljX115IW3Md3J8RrNZTzyCCxVo5Q==
+chaos-data-memory@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/chaos-data-memory/-/chaos-data-memory-4.3.0.tgz#03b15f0fad277eb20e1419924f86d290d3a30297"
+  integrity sha512-mJk5TFk3OjClqNisQQfSZ+4XzP30+p8qO/HcZkBJLd5ewBOVkEXms7FuSpDeVGzgIHyLH4P+P4szTbLBQ+uRbA==
 
 chardet@^0.7.0:
   version "0.7.0"
