@@ -1,3 +1,45 @@
+v4.3.0
+======
+
+Heads Up!
+---------
+v5.0.0 will remove RxJS as a dependency. As an upgrade path, it is recommended 
+to start using promises instead of RxJS Observable streams. Call `.toPromise()` 
+on an Observable to start using promises. After the upgrade to v5.0.0, you can
+remove the `.toPromise()`;
+
+Deprecations (will be removed in v5)
+----------------------------
+- Deprecate `.addEventHandler`
+    - use `.on` instead
+- Deprecate `.triggerEvent`
+    - use `.emit` instead
+- Deprecate `chaos#shutdown$`
+    - use `chaos#on("chaos.shutdown", () => {})` instead
+- Deprecate `chaos#catchError`, and `chaos#notifyError`
+    - use `chaos#handleError` to notify owner of errors
+- Deprecate `#testCommand` and `#testConfigAction` on stubbed bots
+    - use `#testMessage` instead
+
+New Features
+------------
+- Add alias functions to `ChaosComponent`:
+    - `async .getGuildData(guildId, key)`
+    - `async .setGuildData(guildId, key, data)`
+    - `async .getUserData(userId, key)`
+    - `async .setUserData(userId, key, data)`
+    - `.getService(pluginName, serviceName)`
+    
+Bug Fixes
+---------
+- Fix handling of errors in grant-user and grant-role config actions
+
+
+v4.2.1
+======
+
+- Fix loading strings through plugins.
+
 v4.2.0
 ======
 
@@ -22,6 +64,8 @@ Deprecations (will be removed in v5)
 - Deprecate `Context#inputs`
     - use `Context#args` instead
 - Deprecate `Command#services` property
+- Deprecate `utility#toObservable` property
+    - use `utility#asPromise` instead
 
 v4.0.6
 ======

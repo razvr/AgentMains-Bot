@@ -1,11 +1,10 @@
-const { of, Subject, ReplaySubject } = require('rxjs');
-const { take, tap, flatMap } = require('rxjs/operators');
+const { of, from } = require('rxjs');
 
 const createChaosStub = require('../../lib/test/create-chaos-stub');
 const { MockMessage } = require("../../lib/test/mocks/discord.mocks");
 
 describe('Feature: Commands', function () {
-  beforeEach(function (done) {
+  beforeEach(async function () {
     this.chaos = createChaosStub();
     this.message = new MockMessage();
 
@@ -20,22 +19,10 @@ describe('Feature: Commands', function () {
       run: sinon.fake(),
     };
 
-    const responses$ = new Subject();
-    this.chaos.addEventListener('chaos.response', (response) => responses$.next(response));
-
     this.testMessage = (message) => {
-      const cmdResponses = new ReplaySubject();
-      responses$.pipe(
-        take(1),
-        tap((response) => {
-          cmdResponses.next({ response });
-          cmdResponses.complete();
-        }),
-      ).subscribe();
-
+      const nextResponse = new Promise((resolve) => this.chaos.on('chaos.response', resolve));
       this.chaos.discord.emit('message', message);
-
-      return cmdResponses;
+      return from(nextResponse);
     };
 
     this.commandService = this.chaos.getService('core', 'CommandService');
@@ -44,29 +31,26 @@ describe('Feature: Commands', function () {
 
     this.chaos.addPlugin(this.plugin);
 
-    this.chaos.listen().pipe(
-      flatMap(() => this.pluginService.enablePlugin(this.message.guild.id, this.plugin.name)),
-    ).subscribe(() => done(), (error) => done(error));
+    await this.chaos.listen().toPromise();
+    await this.pluginService.enablePlugin(this.message.guild.id, this.plugin.name)
+      .toPromise();
   });
 
-  afterEach(function (done) {
+  afterEach(async function () {
     if (this.chaos.listening) {
-      this.chaos.shutdown().subscribe(() => done(), (error) => done(error));
-    } else {
-      done();
+      await this.chaos.shutdown().toPromise();
     }
   });
 
-  it('runs basic commands', function (done) {
+  it('runs basic commands', async function () {
     this.message.content = '!test';
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    this.testMessage(this.message).pipe(
-      tap(() => expect(this.command.run).to.have.been.called),
-    ).subscribe(() => done(), (error) => done(error));
+    await this.testMessage(this.message).toPromise();
+    expect(this.command.run).to.have.been.called;
   });
 
-  it('runs commands with arguments', function (done) {
+  it('runs commands with arguments', async function () {
     this.message.content = '!test value1 value2';
     this.command.args = [
       { name: 'normal' },
@@ -77,21 +61,18 @@ describe('Feature: Commands', function () {
 
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    this.testMessage(this.message).pipe(
-      tap(() => {
-        expect(this.command.run).to.have.been.calledWith(sinon.match({
-          args: {
-            normal: 'value1',
-            required: 'value2',
-            optional: undefined,
-            default: 'value4',
-          },
-        }));
-      }),
-    ).subscribe(() => done(), (error) => done(error));
+    await this.testMessage(this.message).toPromise();
+    expect(this.command.run).to.have.been.calledWith(sinon.match({
+      args: {
+        normal: 'value1',
+        required: 'value2',
+        optional: undefined,
+        default: 'value4',
+      },
+    }));
   });
 
-  it('returns a help message when a command is missing required arguments', function (done) {
+  it('returns a help message when a command is missing required arguments', async function () {
     this.message.content = '!test value1';
     this.message.channel.send = sinon.fake.resolves(true);
     this.command.args = [
@@ -101,56 +82,47 @@ describe('Feature: Commands', function () {
 
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    this.testMessage(this.message).pipe(
-      tap(() => {
-        expect(this.command.run).not.to.have.been.called;
-        expect(this.message.channel.send).to.have.been.calledWith(
-          "I'm sorry, but I'm missing some information for that command:",
-        );
-      }),
-    ).subscribe(() => done(), (error) => done(error));
+    await this.testMessage(this.message).toPromise();
+    expect(this.command.run).not.to.have.been.called;
+    expect(this.message.channel.send).to.have.been.calledWith(
+      "I'm sorry, but I'm missing some information for that command:",
+    );
   });
 
-  it('does not run commands that the user does not have permission to run', function (done) {
+  it('does not run commands that the user does not have permission to run', async function () {
     this.message.content = '!test';
 
     this.command.permissions = ['test'];
     this.chaos.addPermissionLevel('test');
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    this.testMessage(this.message).pipe(
-      tap(() => expect(this.command.run).not.to.have.been.called),
-    ).subscribe(() => done(), (error) => done(error));
+    await this.testMessage(this.message).toPromise();
+    expect(this.command.run).not.to.have.been.called;
   });
 
-  it('does not run commands that part of disabled plugins', function (done) {
+  it('does not run commands that part of disabled plugins', async function () {
     this.message.content = '!test';
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    of('').pipe(
-      flatMap(() => this.pluginService.disablePlugin(this.message.guild.id, this.plugin.name)),
-      flatMap(() => this.testMessage(this.message)),
-      tap(() => expect(this.command.run).not.to.have.been.called),
-    ).subscribe(() => done(), (error) => done(error));
+    await this.pluginService.disablePlugin(this.message.guild.id, this.plugin.name).toPromise();
+    await this.testMessage(this.message).toPromise();
+    expect(this.command.run).not.to.have.been.called;
   });
 
-  it('does not run commands that are explicitly disabled', function (done) {
+  it('does not run commands that are explicitly disabled', async function () {
     this.message.content = '!test';
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    of('').pipe(
-      flatMap(() => this.commandService.disableCommand(this.message.guild.id, this.command.name)),
-      flatMap(() => this.testMessage(this.message)),
-      tap(() => expect(this.command.run).not.to.have.been.called),
-    ).subscribe(() => done(), (error) => done(error));
+    await this.commandService.disableCommand(this.message.guild.id, this.command.name);
+    await this.testMessage(this.message);
+    expect(this.command.run).not.to.have.been.called;
   });
 
-  it('runs commands that are not explicitly disabled', function (done) {
+  it('runs commands that are not explicitly disabled', async function () {
     this.message.content = '!test';
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    this.testMessage(this.message).pipe(
-      tap(() => expect(this.command.run).to.have.been.called),
-    ).subscribe(() => done(), (error) => done(error));
+    await this.testMessage(this.message).toPromise();
+    expect(this.command.run).to.have.been.called;
   });
 });
