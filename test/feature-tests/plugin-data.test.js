@@ -30,9 +30,9 @@ describe('Feature: Plugin Data', function () {
     await this.chaos.listen();
 
     let [data1, data2, data3] = await Promise.all([
-      this.chaos.getGuildData(this.guild.id, "test.data1").toPromise(),
-      this.chaos.getGuildData(this.guild.id, "test.data2").toPromise(),
-      this.chaos.getGuildData(this.guild.id, "test.data3").toPromise(),
+      this.chaos.getGuildData(this.guild.id, "test.data1"),
+      this.chaos.getGuildData(this.guild.id, "test.data2"),
+      this.chaos.getGuildData(this.guild.id, "test.data3"),
     ]);
 
     expect(data1).to.eq("test.value1");
