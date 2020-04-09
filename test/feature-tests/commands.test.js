@@ -1,5 +1,3 @@
-const { from } = require('rxjs');
-
 const createChaosStub = require('../../lib/test/create-chaos-stub');
 const { MockMessage } = require("../../lib/test/mocks/discord.mocks");
 
@@ -17,14 +15,6 @@ describe('Feature: Commands', function () {
       name: "test",
       args: [],
       run: sinon.fake(),
-    };
-
-    this.testMessage = (message) => {
-      const nextResponse = new Promise((resolve) => {
-        this.chaos.on('chaos.response', (response) => resolve(response));
-        this.chaos.discord.emit('message', message);
-      });
-      return from(nextResponse);
     };
 
     this.commandService = this.chaos.getService('core', 'CommandService');
@@ -47,7 +37,7 @@ describe('Feature: Commands', function () {
     this.message.content = '!test';
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    await this.testMessage(this.message).toPromise();
+    await this.chaos.testMessage(this.message);
     expect(this.command.run).to.have.been.called;
   });
 
@@ -62,7 +52,7 @@ describe('Feature: Commands', function () {
 
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    await this.testMessage(this.message).toPromise();
+    await this.chaos.testMessage(this.message);
     expect(this.command.run).to.have.been.calledWith(sinon.match({
       args: {
         normal: 'value1',
@@ -83,7 +73,7 @@ describe('Feature: Commands', function () {
 
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    await this.testMessage(this.message).toPromise();
+    await this.chaos.testMessage(this.message);
     expect(this.command.run).not.to.have.been.called;
     expect(this.message.channel.send).to.have.been.calledWith(
       "I'm sorry, but I'm missing some information for that command:",
@@ -97,7 +87,7 @@ describe('Feature: Commands', function () {
     this.chaos.addPermissionLevel('test');
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    await this.testMessage(this.message).toPromise();
+    await this.chaos.testMessage(this.message);
     expect(this.command.run).not.to.have.been.called;
   });
 
@@ -106,7 +96,7 @@ describe('Feature: Commands', function () {
     this.chaos.addCommand(this.plugin.name, this.command);
 
     await this.pluginService.disablePlugin(this.message.guild.id, this.plugin.name);
-    await this.testMessage(this.message).toPromise();
+    await this.chaos.testMessage(this.message);
     expect(this.command.run).not.to.have.been.called;
   });
 
@@ -115,7 +105,7 @@ describe('Feature: Commands', function () {
     this.chaos.addCommand(this.plugin.name, this.command);
 
     await this.commandService.disableCommand(this.message.guild.id, this.command.name);
-    await this.testMessage(this.message);
+    await this.chaos.testMessage(this.message);
     expect(this.command.run).not.to.have.been.called;
   });
 
@@ -123,7 +113,7 @@ describe('Feature: Commands', function () {
     this.message.content = '!test';
     this.chaos.addCommand(this.plugin.name, this.command);
 
-    await this.testMessage(this.message).toPromise();
+    await this.chaos.testMessage(this.message);
     expect(this.command.run).to.have.been.called;
   });
 
@@ -137,14 +127,14 @@ describe('Feature: Commands', function () {
     });
 
     it('it gives an error message to the user', async function () {
-      let response = await this.testMessage(this.message).toPromise();
-      expect(response.replies).to.have.length(1);
-      expect(response.replies[0].content)
+      let responses = await this.chaos.testMessage(this.message);
+      expect(responses).to.have.length(1);
+      expect(responses[0].content)
         .to.include("I'm sorry, but there was an unexpected problem");
     });
 
     it('it triggers handleError', async function () {
-      await this.testMessage(this.message).toPromise();
+      await this.chaos.testMessage(this.message);
       expect(this.chaos.handleError).to.have.been.calledWith(this.error);
     });
   });
