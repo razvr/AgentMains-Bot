@@ -1,6 +1,6 @@
 {
   "name": "chaos-core",
-  "version": "4.3.2-dev",
+  "version": "4.3.2",
   "description": "A framework for discord bots",
   "homepage": "",
   "author": {
