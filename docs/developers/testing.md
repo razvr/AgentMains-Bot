@@ -17,7 +17,6 @@ const { createChaosStub } = require('chaos-core').test;
 
 const chaosBot = createChaosStub();
 chaosBot.listen()
-  .toPromise()
   .then(() => {
     assert.equal(chaosBot.listening, true);
   });
@@ -33,7 +32,6 @@ const AwesomeBot = require('./awesome-bot');
 
 const awesomeBot = stubChaosBot(new AwesomeBot()); 
 awesomeBot.listen()
-  .toPromise() 
   .then(() => {
     assert.equal(awesomeBot.listening, true);
   });
@@ -77,7 +75,6 @@ const message = new MockMessage({
 });
 
 chaosBot.listen()
-  .toPromise()
   .then(() => chaosBot.testMessage(message))
   .then((responses) => {
     assert.equal(responses.length, 1);

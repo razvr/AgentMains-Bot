@@ -1,11 +1,5 @@
 {
-  "parserOptions": {
-    "ecmaVersion": 2018,
-    "sourceType": "module",
-    "ecmaFeatures": {
-      "experimentalObjectRestSpread": true
-    }
-  },
+  "parser": "babel-eslint",
   "plugins": [
     "chai-expect"
   ],

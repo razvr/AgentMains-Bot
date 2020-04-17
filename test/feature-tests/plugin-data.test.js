@@ -8,7 +8,7 @@ describe('Feature: Plugin Data', function () {
 
   afterEach(async function () {
     if (this.chaos.listening) {
-      await this.chaos.shutdown().toPromise();
+      await this.chaos.shutdown();
     }
   });
 
@@ -27,12 +27,12 @@ describe('Feature: Plugin Data', function () {
     });
 
     this.chaos.addPlugin(this.plugin);
-    await this.chaos.listen().toPromise();
+    await this.chaos.listen();
 
-    const [data1, data2, data3] = await Promise.all([
-      this.chaos.getGuildData(this.guild.id, "test.data1").toPromise(),
-      this.chaos.getGuildData(this.guild.id, "test.data2").toPromise(),
-      this.chaos.getGuildData(this.guild.id, "test.data3").toPromise(),
+    let [data1, data2, data3] = await Promise.all([
+      this.chaos.getGuildData(this.guild.id, "test.data1"),
+      this.chaos.getGuildData(this.guild.id, "test.data2"),
+      this.chaos.getGuildData(this.guild.id, "test.data3"),
     ]);
 
     expect(data1).to.eq("test.value1");

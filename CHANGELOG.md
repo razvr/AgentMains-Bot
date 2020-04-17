@@ -1,3 +1,44 @@
+v5.0.0
+======
+
+Breaking Changes
+----------------
+- Removed `ChaosCore#responseStrings`
+    - use `strings` instead
+- Removed `ChaosConfig#responseStrings`
+    - use `strings` instead
+- Removed `Plugin#responseStrings`
+    - use `strings` instead
+- Removed `responseStrings` property in plugins
+    - use `strings` instead
+- Removed `Context#inputs`
+    - use `args` instead
+- Removed `permissions` property in plugins
+    - use `permissionLevels` property instead
+- Removed loading dependant plugins by name
+    - require plugins manually and use `chaos#addPlugin` instead
+- Removed `Plugin#onListen`
+    - use `chaos#on("chaos.listen", () => {})` instead
+- Removed `Plugin#prepareData`
+    - use `chaos#on("guildCreate:before", () => {})` instead
+- Removed `Plugin#onJoinGuild`, `Service#onJoinGuild`
+    - use `chaos#on("guildCreate", () => {})` instead
+- Removed `.addEventHandler`
+    - use `.on` instead
+- Removed `.triggerEvent`
+    - use `.emit` instead
+- Removed `Command#services` property
+    - use `chaos#on("chaos.listen", () => {})` instead
+- Removed `chaos#shutdown$`
+    - use `chaos#on("chaos.shutdown", () => {})` instead
+- Removed `Plugin#onEnabled`
+- Removed `chaos#catchError`
+    - use `chaos#handleError` instead
+- Removed `utility#toObservable`
+    - use `chaos#asPromise` instead
+- Removed `#testCommand` and `#testConfigAction` on stubbed bots
+    - use `#testMessage` instead
+
 v4.3.0
 ======
 
@@ -5,8 +46,8 @@ Heads Up!
 ---------
 v5.0.0 will remove RxJS as a dependency. As an upgrade path, it is recommended 
 to start using promises instead of RxJS Observable streams. Call `.toPromise()` 
-on an Observable to start using promises. After the upgrade to v5.0.0, you can
-remove the `.toPromise()`;
+on an Observable to turn the observable stream into a promise. After the 
+upgrade to v5.0.0, you can remove the `.toPromise()`;
 
 Deprecations (will be removed in v5)
 ----------------------------
@@ -39,6 +80,7 @@ v4.2.1
 ======
 
 - Fix loading strings through plugins.
+
 
 v4.2.0
 ======

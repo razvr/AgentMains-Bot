@@ -45,12 +45,8 @@ the current component.
 
 ```js
 class RainboomCommand extends Command {
-  constructor(chaos) {
-    super(chaos, {
-      name: 'rainboom',
-      description: 'make the server cooler',
-    });
-  }
+  name = 'rainboom';
+  description = 'make the server cooler';
 
   // Override strings to 
   get strings() {

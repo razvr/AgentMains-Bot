@@ -1,12 +1,11 @@
 Events
 ======
-
 A ChaosCore bot will emit events during the lifecycle of the bot.
 
 You can listen and handle these events by calling `chaos.on('event', handler)`. 
-Additionally, you can use `event:before` or `event:after` to run code before 
-or after an event respectfully. All handlers for each stage will be run before 
-the next stage starts.
+Additionally, you can add before and after event handlers using with 
+`event:before` and `event:after` respectfully. All handlers for each stage 
+will be run before the next stage starts.
 
 You can emit your own events, or emit existing events for testing, with 
 `chaos.emit('event', payload)`. `.emit` returns an Observable that can be 
@@ -30,7 +29,6 @@ chaos.emit('event');
 
 Discord Events
 --------------
-
 The bot will emit any events emitted by `Discord.js`. See the [Discord Client]
 for a list of all events.
 
@@ -43,7 +41,6 @@ offline.
 
 Chaos Events
 ------------
-
 The current list of ChaosCore specific events are:
 
 | event          | payload  | description                                |
@@ -54,10 +51,6 @@ The current list of ChaosCore specific events are:
 | chaos.command  | Message  | Emitted when a message has a valid command |
 | chaos.response | Response | Emitted when a command makes a response    |
 | chaos.shutdown |          | Emitted when the bot is shutting down      |
-
-If you have tasks that need to be run as soon as possible when starting to 
-listen (eg. binding services, connecting to the database) you can add a listener
-to `chaos.startup`.
 
 
 [Discord Client]: https://discord.js.org/#/docs/main/stable/class/Client

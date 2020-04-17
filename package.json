@@ -1,6 +1,6 @@
 {
   "name": "chaos-core",
-  "version": "4.3.2",
+  "version": "5.0.0",
   "description": "A framework for discord bots",
   "homepage": "",
   "author": {
@@ -37,26 +37,25 @@
     "winston": "^3.2.1"
   },
   "peerDependencies": {
-    "discord.js": "^11.5.1",
-    "rxjs": "^6.5.2"
+    "discord.js": "^11.5.1"
   },
   "engines": {
-    "node": ">=10.19.0"
+    "node": ">=12.5.0"
   },
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
     "chai": "^4.2.0",
     "chai-subset": "^1.6.0",
-    "chaos-data-disk": "^4.3.0",
+    "chaos-data-disk": "^5.0.0",
     "chaos-data-dummy": "file:test/fixtures/chaos-data-dummy",
-    "chaos-data-memory": "^4.3.0",
+    "chaos-data-memory": "^5.0.0",
     "discord.js": "^11.5.1",
-    "eslint": "^6.1.0",
+    "eslint": "^6.8.0",
     "eslint-plugin-chai-expect": "^2.0.1",
     "eslint-watch": "^6.0.0",
     "glob": "^7.1.4",
     "mocha": "^6.2.0",
     "npm-run-all": "^4.1.5",
-    "rxjs": "^6.5.2",
     "sinon": "^7.3.2",
     "sinon-chai": "^3.3.0"
   }
