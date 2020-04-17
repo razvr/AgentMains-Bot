@@ -441,17 +441,20 @@ chalk@^3.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
-"chaos-data-disk@https://github.com/chaos-core/chaos-data-disk.git#4.3.0-dev":
-  version "4.3.0-dev"
-  resolved "https://github.com/chaos-core/chaos-data-disk.git#2914fbbae6cde28a5eeaae66c0d92bcba6c81c99"
+chaos-data-disk@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/chaos-data-disk/-/chaos-data-disk-5.0.0.tgz#0f208508d0c9f4b66e6522b6b5cbce3bc6094a2f"
+  integrity sha512-5+wvYyj/WF+fhhZA2DvialkRw6Iy71ZKU/mkmsTjR0BQ/8nIH60fBozAauP76fcqrDrfYFg9vPcZ83iAxzLXbg==
+  dependencies:
+    rxjs "^6.5.1"
 
 "chaos-data-dummy@file:test/fixtures/chaos-data-dummy":
   version "1.0.0"
 
-chaos-data-memory@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/chaos-data-memory/-/chaos-data-memory-4.2.0.tgz#ebc195728599d9993e8af83ccb249b946714a0b8"
-  integrity sha512-pEekBwns/edM8Pu+KXPSOPbGniLmEMBMNFEv2SgrZ/aepAK6fm8wVIsbZkljX115IW3Md3J8RrNZTzyCCxVo5Q==
+chaos-data-memory@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/chaos-data-memory/-/chaos-data-memory-5.0.0.tgz#4f3f9ddf94c7043deb4b302ccde54fe86ffb121a"
+  integrity sha512-bY5E4l/QPxZsnmWmEOR6DTTM2g7o5HgSQ2ymYNCM3rjvqOlUnjpDW/vBTGPCHYZF8S5yZi2MdmWKDjSwkzNgEg==
 
 chardet@^0.7.0:
   version "0.7.0"
@@ -2480,6 +2483,13 @@ run-async@^2.4.0:
   integrity sha512-xJTbh/d7Lm7SBhc1tNvTpeCHaEzoyxPrqNlvSdMfBTYwaY++UJFyXUOxAtsRUXjlqOfj8luNaR9vjCh4KeV+pg==
   dependencies:
     is-promise "^2.1.0"
+
+rxjs@^6.5.1:
+  version "6.5.5"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.5.5.tgz#c5c884e3094c8cfee31bf27eb87e54ccfc87f9ec"
+  integrity sha512-WfQI+1gohdf0Dai/Bbmk5L5ItH5tYqm3ki2c5GdWhKjalzjg93N3avFjVStyZZz+A2Em+ZxKH5bNghw9UeylGQ==
+  dependencies:
+    tslib "^1.9.0"
 
 rxjs@^6.5.3:
   version "6.5.4"
