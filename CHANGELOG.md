@@ -1,3 +1,10 @@
+v6.0.0
+
+Breaking Changes
+----------------
+- Updated to minimum of Discord.js v12
+- Discord mocks updated to extend real instances of Discord classes
+
 v5.0.0
 ======
 

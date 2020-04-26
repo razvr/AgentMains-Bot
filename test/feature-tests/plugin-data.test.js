@@ -22,9 +22,7 @@ describe('Feature: Plugin Data', function () {
       ],
     };
 
-    this.guild = new MockGuild({
-      client: this.chaos.discord,
-    });
+    this.guild = new MockGuild(this.chaos.discord);
 
     this.chaos.addPlugin(this.plugin);
     await this.chaos.listen();

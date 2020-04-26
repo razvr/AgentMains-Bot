@@ -4,7 +4,7 @@ const { MockMessage } = require("../../lib/test/mocks/discord.mocks");
 describe('Feature: Commands', function () {
   beforeEach(async function () {
     this.chaos = createChaosStub();
-    this.message = new MockMessage();
+    this.message = new MockMessage(this.chaos.discord);
 
     this.plugin = {
       name: "test-plugin",
