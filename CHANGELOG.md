@@ -1,3 +1,14 @@
+v5.1.0
+======
+
+Deprecations (will be removed in v6)
+----------------------------
+- Deprecate all Discord Mocks
+    - changes in Discord.js v12 break the mocks, and keeping the mocks up to 
+        date is not really feasible for me
+    - `MockMessage` can be replaced with `.createMessage` on stubbed bots for
+        tests 
+
 v5.0.0
 ======
 
