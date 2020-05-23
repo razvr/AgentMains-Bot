@@ -6,7 +6,7 @@ Stubbed Bots
 To test features for your plugin, it is recommended to start up a stubbed chaos 
 bot using either `ChaosCore.test.createChaosStub` to create a default stubbed bot, or 
 `ChaosCore.test.stubChaosBot` to sub out an existing bot. A stubbed bot will not communicate
-with Discord, and will use mock proxies instead.
+with Discord.
 
 ### createChaosStub(config=null)
 Creates a default stubbed chaos bot:
@@ -37,11 +37,12 @@ awesomeBot.listen()
   });
 ```
 
-Note: In a future version of ChaosCore, features will be added to allow for doing
-full integration testing with Discord.
-
 Discord Mocks
 -------------
+```
+WARNING: Discord Mocks will be removed in v6
+MockMessage can be replaced with createMessage on a stubbed ChaosBot
+```
 Mock classes for some Discord.js objects are available from `ChaosCore.test.discordMocks`:
 
 - MockClient
@@ -56,21 +57,23 @@ Mock classes for some Discord.js objects are available from `ChaosCore.test.disc
 
 Testing Commands
 ----------------
-On stubbed bots, the function `testMessage` is added to allow for testing
-messages and their responses from the bot. Awaiting it will return a response
-object with a list of `.replies` that the bot made to the message.
+On stubbed bots, the functions `createMessage` and `testMessage` are added to 
+allow for testing messages and their responses from the bot.
+
+`createMessage` can be used to create a basic message object that can be used
+with `testMessage`. Awaiting `testMessage` will return a response object with 
+a list of `.replies` that the bot made to the message.
 
 ### Example
 ```js
 const assert = require('assert').strict;
 const { createChaosStub } = require('chaos-core').test;
-const { MockMessage } = require('chaos-core').test.discordMocks;
 
 const chaosBot = createChaosStub();
 
 // Create a mock message to test with. MockMessage will create additional mock
 // objects for message.guild, .channel, .member, etc... if they are not provided
-const message = new MockMessage({
+const message = chaosBot.createMessage({
   content: '!rainboom',
 });
 
