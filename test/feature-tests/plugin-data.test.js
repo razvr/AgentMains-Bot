@@ -1,5 +1,6 @@
+const Discord = require('discord.js');
+
 const createChaosStub = require('../../lib/test/create-chaos-stub');
-const { MockGuild } = require("../../lib/test/mocks/discord.mocks");
 
 describe('Feature: Plugin Data', function () {
   beforeEach(function () {
@@ -22,9 +23,8 @@ describe('Feature: Plugin Data', function () {
       ],
     };
 
-    this.guild = new MockGuild({
-      client: this.chaos.discord,
-    });
+    this.guild = { id: Discord.SnowflakeUtil.generate() };
+    this.chaos.discord.guilds.set(this.guild.id, this.guild);
 
     this.chaos.addPlugin(this.plugin);
     await this.chaos.listen();
