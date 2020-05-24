@@ -24,7 +24,7 @@ describe('Feature: Plugin Data', function () {
     };
 
     this.guild = { id: Discord.SnowflakeUtil.generate() };
-    this.chaos.discord.guilds.set(this.guild.id, this.guild);
+    this.chaos.discord.guilds.cache.set(this.guild.id, this.guild);
 
     this.chaos.addPlugin(this.plugin);
     await this.chaos.listen();
