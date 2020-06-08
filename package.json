@@ -1,62 +1,52 @@
 {
-  "name": "chaos-core",
-  "version": "5.0.0",
-  "description": "A framework for discord bots",
-  "homepage": "",
+  "name": "ar-3s",
+  "version": "0.0.1",
   "author": {
-    "name": "Stephen A. Wilson",
-    "email": "Stephen-356@hotmail.com",
-    "url": "stephenawilson.me"
+    "name": "Razur",
+    "email": "razur@pm.me",
+    "url": ""
   },
-  "files": [
-    "lib"
-  ],
   "scripts": {
     "start": "npm run bot",
-    "bot": "node --preserve-symlinks ./test/test-bot.js",
+    "bot": "node --preserve-symlinks ./index.js",
     "test": "mocha",
     "lint": "eslint .",
     "lint-watch": "esw . -w",
     "validate": "npm-run-all --parallel test lint"
   },
-  "main": "index.js",
-  "keywords": [
-    "discord",
-    "bot",
-    "discord.js",
-    "framework"
-  ],
-  "repository": "https://github.com/chaos-core/chaos-core",
-  "license": "MIT",
-  "directories": {
-    "lib": "lib",
-    "test": "test"
-  },
-  "dependencies": {
-    "deepmerge": "^4.2.2",
-    "winston": "^3.2.1"
-  },
-  "peerDependencies": {
-    "discord.js": "^11.5.1"
-  },
-  "engines": {
-    "node": ">=12.5.0"
-  },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
     "chai": "^4.2.0",
     "chai-subset": "^1.6.0",
-    "chaos-data-disk": "^5.0.0",
-    "chaos-data-dummy": "file:test/fixtures/chaos-data-dummy",
     "chaos-data-memory": "^5.0.0",
-    "discord.js": "^11.5.1",
-    "eslint": "^6.8.0",
+    "eslint": "^6.1.0",
     "eslint-plugin-chai-expect": "^2.0.1",
     "eslint-watch": "^6.0.0",
-    "glob": "^7.1.4",
-    "mocha": "^6.2.0",
+    "mocha": "^7.2.0",
     "npm-run-all": "^4.1.5",
+    "nyc": "^15.0.1",
+    "range": "^0.0.3",
     "sinon": "^7.3.2",
     "sinon-chai": "^3.3.0"
+  },
+  "mocha": {
+    "require": [
+      "./test/test-helper.js"
+    ],
+    "spec": "src/**/*.test.js"
+  },
+  "repository": "",
+  "license": "MIT",
+  "dependencies": {
+    "chaos-core": "^5.0.0",
+    "chaos-data-disk": "^5.0.0",
+    "chaos-plugin-auto-role": "^5.0.1",
+    "chaos-plugin-user-roles": "^5.0.0",
+    "discord.js": "^11.5.1",
+    "git-rev": "^0.2.1",
+    "glob": "^7.1.4",
+    "node-glob": "^1.2.0",
+    "rxjs": "^6.5.2",
+    "yarn": "^1.17.3"
   }
 }

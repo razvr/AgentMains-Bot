@@ -1,3 +1,2 @@
 --require ./test/test-helper.js
-lib/**/*.test.js
-test/**/*.test.js
+src/**/*.test.js
